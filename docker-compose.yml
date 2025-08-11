@@ -1,0 +1,19 @@
+version: "3.9"
+
+services:
+
+  backend:
+    container_name: MediaVault-backend
+    build: ./backend/MediaVault-backend
+    ports:
+      - 8080:8080
+
+  frontend:
+    container_name: MediaVault-frontend
+    image: nginx:alpine  # einfacher leerer Platzhalter, liefert statische Dateien
+    ports:
+      - 3000:80
+    volumes:
+      - ./frontend:/usr/share/nginx/html:ro
+    depends_on:
+      - backend
