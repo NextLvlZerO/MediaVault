@@ -10,7 +10,7 @@ import Main from './components/Main.vue'
 <template>
   <div class="app-component">
     <Header />
-    <Main />
+    <RouterView />
     <Footer />
   </div>
 </template>

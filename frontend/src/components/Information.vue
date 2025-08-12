@@ -1,5 +1,7 @@
 <template>
-  <div class="information-component">
+  <motion.div class="information-component" :initial="{ opacity: 0, filter: 'blur(5px)' }"
+    :animate="{ opacity: 1, filter: 'blur(0px)' }" :transition="{ duration: 2 }">
+
     <div class="information-container-left">
       <div class="information-container-title">
         <h1 class="information-container-title-media text">MEDIA</h1>
@@ -12,21 +14,18 @@
       </span>
       <button class="get-started-button" @click="scrollToBody">Get started</button>
     </div>
-  </div>
+  </motion.div>
 </template>
 
 
 
-<script>
+<script setup>
 
-export default {
-  name: 'Information',
-  methods: {
-    scrollToBody() {
-      document.getElementById('body').scrollIntoView({ behavior: 'smooth' });
-    },
-  },
-}
+import { motion } from 'motion-v';
+
+const scrollToBody = () => {
+  document.getElementById('body').scrollIntoView({ behavior: 'smooth' });
+};
 
 </script>
 
@@ -75,14 +74,14 @@ export default {
 }
 
 .information-container-title-media {
-  font-weight: 600;
+  font-weight: 400;
   color: var(--color-primary);
   margin-bottom: -50px;
   line-height: 10rem;
 }
 
 .information-container-title-vault {
-  font-weight: 600;
+  font-weight: 400;
   background: linear-gradient(to top, #87aad4, white);
   background-clip: text;
   color: transparent;
@@ -99,11 +98,11 @@ export default {
   background-color: var(--color-primary);
   color: #000000dd;
   font-family: var(--font-family-main);
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 600;
   border: 0px;
   border-radius: 100px;
-  padding: 10px 15px;
+  padding: 8px 13px;
   margin-top: 1.6rem;
   align-self: flex-start;
   cursor: pointer;

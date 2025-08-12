@@ -1,10 +1,10 @@
 <template>
   <div class="media-list-container">
-    <Item />
-    <Item />
-    <Item />
-    <Item />
-    <Item />
+    <Item title="Avatar" rating="4" />
+    <Item title="Avatar" rating="4" />
+    <Item title="Avatar" rating="4" />
+    <Item title="Avatar" rating="4" />
+    <Item title="Avatar" rating="4" />
   </div>
 </template>
 

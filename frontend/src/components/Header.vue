@@ -12,9 +12,9 @@
         </div>
       </div>
       <div class="header-component-navbar-links">
-        <p class="navbar-text">Media</p>
-        <p class="navbar-text">Movies</p>
-        <p class="navbar-text">Series</p>
+        <RouterLink to="/" class="navbar-text">Media</RouterLink>
+        <RouterLink to="/" class="navbar-text">Movies</RouterLink>
+        <RouterLink to="/" class="navbar-text">Series</RouterLink>
       </div>
 
       <div class="header-component-navbar-right">
@@ -26,12 +26,12 @@
             data-bs-toggle="dropdown" aria-expanded="false">
             <i class="bi bi-person-fill" style="font-size: 24px; color: var(--color-primary)"></i>
           </div>
-          <ul class=" dropdown-menu fade" aria-labelledby="dropdownMenuButton">
+          <motion.ul class="dropdown-menu fade" aria-labelledby="dropdownMenuButton">
             <li><a class="dropdown-item" href="#">Profile</a></li>
             <li><a class="dropdown-item" href="#">Friends</a></li>
             <li><a class="dropdown-item" href="#">Settings</a></li>
             <li><a class="dropdown-item" href="#">Logout</a></li>
-          </ul>
+          </motion.ul>
         </div>
       </div>
     </div>
@@ -41,9 +41,10 @@
 
 
 
-<script>
+<script setup>
 
 import { RouterLink, RouterView } from 'vue-router';
+import { motion } from 'motion-v';
 
 
 
@@ -156,5 +157,20 @@ Router .header-component-navbar-links {
   color: #aaaaaa;
   background-color: #00000000 !important;
   cursor: pointer;
+}
+
+.dropdown-menu {
+  background-color: var(--color-background);
+  border: 1px solid #ffffff44;
+}
+
+
+.dropdown-item {
+  color: #fff;
+}
+
+.dropdown-item:hover {
+  background-color: var(--color-background);
+  color: var(--color-primary);
 }
 </style>
