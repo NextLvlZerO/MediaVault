@@ -10,7 +10,7 @@ services:
 
   frontend:
     container_name: MediaVault-frontend
-    image: nginx:alpine  # einfacher leerer Platzhalter, liefert statische Dateien
+    image: nginx:alpine
     ports:
       - 3000:80
     volumes:
