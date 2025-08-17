@@ -1,24 +1,16 @@
 <template>
   <div class="media-list-container">
-    <Item title="Avatar" rating="4" />
-    <Item title="Avatar" rating="4" />
-    <Item title="Avatar" rating="4" />
-    <Item title="Avatar" rating="4" />
-    <Item title="Avatar" rating="4" />
+    <Item v-for="(item, index) in data" :key="index" :title="item?.title" :rating="item?.rating"
+      :clickable="props?.clickable" />
   </div>
 </template>
 
 
 
-<script>
-import Item from './Item.vue'
+<script setup>
 
-export default {
-  name: 'MediaList',
-  components: {
-    Item,
-  }
-}
+const props = defineProps(['data', 'clickable']);
+
 </script>
 
 
@@ -27,7 +19,6 @@ export default {
 p {
   font-size: 5rem;
   color: #fff;
-
 }
 
 .media-list-container {

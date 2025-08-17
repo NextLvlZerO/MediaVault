@@ -1,0 +1,27 @@
+services:
+
+  backend:
+    container_name: MediaVault-backend
+    build: ./backend/MediaVault-backend
+    ports:
+      - 8080:8080
+    expose:
+      - "5173"
+    networks:
+      - app-network
+
+  frontend:
+    container_name: MediaVault-frontend
+    build: ./frontend
+    ports:
+      - "5173:5173"
+    expose:
+      - "5173"
+    volumes:
+      - ./frontend/src:/app/src
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

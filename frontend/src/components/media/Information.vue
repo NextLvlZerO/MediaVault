@@ -39,7 +39,7 @@ const scrollToBody = () => {
   width: 100%;
   height: 300px;
   margin-top: 8rem;
-  margin-bottom: 4rem;
+  margin-bottom: 8rem;
 }
 
 .information-container-left {

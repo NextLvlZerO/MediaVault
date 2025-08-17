@@ -22,10 +22,11 @@
 <script setup>
 import { useRouter } from 'vue-router'
 
-const props = defineProps(['title', 'rating']);
+const props = defineProps(['title', 'rating', 'clickable']);
 const router = useRouter();
 
 const onItemPressed = () => {
+  if (!props.clickable) { return; }
   router.push(`/media/item/${props.title}`)
 };
 
@@ -85,10 +86,12 @@ const onItemPressed = () => {
 
 .item-container-title {
   color: #fff;
+  width: 85%;
   font-family: var(--font-family-main);
   font-weight: 500;
   margin-top: 1rem;
-  font-size: 1.6rem;
+  font-size: 1.3rem;
+  text-align: center;
 }
 
 .item-container-details {

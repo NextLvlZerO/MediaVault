@@ -8,19 +8,26 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
-    Footer: typeof import('./src/components/Footer.vue')['default']
-    Header: typeof import('./src/components/Header.vue')['default']
+    Footer: typeof import('./src/components/navigation/Footer.vue')['default']
+    Header: typeof import('./src/components/navigation/Header.vue')['default']
+    HSeperator: typeof import('./src/components/utility/HSeperator.vue')['default']
     IconCommunity: typeof import('./src/components/icons/IconCommunity.vue')['default']
     IconDocumentation: typeof import('./src/components/icons/IconDocumentation.vue')['default']
     IconEcosystem: typeof import('./src/components/icons/IconEcosystem.vue')['default']
     IconSupport: typeof import('./src/components/icons/IconSupport.vue')['default']
     IconTooling: typeof import('./src/components/icons/IconTooling.vue')['default']
-    Information: typeof import('./src/components/Information.vue')['default']
-    Item: typeof import('./src/components/Media/Item.vue')['default']
+    Information: typeof import('./src/components/media/Information.vue')['default']
+    Item: typeof import('./src/components/media/Item.vue')['default']
     ItemPage: typeof import('./src/components/ItemPage/ItemPage.vue')['default']
+    LendPage: typeof import('./src/components/LendPage/LendPage.vue')['default']
     Main: typeof import('./src/components/Main.vue')['default']
-    MediaList: typeof import('./src/components/Media/MediaList.vue')['default']
+    MediaContainer: typeof import('./src/components/media/MediaContainer.vue')['default']
+    MediaList: typeof import('./src/components/media/MediaList.vue')['default']
+    Rating: typeof import('./src/components/media/Rating.vue')['default']
+    RatingAddition: typeof import('./src/components/media/RatingAddition.vue')['default']
+    RatingsContainer: typeof import('./src/components/media/RatingsContainer.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
+    SawSvg: typeof import('./src/components/SawSvg.vue')['default']
   }
 }

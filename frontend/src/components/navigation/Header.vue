@@ -24,15 +24,17 @@
         <div class="dropdown">
           <div class="header-component-navbar-profile-button nav-button" id="dropdownMenuButton"
             data-bs-toggle="dropdown" aria-expanded="false">
-            <i class="bi bi-person-fill" style="font-size: 24px; color: var(--color-primary)"></i>
+            <i class="bi bi-person-fill " style="font-size: 24px; color: var(--color-primary)"></i>
           </div>
-          <motion.ul class="dropdown-menu fade" aria-labelledby="dropdownMenuButton">
-            <li><a class="dropdown-item" href="#">Profile</a></li>
-            <li><a class="dropdown-item" href="#">Friends</a></li>
-            <li><a class="dropdown-item" href="#">Settings</a></li>
-            <li><a class="dropdown-item" href="#">Logout</a></li>
-          </motion.ul>
+          <ul class="dropdown-menu fade" aria-labelledby="dropdownMenuButton">
+            <li style="cursor: pointer;"><a class="dropdown-item" :onclick="() => Router.push('/Profile')">Profile</a>
+            </li>
+            <li style="cursor: pointer;"><a class="dropdown-item" href="">Friends</a></li>
+            <li style="cursor: pointer;"><a class="dropdown-item">Settings</a></li>
+            <li style="cursor: pointer;"><a class="dropdown-item">Logout</a></li>
+          </ul>
         </div>
+
       </div>
     </div>
   </div>
@@ -43,18 +45,17 @@
 
 <script setup>
 
-import { RouterLink, RouterView } from 'vue-router';
+import { RouterLink, RouterView, useRouter } from 'vue-router';
 import { motion } from 'motion-v';
 
-
-
+const Router = useRouter();
 
 </script>
 
 
 
 
-<style scoped>
+<style>
 .header-component {
   display: flex;
   width: 100vw;
