@@ -3,21 +3,22 @@ package org.example.mediavaultbackend.Services;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
-import org.example.mediavaultbackend.Models.Media;
+import org.example.mediavaultbackend.models.Media;
 import org.example.mediavaultbackend.Repositories.MediaRepository;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URI;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.time.Year;
 import java.util.Arrays;
+import java.util.Optional;
 import java.util.zip.GZIPInputStream;
 
 @Service
 @RequiredArgsConstructor
-public class ImdbDataService {
+public class DataService {
 
     private final MediaRepository mediaRepository;
 
@@ -40,18 +41,33 @@ public class ImdbDataService {
 
             int count = 0;
             for (CSVRecord record : records) {
+
+
+
                 String type = record.get("titleType");
                 String title = record.get("primaryTitle");
-                boolean isAdult =  record.get("isAdult").equals("1");
-                int year = Integer.parseInt(record.get("startYear"));
-                int runtime = Integer.parseInt(record.get("runtimeMinutes"));
+                boolean isAdult = "1".equals(record.get("isAdult"));
+
+                Year year = Optional.ofNullable(record.get("startYear"))
+                        .filter(s -> !s.isBlank())
+                        .filter(s -> !s.equals("\\N"))
+                        .map(Integer::parseInt)
+                        .map(Year::of)
+                        .orElse(null);
+
+                Integer runtime = Optional.ofNullable(record.get("runtimeMinutes"))
+                        .filter(s -> !s.isBlank())
+                        .filter(s -> !s.equals("\\N"))
+                        .map(Integer::parseInt)
+                        .orElse(null);
+
                 String[] genres = record.get("genres").split(",");
 
             mediaRepository.save(Media.builder()
                     .type(type)
                     .title(title)
                     .isAdult(isAdult)
-                    .year(year)
+                    .startYear(year)
                     .runtimeMinutes(runtime)
                     .genres(Arrays.stream(genres).toList())
                     .build());

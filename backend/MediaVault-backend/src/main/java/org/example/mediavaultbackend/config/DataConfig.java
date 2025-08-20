@@ -2,7 +2,7 @@ package org.example.mediavaultbackend.config;
 
 
 import jakarta.transaction.Transactional;
-import org.example.mediavaultbackend.Services.ImdbDataService;
+import org.example.mediavaultbackend.Services.DataService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -12,10 +12,11 @@ public class DataConfig {
 
     @Bean
     @Transactional
-    CommandLineRunner commandLineRunner(ImdbDataService imdbDataService) {
+    CommandLineRunner commandLineRunner(DataService dataService) {
 
         return args -> {
-            imdbDataService.importTitleBasics();
+            dataService.importTitleBasics();
+            System.out.println("Imported Title Basics");
         };
     }
 
