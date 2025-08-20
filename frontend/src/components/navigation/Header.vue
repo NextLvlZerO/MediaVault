@@ -15,11 +15,11 @@
         <RouterLink to="/" class="navbar-text">Media</RouterLink>
         <RouterLink to="/" class="navbar-text">Movies</RouterLink>
         <RouterLink to="/" class="navbar-text">Series</RouterLink>
+        <input class="search-component" placeholder="Search" />
       </div>
 
       <div class="header-component-navbar-right">
         <div class="header-component-navbar-message-button">
-          <i class="bi bi-chat-left-text-fill" style="font-size: 20px; color: var(--color-primary)" />
         </div>
         <div class="dropdown">
           <div class="header-component-navbar-profile-button nav-button" id="dropdownMenuButton"
@@ -27,11 +27,13 @@
             <i class="bi bi-person-fill " style="font-size: 24px; color: var(--color-primary)"></i>
           </div>
           <ul class="dropdown-menu fade" aria-labelledby="dropdownMenuButton">
-            <li style="cursor: pointer;"><a class="dropdown-item" :onclick="() => Router.push('/Profile')">Profile</a>
+            <li style="cursor: pointer;"><a class="dropdown-item" :onclick="() =>
+              Router.push('/user/profile')">Profile</a>
             </li>
-            <li style="cursor: pointer;"><a class="dropdown-item" href="">Friends</a></li>
+            <li style="cursor: pointer;"><a class="dropdown-item">Friends</a></li>
             <li style="cursor: pointer;"><a class="dropdown-item">Settings</a></li>
-            <li style="cursor: pointer;"><a class="dropdown-item">Logout</a></li>
+            <li style="cursor: pointer;"><a class="dropdown-item" :onclick="() =>
+              Router.push('/login')">Logout</a></li>
           </ul>
         </div>
 
@@ -105,9 +107,9 @@ const Router = useRouter();
 
 
   border-radius: 100px;
-  width: 30px;
-  height: 30px;
-  margin-right: 0.8rem;
+  width: 35px;
+  height: 35px;
+  margin-right: 1.2rem;
   margin-bottom: 0.1rem;
   cursor: pointer;
   transition: all 0.2s ease-in-out;
@@ -173,5 +175,17 @@ Router .header-component-navbar-links {
 .dropdown-item:hover {
   background-color: var(--color-background);
   color: var(--color-primary);
+}
+
+.search-component {
+  background-color: var(--color-background);
+  color: #fff;
+  border-radius: 100px;
+  padding-left: 15px;
+  border: 1px solid #ffffff44;
+}
+
+.header-component-navbar-message-button {
+  width: 100px;
 }
 </style>

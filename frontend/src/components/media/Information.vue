@@ -61,7 +61,7 @@ const scrollToBody = () => {
   opacity: 1;
   font-family: var(--font-family-main);
   font-weight: 300;
-  font-size: 2rem;
+  font-size: 1.8rem;
   line-height: 2rem;
 }
 

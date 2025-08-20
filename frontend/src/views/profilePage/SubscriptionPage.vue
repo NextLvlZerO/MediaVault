@@ -1,0 +1,101 @@
+<template>
+  <div class="background">
+    <div class="subscription-container">
+      <div class="subscription-header">
+        <h1 class="subscription-title g-text">
+          Choose your plan
+        </h1>
+      </div>
+      <div class="subscription-body">
+        <SubscriptionItem title="Free Tier" :details="freeTierDetails" :price="0" type="free" />
+        <SubscriptionItem title="Premium Tier" :details="premiumTierDetails" :price="5" type="premium" />
+        <SubscriptionItem title="Deluxe Tier" :details="deluxeTierDetails" :price="12" type="deluxe" />
+      </div>
+    </div>
+  </div>
+</template>
+
+<script setup>
+import { useRoute, useRouter } from 'vue-router';
+
+const route = useRoute();
+const router = useRouter();
+
+const freeTierDetails = [
+  { eigenschaft: "Zugriff auf Basis-Inhalte", available: true },
+  { eigenschaft: "HD-Streaming", available: false },
+  { eigenschaft: "Offline-Modus", available: false },
+  { eigenschaft: "Werbefrei", available: false },
+  { eigenschaft: "Exklusive Premium-Inhalte", available: false }
+];
+
+const premiumTierDetails = [
+  { eigenschaft: "Zugriff auf Basis-Inhalte", available: true },
+  { eigenschaft: "HD-Streaming", available: true },
+  { eigenschaft: "Offline-Modus", available: true },
+  { eigenschaft: "Werbefrei", available: true },
+  { eigenschaft: "Exklusive Premium-Inhalte", available: false }
+];
+
+const deluxeTierDetails = [
+  { eigenschaft: "Zugriff auf Basis-Inhalte", available: true },
+  { eigenschaft: "HD-Streaming", available: true },
+  { eigenschaft: "Offline-Modus", available: true },
+  { eigenschaft: "Werbefrei", available: true },
+  { eigenschaft: "Exklusive Premium-Inhalte", available: true }
+];
+
+</script>
+
+
+<style scoped>
+.background {
+  display: flex;
+  width: 100vw;
+  flex: 1;
+  background: radial-gradient(ellipse 600px 500px at 50% 500px, #ffffff22, transparent);
+}
+
+.subscription-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  max-width: 1280px;
+  min-width: 800px;
+  width: 100%;
+  min-height: max(100vh, 1000px);
+  margin: 0 auto;
+  padding: 0rem 2rem;
+  font-weight: normal;
+}
+
+.subscription-header {
+  margin-top: 5rem;
+}
+
+.subscription-body {
+  display: flex;
+  justify-content: center;
+  gap: 2rem;
+  width: 100%;
+  margin-top: 5rem;
+}
+
+.subscription-title {
+  font-size: 3rem !important;
+  font-weight: 500;
+}
+
+.five-rem-distance {
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}
+
+.body-header {
+  color: #fff;
+  font-family: var(--font-family);
+  font-size: 1.8rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+</style>

@@ -3,6 +3,7 @@
     <div class="profile-container">
       <div class="profile-header">
         <h1 class="profile-title g-text">
+          Profile
         </h1>
       </div>
       <div class="profile-body">
@@ -25,7 +26,12 @@
               <p class="g-text-b-a"> {{ `Status: \b` }} </p>
               <p class="g-text-b"> Gold</p>
             </div>
-            <button class="item-page-container-lend-button" :onclick="onLendPressed"> cancel</button>
+            <div class="subscription-buttons">
+              <button class="item-page-container-manage-button g-button-p" :onclick="() => {
+                router.push('/user/subscription');
+              }">manage</button>
+              <button class="item-page-container-cancel-button g-button-s" :onclick="onLendPressed"> cancel</button>
+            </div>
           </div>
         </div>
         <HSeperator class="five-rem-distance" />
@@ -104,17 +110,8 @@ const router = useRouter();
   margin-bottom: 1rem;
 }
 
-.item-page-container-lend-button {
+.subscription-buttons {
   display: flex;
-  background-color: var(--color-primary);
-  color: #000000dd;
-  font-family: var(--font-family-main);
-  font-size: 1rem;
-  font-weight: 600;
-  border: 0px;
-  border-radius: 100px;
-  padding: 8px 13px;
-  cursor: pointer;
-  transition: 0.2s ease-in-out all;
+  gap: .5rem;
 }
 </style>

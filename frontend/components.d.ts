@@ -20,6 +20,7 @@ declare module 'vue' {
     Item: typeof import('./src/components/media/Item.vue')['default']
     ItemPage: typeof import('./src/components/ItemPage/ItemPage.vue')['default']
     LendPage: typeof import('./src/components/LendPage/LendPage.vue')['default']
+    LoginForm: typeof import('./src/components/login/LoginForm.vue')['default']
     Main: typeof import('./src/components/Main.vue')['default']
     MediaContainer: typeof import('./src/components/media/MediaContainer.vue')['default']
     MediaList: typeof import('./src/components/media/MediaList.vue')['default']
@@ -29,5 +30,6 @@ declare module 'vue' {
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SawSvg: typeof import('./src/components/SawSvg.vue')['default']
+    SubscriptionItem: typeof import('./src/components/subscription/SubscriptionItem.vue')['default']
   }
 }
