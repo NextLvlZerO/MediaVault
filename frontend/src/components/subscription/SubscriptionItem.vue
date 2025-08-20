@@ -14,7 +14,7 @@
       </div>
       <div class="body-footer">
         <p class="item-price"> {{ props?.price ? props.price.toFixed(2) : 0 }} € </p>
-        <button class="g-button-p item-continue-button"> Continue </button>
+        <button class="g-button-p item-continue-button" :onclick="onContinuePressed"> Continue </button>
       </div>
     </div>
   </div>
@@ -23,8 +23,14 @@
 
 <script setup>
 import { defineProps } from 'vue';
+import { useRouter } from 'vue-router';
 
 const props = defineProps(['title', 'details', 'price', 'type']);
+const router = useRouter();
+
+const onContinuePressed = () => {
+  router.push(`/checkout/subscription/${props?.type}`);
+};
 
 </script>
 
@@ -67,7 +73,7 @@ const props = defineProps(['title', 'details', 'price', 'type']);
   display: flex;
   font-family: var(--font-family-main);
   font-size: 1.6rem;
-  font-weight: 400;
+  font-weight: 500;
   color: #fff;
   margin-top: 2rem;
 }

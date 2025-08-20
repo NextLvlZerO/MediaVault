@@ -7,7 +7,7 @@
         </h1>
       </div>
       <div class="lend-body">
-        <p class="g-text"> {{ route.params.title }}</p>
+        <p class="g-text"> {{ route.params.item }}</p>
         <button class="go-back-button" :onclick="onBackClick">Back</button>
         <button class="lend-button" :onclick="onPurchaseClick">Confirm purchase</button>
       </div>

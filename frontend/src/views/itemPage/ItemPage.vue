@@ -99,7 +99,7 @@ watch(currentlyWritingReview, (newVal) => {
 })
 
 const onLendPressed = () => {
-  router.push(`/media/item/lend/${route.params.title}`);
+  router.push(`/checkout/item/${route.params.title}`);
 };
 
 const onWriteButtonPressed = () => {

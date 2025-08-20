@@ -8,7 +8,7 @@
   /*--color-background: #01212d;*/
   --color-background: var(--vt-c-black);
   /*--color-background-lighter: #12303b;*/
-  --color-background-lighter: var(--vt-c-black-mute);
+  --color-background-lighter: var(--vt-c-black-soft);
 }
 
 

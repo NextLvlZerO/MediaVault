@@ -30,7 +30,8 @@
             <li style="cursor: pointer;"><a class="dropdown-item" :onclick="() =>
               Router.push('/user/profile')">Profile</a>
             </li>
-            <li style="cursor: pointer;"><a class="dropdown-item">Friends</a></li>
+            <li style="cursor: pointer;"><a class="dropdown-item" :onclick="() =>
+              Router.push('/user/friends')">Friends</a></li>
             <li style="cursor: pointer;"><a class="dropdown-item">Settings</a></li>
             <li style="cursor: pointer;"><a class="dropdown-item" :onclick="() =>
               Router.push('/login')">Logout</a></li>
@@ -183,6 +184,11 @@ Router .header-component-navbar-links {
   border-radius: 100px;
   padding-left: 15px;
   border: 1px solid #ffffff44;
+  outline: none;
+}
+
+.search-component:focus {
+  border: 1px solid var(--color-primary);
 }
 
 .header-component-navbar-message-button {

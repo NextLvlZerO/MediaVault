@@ -9,6 +9,7 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     Footer: typeof import('./src/components/navigation/Footer.vue')['default']
+    FriendsContainer: typeof import('./src/components/users/FriendsContainer.vue')['default']
     Header: typeof import('./src/components/navigation/Header.vue')['default']
     HSeperator: typeof import('./src/components/utility/HSeperator.vue')['default']
     IconCommunity: typeof import('./src/components/icons/IconCommunity.vue')['default']
@@ -30,6 +31,8 @@ declare module 'vue' {
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
     SawSvg: typeof import('./src/components/SawSvg.vue')['default']
+    SingleFriend: typeof import('./src/components/users/SingleFriend.vue')['default']
     SubscriptionItem: typeof import('./src/components/subscription/SubscriptionItem.vue')['default']
+    UserMessage: typeof import('./src/components/users/UserMessage.vue')['default']
   }
 }
