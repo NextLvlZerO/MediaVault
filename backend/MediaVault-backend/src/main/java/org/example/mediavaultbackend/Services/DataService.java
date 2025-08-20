@@ -1,5 +1,9 @@
 package org.example.mediavaultbackend.Services;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
@@ -8,12 +12,17 @@ import org.example.mediavaultbackend.Repositories.MediaRepository;
 import org.springframework.stereotype.Service;
 
 import java.io.BufferedReader;
+import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URI;
+import java.net.http.HttpClient;
+import java.net.http.HttpRequest;
+import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
 import java.time.Year;
-import java.util.Arrays;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 import java.util.zip.GZIPInputStream;
 
 @Service
@@ -22,61 +31,90 @@ public class DataService {
 
     private final MediaRepository mediaRepository;
 
-    public void importTitleBasics() {
+    private final String API_KEY = "a80a453e831efa922a44cb8a54281aee";
+    private final String BASE_URL = "https://api.themoviedb.org/3";
 
-        String fileUrl = "https://datasets.imdbws.com/title.basics.tsv.gz";
+    public void importMovies() {
 
-        try (GZIPInputStream gzip = new GZIPInputStream(
-                URI.create(fileUrl).toURL().openStream());
-             BufferedReader reader = new BufferedReader(
-                     new InputStreamReader(gzip, StandardCharsets.UTF_8))) {
+        try (HttpClient client = HttpClient.newHttpClient();) {
 
-            Iterable<CSVRecord> records = CSVFormat.TDF
-                    .builder()
-                    .setHeader()              // nimmt die erste Zeile als Header
-                    .setSkipHeaderRecord(true) // Headerzeile wird nicht als Datenrecord gelesen
-                    .setQuote(null)            // kein Quotesymbol
-                    .get()
-                    .parse(reader);
+            HttpRequest genreRequest = HttpRequest.newBuilder()
+                    .uri(URI.create(BASE_URL + "/genre/movie/list?api_key=" + API_KEY + "&language=de-DE"))
+                    .GET()
+                    .build();
 
-            int count = 0;
-            for (CSVRecord record : records) {
+            HttpResponse<String> genreResponse = client.send(genreRequest, HttpResponse.BodyHandlers.ofString());
+
+            Map<Integer, String> genreMap = new HashMap<>();
+
+            if (genreResponse.statusCode() == 200) {
+                ObjectMapper mapper = new ObjectMapper();
+                JsonNode root = mapper.readTree(genreResponse.body());
+                for (JsonNode genre : root.get("genres")) {
+                    genreMap.put(genre.get("id").asInt(), genre.get("name").asText());
+                }
+            } else {
+                System.out.println(genreResponse.statusCode());
+                return;
+            }
+
+            HttpRequest movieRequest = HttpRequest.newBuilder()
+                    .uri(URI.create(BASE_URL + "/movie/popular?api_key=" + API_KEY + "&language=de-DE&page=1"))
+                    .GET()
+                    .build();
+
+            HttpResponse<String> movieResponse = client.send(movieRequest, HttpResponse.BodyHandlers.ofString());
+
+            if (movieResponse.statusCode() == 200) {
+                ObjectMapper mapper = new ObjectMapper();
+                JsonNode root = mapper.readTree(movieResponse.body());
+
+                for (JsonNode movie : root.get("results")) {
+
+                    Boolean isAdult = Boolean.parseBoolean(movie.get("adult").asText());
+
+                    int[] genreIds = mapper.treeToValue(movie.get("genre_ids"), int[].class);
+                    List<String> genres = Arrays.stream(genreIds).mapToObj(genreMap::get).toList();
+
+                    String title = movie.get("title").asText();
+                    String description = movie.get("overview").asText();
+
+                    LocalDate releaseDate = Optional.ofNullable(movie.get("release_date").asText())
+                            .filter(s -> !s.isBlank())
+                            .map(LocalDate::parse)
+                            .orElse(null);
 
 
 
-                String type = record.get("titleType");
-                String title = record.get("primaryTitle");
-                boolean isAdult = "1".equals(record.get("isAdult"));
+                    String poster = Optional.ofNullable(movie.get("poster_path").asText())
+                            .filter(s -> !s.isBlank())
+                            .orElse(null);
 
-                Year year = Optional.ofNullable(record.get("startYear"))
-                        .filter(s -> !s.isBlank())
-                        .filter(s -> !s.equals("\\N"))
-                        .map(Integer::parseInt)
-                        .map(Year::of)
-                        .orElse(null);
 
-                Integer runtime = Optional.ofNullable(record.get("runtimeMinutes"))
-                        .filter(s -> !s.isBlank())
-                        .filter(s -> !s.equals("\\N"))
-                        .map(Integer::parseInt)
-                        .orElse(null);
+                    mediaRepository.save(Media.builder()
+                            .title(title)
+                            .description(description)
+                            .isAdult(isAdult)
+                            .releaseDate(releaseDate)
+                            .genres(genres)
+                            .poster(poster)
+                            .averageRating(2)
+                            .build());
 
-                String[] genres = record.get("genres").split(",");
 
-            mediaRepository.save(Media.builder()
-                    .type(type)
-                    .title(title)
-                    .isAdult(isAdult)
-                    .startYear(year)
-                    .runtimeMinutes(runtime)
-                    .genres(Arrays.stream(genres).toList())
-                    .build());
 
+                }
+            } else {
+                System.out.println("Fehler: " + movieResponse.statusCode());
+                System.out.println(movieResponse.body());
             }
 
         } catch (Exception e) {
             e.printStackTrace();
         }
+
+
+
 
     }
 

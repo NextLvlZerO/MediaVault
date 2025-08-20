@@ -15,7 +15,7 @@ public class DataConfig {
     CommandLineRunner commandLineRunner(DataService dataService) {
 
         return args -> {
-            dataService.importTitleBasics();
+            dataService.importMovies();
             System.out.println("Imported Title Basics");
         };
     }
