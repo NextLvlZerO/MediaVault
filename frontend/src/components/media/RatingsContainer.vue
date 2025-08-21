@@ -7,11 +7,11 @@
             `${props.fontSize ? props.fontSize : 5}rem`
         }" class="ratings-container-title">
           <p class="ratings-container-title-media">{{ `R` }}</p>
-          <p class="ratings-container-title-vault">atings</p>
+          <p class="ratings-container-title-vault">eviews</p>
         </div>
         <button class="ratings-page-write-button" :onclick="onWritePressed"> write review </button>
       </div>
-      <Rating v-for="(item, index) in props.data" :key="index" :user="item?.user" :title="item?.title"
+      <Rating v-for="(item, index) in data" :key="index" :user="item?.user" :title="item?.title"
         :details="item?.details" :rating="item?.rating" :verified="item?.verified" />
     </div>
   </div>
@@ -20,15 +20,57 @@
 
 <script setup>
 
-import { defineEmits } from 'vue';
+import { defineEmits, onMounted } from 'vue';
+
 const emit = defineEmits(['toggleWriteEvent']);
-const props = defineProps(['data', 'fontSize']);
+const props = defineProps(['movieId', 'fontSize']);
+
+
+const data = [
+  {
+    title: 'Best Film ever', user: 'NextLvlZer0', verified: true, rating: 5, details: `Lorem ipsum dolor sit amet, consetetur sadipscing
+    elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam
+    voluptua.At vero eos et accusam et justo duo dolores et ea rebum.Stet clita kasd gubergren, no
+    sea takimata sanctus est Lorem ipsum dolor sit amet.`},
+  {
+    title: 'Best Film ever', user: 'NextLvlZer0', rating: 5, details: `Lorem ipsum dolor sit amet, consetetur sadipscing
+    elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam
+    voluptua.At vero eos et accusam et justo duo dolores et ea rebum.Stet clita kasd gubergren, no
+    sea takimata sanctus est Lorem ipsum dolor sit amet.`},
+  {
+    title: 'Best Film ever', user: 'NextLvlZer0', rating: 5, details: `Lorem ipsum dolor sit amet, consetetur sadipscing
+    elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam
+    voluptua.At vero eos et accusam et justo duo dolores et ea rebum.Stet clita kasd gubergren, no
+    sea takimata sanctus est Lorem ipsum dolor sit amet.`},
+  {
+    title: 'Best Film ever', user: 'NextLvlZer0', rating: 5, details: `Lorem ipsum dolor sit amet, consetetur sadipscing
+    elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam
+    voluptua.At vero eos et accusam et justo duo dolores et ea rebum.Stet clita kasd gubergren, no
+    sea takimata sanctus est Lorem ipsum dolor sit amet.`},
+  {
+    title: 'Best Film ever', user: 'NextLvlZer0', rating: 5, details: `Lorem ipsum dolor sit amet, consetetur sadipscing
+    elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam
+    voluptua.At vero eos et accusam et justo duo dolores et ea rebum.Stet clita kasd gubergren, no
+    sea takimata sanctus est Lorem ipsum dolor sit amet.`},
+];
+
+
+
+// method for getting the reviews of the media id
+
+const getMediaReviews = () => {
+
+};
+
 
 const onWritePressed = () => {
-  console.log("test");
   emit('toggleWriteEvent');
 };
 
+
+onMounted(() => {
+  getMediaReviews();
+});
 
 </script>
 

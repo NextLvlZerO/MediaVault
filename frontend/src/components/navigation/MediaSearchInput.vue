@@ -1,8 +1,10 @@
 <template>
   <div class="search-input-component">
-    <input class="search-component" placeholder="Search" type="text" @focus="onInputFocus" @blur="active = false" />
+    <input ref="inputRef" class="search-component" placeholder="Search" type="text" @focus="onInputFocus"
+      @blur="active = false" />
     <div class="search-results" v-if="active" @mousedown.prevent>
-      <MediaSearchResultItem v-for="(item, index) in data" :key="index" :title="item?.title" :id="item?.id" />
+      <MediaSearchResultItem v-for="(item, index) in data" :key="index" :title="item?.title" :id="item?.id"
+        @onChildPressedEvent="unfocusInput" />
     </div>
   </div>
 </template>
@@ -12,7 +14,13 @@
 import { ref } from 'vue';
 
 const active = ref(false);
+const inputRef = ref(null);
+
 const data = [{
+  "title": "Avengers Infinity war",
+  "id": 2
+},
+{
   "title": "Avengers Infinity war",
   "id": 2
 },
@@ -44,6 +52,12 @@ const getMediaQueryData = () => {
   return;
 };
 
+
+const unfocusInput = () => {
+  active.value = false;
+  inputRef.value?.blur();
+};
+
 </script>
 
 
@@ -67,6 +81,7 @@ const getMediaQueryData = () => {
 }
 
 .search-results {
+  z-index: 10;
   position: absolute;
   bottom: 1;
   transform: translateY(50px);

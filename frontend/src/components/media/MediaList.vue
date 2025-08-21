@@ -1,7 +1,7 @@
 <template>
   <div class="media-list-container">
-    <Item v-for="(item, index) in data" :key="index" :title="item?.title" :rating="item?.rating"
-      :clickable="props?.clickable" />
+    <Item v-for="(item, index) in data" :key="index" :title="item?.title" :rating="item?.rating" :poster="item?.poster"
+      :clickable="props?.clickable" :id="item?.id" />
   </div>
 </template>
 

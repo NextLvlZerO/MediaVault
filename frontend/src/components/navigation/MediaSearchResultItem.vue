@@ -6,16 +6,18 @@
 
 
 <script setup>
-import { defineProps } from 'vue';
+import { defineProps, defineEmits } from 'vue';
 import { useRouter } from 'vue-router';
 
 const props = defineProps(['title', 'id']);
+const emits = defineEmits(['onChildPressedEvent']);
 const router = useRouter();
 
 
 
 const onItemClick = () => {
   router.push(`/media/item/${props?.id}`)
+  emits('onChildPressedEvent');
 };
 
 </script>
@@ -41,6 +43,5 @@ const onItemClick = () => {
   margin-left: 1rem;
   color: #fff;
   transform: translateY(7px);
-
 }
 </style>

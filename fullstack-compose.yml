@@ -6,7 +6,7 @@ services:
     ports:
       - 8080:8080
     expose:
-      - "5173"
+      - "8080"
     networks:
       - app-network
 
@@ -18,7 +18,8 @@ services:
     expose:
       - "5173"
     volumes:
-      - ./frontend/src:/app/src
+      - ./frontend:/app
+      - /app/node_modules
     networks:
       - app-network
 

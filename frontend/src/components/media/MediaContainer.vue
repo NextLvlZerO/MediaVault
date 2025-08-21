@@ -17,16 +17,38 @@
 
 
 <script setup>
+import { ref, onMounted } from 'vue';
+import { useToast } from 'vue-toast-notification';
+const apiUrl = import.meta.env.VITE_API_URL;
 
 const props = defineProps(['prename', 'name', 'clickable', 'fontSize']);
+const toast = useToast();
 
-const data = [
-  { title: 'Avatar', rating: 4 },
-  { title: 'Avengers: Endgabe', rating: 5 },
-  { title: 'Interstellar', rating: 2 },
-  { title: 'Stranger Things', rating: 3 },
-  { title: 'Game Of Thrones', rating: 4 }
-];
+const data = ref([null, null, null, null, null]);
+
+
+
+
+const getMediaItemData = () => {
+  fetch(`${apiUrl}/media/movies/best-rated?amount=10`)
+    .then(response => {
+      if (!response.ok) { throw new Error('error') }
+      return response.json()
+    })
+    .then(json => {
+      data.value = json
+    })
+    .catch(error => {
+      toast.error('Failed to load data');
+      console.error('Failed to fetch data: ', error)
+    })
+};
+
+
+onMounted(() => {
+  getMediaItemData();
+})
+
 
 </script>
 

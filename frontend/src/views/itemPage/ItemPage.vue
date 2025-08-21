@@ -38,10 +38,11 @@
       <div class="item-page-container-body">
         <MediaContainer :fontSize="3" prename="R" name="elevant" dataType="relevant" :clickable="true" />
         <HSeperator class="five-rem-distance" />
-        <RatingsContainer :fontSize="3" :data="ratingData" @toggleWriteEvent="onWriteButtonPressed" />
+        <RatingsContainer :fontSize="3" :movieId="route.params?.id" @toggleWriteEvent="onWriteButtonPressed" />
       </div>
     </div>
-    <RatingAddition v-if="currentlyWritingReview" @goBackEvent="currentlyWritingReview = false" />
+    <RatingAddition v-if="currentlyWritingReview" :movieId="route.params?.id"
+      @goBackEvent="currentlyWritingReview = false" />
   </div>
 
 </template>

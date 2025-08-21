@@ -1,19 +1,19 @@
 <template>
   <div class="add-background">
     <div class="add-container">
-      <form class="input-forms">
+      <form class="input-forms" @submit.prevent="handleReviewSubmit">
         <h1 class="add-title"> Add review</h1>
         <div class="mb-3">
           <label for="exampleInputEmail1" class="form-label g-text">Title</label>
-          <input class="form-control input-field">
+          <input class="form-control input-field" v-model="reviewTitle">
         </div>
         <div class="mb-3 content-input-container">
           <label for="exampleInputPassword1" class="form-label g-text">Content</label>
-          <textarea class="form-control input-field content-input" />
+          <textarea class="form-control input-field content-input" v-model="reviewContent" />
         </div>
         <div class="add-buttons">
           <button class="cancel-button" :onclick="onCancelButtonPressed"> cancel </button>
-          <button class="confirm-button" :onclick="onCancelButtonPressed"> confirm </button>
+          <button class="confirm-button" type="submit"> confirm </button>
         </div>
       </form>
     </div>
@@ -22,15 +22,56 @@
 
 
 <script setup>
+import { defineEmits, defineProps, ref } from 'vue';
+import { useToast } from 'vue-toast-notification';
 
-import { defineEmits } from 'vue';
-const emit = defineEmits(['goBackEvent']);
+const emits = defineEmits(['goBackEvent']);
+const props = defineProps(['movieId']);
+const toast = useToast();
+
+const reviewTitle = ref('');
+const reviewContent = ref('');
+
 
 const onCancelButtonPressed = () => {
-  emit('goBackEvent');
+  emits('goBackEvent');
+};
+
+
+// function, that tries to put review into backend database
+
+const handleReviewSubmit = () => {
+
+  if (!reviewTitle.value?.trim() || !reviewContent.value?.trim()) {
+    toast.error('Invalid input');
+    return;
+  }
+
+  const reviewBody = {
+    'user': 'NextLvlBulian',
+    'title': reviewTitle.value,
+    'details': reviewContent.value,
+    'rating': 2
+  }
+
+  fetch(`http://localhost:8080/api/v1/media/${props?.movieId}/review/create`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(reviewBody)
+  })
+    .then(result => {
+      if (!result.ok) throw new Error('error');
+      toast.success('Successfully posted review!');
+    })
+    .catch(error => {
+      console.error('Failed to fetch data: ', error)
+    })
 };
 
 </script>
+
 
 
 <style scoped>
@@ -54,7 +95,7 @@ const onCancelButtonPressed = () => {
   max-height: 70%;
   border: 1px solid #ffffff44;
   border-radius: 10px;
-  background-color: #ffffff11;
+  background-color: #181818dd;
 }
 
 .input-forms {
@@ -70,6 +111,7 @@ const onCancelButtonPressed = () => {
   border: 1px solid #ffffff44;
   color: #fff;
 }
+
 
 .input-field:focus {
   background-color: var(--background-color-ligher);

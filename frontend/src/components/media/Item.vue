@@ -2,7 +2,7 @@
   <div class="item-container" :onClick="onItemPressed">
     <div class="item-container-border">
       <div class="item-container-border-body">
-        <div class="item-container-header">
+        <!-- <div class="item-container-header">
           <h1 class="item-container-title">
             {{ props.title }}
           </h1>
@@ -11,6 +11,12 @@
           <div class="item-container-details">
             <span class="item-container-rating"> {{ props.rating }}</span>
           </div>
+        </div>
+-->
+        <img v-if="props.poster" style="border-radius: 4px; width: 198px; height: 298px"
+          :src="`${baseUrl}${props?.poster}`" alt="Poster">
+        <div v-else class="spinner-border text-secondary" role="status">
+          <span class="visually-hidden">Loading...</span>
         </div>
       </div>
     </div>
@@ -22,12 +28,14 @@
 <script setup>
 import { useRouter } from 'vue-router'
 
-const props = defineProps(['title', 'rating', 'clickable']);
+const props = defineProps(['title', 'rating', 'poster', 'clickable', 'id']);
 const router = useRouter();
+
+const baseUrl = 'https://image.tmdb.org/t/p/w500';
 
 const onItemPressed = () => {
   if (!props.clickable) { return; }
-  router.push(`/media/item/${props.title}`)
+  router.push(`/media/item/${props.id}`)
 };
 
 </script>
@@ -35,7 +43,7 @@ const onItemPressed = () => {
 
 <style scoped>
 .item-container {
-  height: 270px;
+  height: 300px;
   width: 200px;
   perspective: 800px;
 }
@@ -55,7 +63,7 @@ const onItemPressed = () => {
   transform: scale(1) rotateY(0deg);
   transform-style: preserve-3d;
   transition: all ease-in-out 0.15s;
-  box-shadow: 0 0 80px rgba(255, 255, 255, 0);
+  box-shadow: 0 0 80px rgba(0, 0, 0, 0.4);
 }
 
 .item-container-border:hover {
@@ -66,6 +74,8 @@ const onItemPressed = () => {
 .item-container-border-body {
   display: flex;
   flex-direction: column;
+  justify-content: center;
+  align-items: center;
   height: 100%;
   width: 100%;
   background-color: var(--color-background-lighter);
