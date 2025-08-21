@@ -2,7 +2,7 @@ package org.example.mediavaultbackend.config;
 
 
 import jakarta.transaction.Transactional;
-import org.example.mediavaultbackend.Services.DataService;
+import org.example.mediavaultbackend.services.DataService;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -15,8 +15,8 @@ public class DataConfig {
     CommandLineRunner commandLineRunner(DataService dataService) {
 
         return args -> {
-            dataService.importMovies();
-            System.out.println("Imported Title Basics");
+            dataService.importMedia();
+            System.out.println("Imported Media");
         };
     }
 

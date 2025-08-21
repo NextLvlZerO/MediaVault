@@ -24,13 +24,13 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.H2Dialect
-        format_sql: false
-    show-sql: false
+        format_sql: true
+    show-sql: true
 
 logging:
   level:
     root: INFO
-    org.hibernate: FATAL
+    org.hibernate: DEBUG
     org.springframework: FATAL
   file:
     path: ./logs

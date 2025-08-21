@@ -1,40 +1,41 @@
-package org.example.mediavaultbackend.Services;
+package org.example.mediavaultbackend.services;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVRecord;
+import org.example.mediavaultbackend.models.Genre;
 import org.example.mediavaultbackend.models.Media;
-import org.example.mediavaultbackend.Repositories.MediaRepository;
+import org.example.mediavaultbackend.repositories.GenreRepository;
+import org.example.mediavaultbackend.repositories.MediaRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
-import java.time.Year;
 import java.util.*;
 import java.util.stream.Collectors;
-import java.util.zip.GZIPInputStream;
 
 @Service
 @RequiredArgsConstructor
 public class DataService {
 
     private final MediaRepository mediaRepository;
+    private final GenreRepository genreRepository;
 
     private final String API_KEY = "a80a453e831efa922a44cb8a54281aee"; //TODO: Make environmental var
     private final String BASE_URL = "https://api.themoviedb.org/3";
 
-    public void importMovies() {
+    public void importMedia() {
+        importGenres();
+        importMovies();
+        importSeries();
+    }
+
+
+    public void importGenres() {
 
         try (HttpClient client = HttpClient.newHttpClient();) {
 
@@ -45,18 +46,47 @@ public class DataService {
 
             HttpResponse<String> genreResponse = client.send(genreRequest, HttpResponse.BodyHandlers.ofString());
 
-            Map<Integer, String> genreMap = new HashMap<>();
 
             if (genreResponse.statusCode() == 200) {
                 ObjectMapper mapper = new ObjectMapper();
                 JsonNode root = mapper.readTree(genreResponse.body());
                 for (JsonNode genre : root.get("genres")) {
-                    genreMap.put(genre.get("id").asInt(), genre.get("name").asText());
+
+                    Long tmdbId = Optional.ofNullable(genre.get("id").asText())
+                            .filter(s -> !s.isBlank())
+                            .map(Long::parseLong)
+                            .orElseThrow(() -> new IllegalArgumentException("GenreId not found"));
+
+                    String genreName = genre.get("name").asText().strip();
+                    if (genreName.isBlank()) {
+                        continue;
+                    }
+
+                    genreRepository.save(Genre.builder()
+                            .tmdbId(tmdbId)
+                            .genreName(genreName)
+                            .build());
                 }
             } else {
                 System.out.println(genreResponse.statusCode());
                 return;
             }
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e.getMessage());
+        }
+
+
+    }
+
+
+    public void importMovies() {
+
+        try (HttpClient client = HttpClient.newHttpClient();) {
+
+
 
             HttpRequest movieRequest = HttpRequest.newBuilder()
                     .uri(URI.create(BASE_URL + "/movie/popular?api_key=" + API_KEY + "&language=de-DE&page=1"))
@@ -74,7 +104,10 @@ public class DataService {
                     Boolean isAdult = Boolean.parseBoolean(movie.get("adult").asText());
 
                     int[] genreIds = mapper.treeToValue(movie.get("genre_ids"), int[].class);
-                    List<String> genres = Arrays.stream(genreIds).mapToObj(genreMap::get).toList();
+                    List<Genre> genres = Arrays.stream(genreIds)
+                            .mapToObj(id -> genreRepository.findByTmdbId((long) id))
+                            .flatMap(Optional::stream)
+                            .toList();
 
                     String title = movie.get("title").asText();
                     String description = movie.get("overview").asText();
@@ -112,9 +145,10 @@ public class DataService {
             e.printStackTrace();
         }
 
+    }
 
 
-
+    private void importSeries() {
     }
 
 

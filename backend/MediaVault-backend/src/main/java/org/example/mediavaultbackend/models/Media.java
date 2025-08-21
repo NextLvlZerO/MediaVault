@@ -40,13 +40,13 @@ public class Media {
     @Column(name = "release_date")
     private LocalDate releaseDate;
 
-    @ElementCollection
-    @CollectionTable(
-            name = "media_genres",
-            joinColumns = @JoinColumn(name = "media_id")
+    @ManyToMany
+    @JoinTable(
+            name = "media_genre",
+            joinColumns = @JoinColumn(name = "media_id"),
+            inverseJoinColumns = @JoinColumn(name = "genre_id")
     )
-    @Column(name = "genre")
-    private List<String> genres;
+    private List<Genre> genres;
 
     @Column(name = "poster")
     private String poster;
@@ -57,7 +57,7 @@ public class Media {
     @Column(name = "price")
     private Double price;
 
-    @Column(name = "averageRating")
+    @Column(name = "average_rating")
     @Min(1)
     @Max(5)
     private Double averageRating;
