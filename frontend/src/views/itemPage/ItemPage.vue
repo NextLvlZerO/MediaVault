@@ -3,7 +3,7 @@
     <div class="item-page-container">
       <div class="item-page-container-head">
         <div class="item-page-container-left">
-          <h1 class="item-page-container-title"> {{ route.params.title }}</h1>
+          <h1 class="item-page-container-title"> {{ route.params.id }}</h1>
           <span class="item-page-container-details">
             {{ details }}
           </span>

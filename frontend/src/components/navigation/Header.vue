@@ -15,7 +15,7 @@
         <RouterLink to="/" class="navbar-text">Media</RouterLink>
         <RouterLink to="/" class="navbar-text">Movies</RouterLink>
         <RouterLink to="/" class="navbar-text">Series</RouterLink>
-        <input class="search-component" placeholder="Search" />
+        <MediaSearchInput />
       </div>
 
       <div class="header-component-navbar-right">
@@ -178,18 +178,6 @@ Router .header-component-navbar-links {
   color: var(--color-primary);
 }
 
-.search-component {
-  background-color: var(--color-background);
-  color: #fff;
-  border-radius: 100px;
-  padding-left: 15px;
-  border: 1px solid #ffffff44;
-  outline: none;
-}
-
-.search-component:focus {
-  border: 1px solid var(--color-primary);
-}
 
 .header-component-navbar-message-button {
   width: 100px;

@@ -25,6 +25,8 @@ declare module 'vue' {
     Main: typeof import('./src/components/Main.vue')['default']
     MediaContainer: typeof import('./src/components/media/MediaContainer.vue')['default']
     MediaList: typeof import('./src/components/media/MediaList.vue')['default']
+    MediaSearchInput: typeof import('./src/components/navigation/MediaSearchInput.vue')['default']
+    MediaSearchResultItem: typeof import('./src/components/navigation/MediaSearchResultItem.vue')['default']
     Rating: typeof import('./src/components/media/Rating.vue')['default']
     RatingAddition: typeof import('./src/components/media/RatingAddition.vue')['default']
     RatingsContainer: typeof import('./src/components/media/RatingsContainer.vue')['default']

@@ -9,7 +9,7 @@
       color: props.active ? 'var(--color-primary)' :
         none
     }"> {{ props.username
-      }} </p>
+    }} </p>
   </div>
 </template>
 

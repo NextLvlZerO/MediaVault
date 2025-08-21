@@ -15,7 +15,7 @@ const router = createRouter({
       path: '/', component: Main
     },
     {
-      path: '/media/item/:title', component: ItemPage
+      path: '/media/item/:id', component: ItemPage
     },
     {
       path: '/checkout/:type/:item', component: LendPage

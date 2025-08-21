@@ -5,12 +5,31 @@
         <h1 class="friends-title g-text">
           Friends
         </h1>
+        <button class="g-button-p add-button" :onclick="onAddButtonClicked">
+          {{ addState ? 'back' : 'add' }}
+        </button>
       </div>
-      <SingleFriend username="Lars" @userClickedEmit="onUserChange" :active="activeUser === 'Lars'" />
-      <SingleFriend username="Julian Hensel" @userClickedEmit="onUserChange" :active="activeUser === 'Julian Hensel'" />
-      <SingleFriend username="Fortniteenjoyer123" @userClickedEmit="onUserChange"
-        :active="activeUser === 'Fortniteenjoyer123'" />
-      <SingleFriend username="NextLvlZer0" @userClickedEmit="onUserChange" :active="activeUser === 'NextLvlZer0'" />
+      <div v-if="!addState" class="friends-body">
+        <SingleFriend username="Lars" @userClickedEmit="onUserChange" :active="activeUser === 'Lars'" />
+        <SingleFriend username="Julian Hensel" @userClickedEmit="onUserChange"
+          :active="activeUser === 'Julian Hensel'" />
+        <SingleFriend username="Fortniteenjoyer123" @userClickedEmit="onUserChange"
+          :active="activeUser === 'Fortniteenjoyer123'" />
+        <SingleFriend username="NextLvlZer0" @userClickedEmit="onUserChange" :active="activeUser === 'NextLvlZer0'" />
+      </div>
+      <div v-if="addState" class="add-body">
+        <div class="mb-3">
+          <label class="form-label g-text-a">Username</label>
+          <input class="form-control input-field" placeholder="search" />
+        </div>
+        <div class="add-results">
+          <SingleFriend username="Lars" @userClickedEmit="onUserChange" :active="activeUser === 'Lars'" />
+          <SingleFriend username="Larss" @userClickedEmit="onUserChange" :active="activeUser ===
+            'Larss'" />
+          <SingleFriend username="Larsss" @userClickedEmit="onUserChange" :active="activeUser ===
+            'Larsss'" />
+        </div>
+      </div>
     </div>
     <div class="right">
       <div class="right-messages">
@@ -23,7 +42,7 @@
         <textarea class="message-input-area" placeholder="message" v-model="message" @input="resizeTextarea"
           ref="textarea" />
         <button class="send-button g-button-p">
-          <i class="bi bi-send-fill" style="color: #000; font-size: 18px" />
+          <i class="bi bi-send-fill" style="color: #000; font-size: 18px; margin: 0px" />
         </button>
       </div>
     </div>
@@ -39,6 +58,8 @@ const activeUser = ref('Lars');
 const message = ref("");
 const textarea = ref(null);
 
+const addState = ref(false);
+
 
 const resizeTextarea = () => {
   const el = textarea.value;
@@ -48,7 +69,19 @@ const resizeTextarea = () => {
 };
 
 
+const onAddButtonClicked = () => {
+  activeUser.value = null;
+  addState.value = !addState.value;
+};
+
+
 const onUserChange = (username) => {
+
+
+  if (addState.value) {
+
+    return;
+  }
   activeUser.value = username;
 };
 
@@ -71,7 +104,8 @@ const onUserChange = (username) => {
 .friends-header {
   display: flex;
   width: 100%;
-  justify-content: center;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 1rem;
 }
 
@@ -79,6 +113,12 @@ const onUserChange = (username) => {
   display: flex;
   font-size: 1.6rem !important;
   font-weight: 500;
+}
+
+.friends-body {
+  display: flex;
+  flex-direction: column;
+  gap: .2rem;
 }
 
 .left {
@@ -135,5 +175,26 @@ const onUserChange = (username) => {
   margin-left: 1rem;
   align-self: flex-end;
   padding: 0.4rem 0.7rem !important;
+}
+
+.add-button {
+  transform: translateY(-4px);
+}
+
+.input-field {
+  background-color: var(--background-color-ligher);
+  border: 1px solid #ffffff44;
+  color: #fff;
+}
+
+.input-field:focus {
+  background-color: var(--background-color-ligher);
+  color: #fff;
+}
+
+.add-results {
+  display: flex;
+  flex-direction: column;
+  gap: .2rem;
 }
 </style>
