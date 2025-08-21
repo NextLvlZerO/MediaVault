@@ -35,7 +35,7 @@ public class Media {
     private String description;
 
     @Column(name = "is_adult")
-    private boolean isAdult;
+    private Boolean isAdult;
 
     @Column(name = "release_date")
     private LocalDate releaseDate;
@@ -52,15 +52,15 @@ public class Media {
     private String poster;
 
     @Column(name = "amount")
-    private int amount;
+    private Integer amount;
 
     @Column(name = "price")
-    private double price;
+    private Double price;
 
     @Column(name = "averageRating")
     @Min(1)
     @Max(5)
-    private double averageRating;
+    private Double averageRating;
 
     @OneToMany(mappedBy = "media")
     private List<CurrentlyLending> lendings;

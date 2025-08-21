@@ -31,7 +31,7 @@ public class DataService {
 
     private final MediaRepository mediaRepository;
 
-    private final String API_KEY = "a80a453e831efa922a44cb8a54281aee";
+    private final String API_KEY = "a80a453e831efa922a44cb8a54281aee"; //TODO: Make environmental var
     private final String BASE_URL = "https://api.themoviedb.org/3";
 
     public void importMovies() {
@@ -98,7 +98,6 @@ public class DataService {
                             .releaseDate(releaseDate)
                             .genres(genres)
                             .poster(poster)
-                            .averageRating(2)
                             .build());
 
 

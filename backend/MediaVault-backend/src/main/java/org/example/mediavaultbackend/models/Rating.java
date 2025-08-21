@@ -36,7 +36,7 @@ public class Rating {
     @Column(name = "rating")
     @Min(1)
     @Max(5)
-    private int rating;
+    private Integer rating;
 
     @Column(name = "date")
     private LocalDateTime date;
