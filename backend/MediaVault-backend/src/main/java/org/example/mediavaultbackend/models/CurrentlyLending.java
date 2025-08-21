@@ -22,8 +22,8 @@ public class CurrentlyLending {
     private Long lendingID;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "user_id")
-    private User user;
+    @JoinColumn(name = "account_id", referencedColumnName = "account_id")
+    private Account account;
 
     @ManyToOne
     @JoinColumn(name = "media_id", referencedColumnName = "media_id")

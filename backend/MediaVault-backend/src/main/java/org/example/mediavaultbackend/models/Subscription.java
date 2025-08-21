@@ -22,8 +22,8 @@ public class Subscription {
     private Long subscriptionId;
 
     @OneToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "user_id")
-    private User user;
+    @JoinColumn(name = "account_id", referencedColumnName = "account_id")
+    private Account account;
 
     @Column(name = "type")
     private String type;

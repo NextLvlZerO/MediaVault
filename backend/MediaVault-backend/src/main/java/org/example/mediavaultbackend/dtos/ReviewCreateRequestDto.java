@@ -7,7 +7,6 @@ import lombok.Data;
 @Builder
 public class ReviewCreateRequestDto {
 
-    private String username;
     private String title;
     private String details;
     private Integer rating;

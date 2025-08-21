@@ -6,9 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Data
 @Entity
@@ -24,8 +22,8 @@ public class History {
     private Long historyId;
 
     @ManyToOne
-    @JoinColumn(name = "user_id", referencedColumnName = "user_id")
-    private User user;
+    @JoinColumn(name = "account_id", referencedColumnName = "account_id")
+    private Account account;
 
     @ManyToOne
     @JoinColumn(name = "media_id", referencedColumnName = "media_id")

@@ -10,16 +10,16 @@ import java.util.List;
 
 @Data
 @Entity
-@Table(name = "user")
+@Table(name = "account")
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class User {
+public class Account {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_id")
-    private Long userId;
+    @Column(name = "account_id")
+    private Long accountId;
 
     @Column(name = "username")
     private String username;
@@ -27,10 +27,10 @@ public class User {
     @Column(name = "password")
     private String password;
 
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "account")
     private List<CurrentlyLending> lendings;
 
-    @OneToOne(mappedBy = "user")
+    @OneToOne(mappedBy = "account")
     private Watchlist watchlist;
 
 }

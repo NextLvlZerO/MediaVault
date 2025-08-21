@@ -10,7 +10,7 @@ import java.util.Optional;
 @Repository
 public interface CurrentlyLendingRepository extends JpaRepository<CurrentlyLending, Integer> {
 
-    @Query("SELECT l FROM CurrentlyLending l WHERE l.media.mediaId = :mediaId AND l.user.userId = :userId")
+    @Query("SELECT l FROM CurrentlyLending l WHERE l.media.mediaId = :mediaId AND l.account.accountId = :userId")
     public Optional<CurrentlyLending> findByMediaUser(Long mediaId, Long userId);
 
 }

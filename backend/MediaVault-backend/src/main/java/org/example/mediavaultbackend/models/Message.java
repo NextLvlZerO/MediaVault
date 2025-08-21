@@ -22,12 +22,12 @@ public class Message {
     private Long messasgeId;
 
     @ManyToOne
-    @JoinColumn(name = "user1_id", referencedColumnName = "user_id")
-    private User user1;
+    @JoinColumn(name = "account1_id", referencedColumnName = "account_id")
+    private Account account1;
 
     @ManyToOne
-    @JoinColumn(name = "user2_id", referencedColumnName = "user_id")
-    private User user2;
+    @JoinColumn(name = "account2_id", referencedColumnName = "account_id")
+    private Account account2;
 
     @Column(name = "message")
     private String message;
