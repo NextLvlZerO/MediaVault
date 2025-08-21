@@ -16,10 +16,12 @@
       <div class="mb-3">
         <label class="form-label g-text-d-a">Password</label>
         <input class="form-control input-field input-password" type="password" v-model="password" required>
+        <div class="invalid-feedback">password can't be empty!</div>
       </div>
       <div class="mb-3" v-if="registerLayout">
         <label class="form-label g-text-d-a">Confirm password</label>
-        <input class="form-control input-field input-password" type="password" v-model="confirmedPassword" required>
+        <input class="form-control input-field input-password" type="password" v-model="confirmedPassword"
+          :required="registerLayout">
       </div>
       <label style="align-self: center" class="form-label-forgot-password g-text-d-a" v-if="!registerLayout">Forgot
         password?</label>
@@ -40,14 +42,17 @@
       </div>
     </form>
   </div>
-
 </template>
 
+
+
 <script setup>
-import { ref } from 'vue';
+
+import { ref, defineEmits } from 'vue';
 import { useRouter } from 'vue-router';
 
 const Router = useRouter();
+const emits = defineEmits(['onFormSubmitEmit']);
 
 const username = ref('');
 const password = ref('');
@@ -58,20 +63,34 @@ const registerLayout = ref(false);
 
 
 const onSubmit = (e) => {
-  const form = e.target;
-
-  if (!form.checkValidity()) {
-    console.log('invalid inputs');
-  }
   e.preventDefault();
   e.stopPropagation();
 
-  form.classList.add("was-validated");
-
-  Router.push('/');
+  if (!checkValidation(e)) return;
+  emits('onFormSubmitEmit', {
+    type: registerLayout.value ? 'register' : 'login',
+    username: username.value,
+    password: password.value,
+    confirmedPassword: confirmedPassword.value
+  });
 };
 
+
+const checkValidation = (e) => {
+  let result = true;
+  const form = e.target;
+
+  if (!form.checkValidity()) {
+    console.error('invalid inputs');
+    result = false;
+  }
+  form.classList.add("was-validated");
+
+  return result;
+}
+
 </script>
+
 
 
 <style scoped>

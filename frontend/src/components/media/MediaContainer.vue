@@ -17,9 +17,10 @@
 
 
 <script setup>
+
+const apiUrl = import.meta.env.VITE_API_URL;
 import { ref, onMounted } from 'vue';
 import { useToast } from 'vue-toast-notification';
-const apiUrl = import.meta.env.VITE_API_URL;
 
 const props = defineProps(['prename', 'name', 'clickable', 'fontSize']);
 const toast = useToast();
@@ -30,7 +31,7 @@ const data = ref([null, null, null, null, null]);
 
 
 const getMediaItemData = () => {
-  fetch(`${apiUrl}/media/movies/best-rated?amount=10`)
+  fetch(`${apiUrl}/media/movies/best-rated?page=0&page-size=15`)
     .then(response => {
       if (!response.ok) { throw new Error('error') }
       return response.json()

@@ -20,10 +20,13 @@
 
 <script setup>
 
+const apiUrl = import.meta.env.VITE_API_URL;
 import { defineEmits, onMounted } from 'vue';
+import { useToast } from 'vue-toast-notification'
 
 const emit = defineEmits(['toggleWriteEvent']);
 const props = defineProps(['movieId', 'fontSize']);
+const toast = useToast();
 
 
 const data = [
@@ -59,7 +62,18 @@ const data = [
 // method for getting the reviews of the media id
 
 const getMediaReviews = () => {
+  fetch(`${apiUrl}/media/${props?.movieId}/reviews`)
+    .then(result => {
+      if (!result.ok) throw new Error('error');
+      return response
+    })
+    .then(response => response.json())
+    .then(jsonData => data.value = jsonData)
 
+    .catch(error => {
+      toast.error('Failed to load data');
+      console.error('Failed to fetch data: ', error)
+    })
 };
 
 

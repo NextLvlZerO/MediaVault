@@ -62,33 +62,6 @@ const price = 2.30;
 const available = "available";
 const watchlistAdded = true;
 const currentlyWritingReview = ref(false);
-const ratingData = [
-  {
-    title: 'Best Film ever', user: 'NextLvlZer0', verified: true, rating: 5, details: `Lorem ipsum dolor sit amet, consetetur sadipscing
-    elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam
-    voluptua.At vero eos et accusam et justo duo dolores et ea rebum.Stet clita kasd gubergren, no
-    sea takimata sanctus est Lorem ipsum dolor sit amet.`},
-  {
-    title: 'Best Film ever', user: 'NextLvlZer0', rating: 5, details: `Lorem ipsum dolor sit amet, consetetur sadipscing
-    elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam
-    voluptua.At vero eos et accusam et justo duo dolores et ea rebum.Stet clita kasd gubergren, no
-    sea takimata sanctus est Lorem ipsum dolor sit amet.`},
-  {
-    title: 'Best Film ever', user: 'NextLvlZer0', rating: 5, details: `Lorem ipsum dolor sit amet, consetetur sadipscing
-    elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam
-    voluptua.At vero eos et accusam et justo duo dolores et ea rebum.Stet clita kasd gubergren, no
-    sea takimata sanctus est Lorem ipsum dolor sit amet.`},
-  {
-    title: 'Best Film ever', user: 'NextLvlZer0', rating: 5, details: `Lorem ipsum dolor sit amet, consetetur sadipscing
-    elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam
-    voluptua.At vero eos et accusam et justo duo dolores et ea rebum.Stet clita kasd gubergren, no
-    sea takimata sanctus est Lorem ipsum dolor sit amet.`},
-  {
-    title: 'Best Film ever', user: 'NextLvlZer0', rating: 5, details: `Lorem ipsum dolor sit amet, consetetur sadipscing
-    elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam
-    voluptua.At vero eos et accusam et justo duo dolores et ea rebum.Stet clita kasd gubergren, no
-    sea takimata sanctus est Lorem ipsum dolor sit amet.`},
-];
 
 onMounted(() => {
   window.scrollTo({ top: -100, left: 0 })

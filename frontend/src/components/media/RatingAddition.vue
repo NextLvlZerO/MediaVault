@@ -66,6 +66,7 @@ const handleReviewSubmit = () => {
       toast.success('Successfully posted review!');
     })
     .catch(error => {
+      toast.error('Failed to load data');
       console.error('Failed to fetch data: ', error)
     })
 };

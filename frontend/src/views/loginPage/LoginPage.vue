@@ -15,17 +15,73 @@
         </div>
       </div>
       <div class="right-container">
-        <LoginForm />
+        <LoginForm @onFormSubmitEmit="handleFormSubmit" />
       </div>
     </div>
   </div>
 </template>
 
+
+
 <script setup>
+
+const apiUrl = import.meta.env.VITE_API_URL;
 import { useRoute, useRouter } from 'vue-router';
+import { useToast } from 'vue-toast-notification';
 
 const route = useRoute();
 const router = useRouter();
+const toast = useToast();
+
+
+// method that tries to log in or to register a new account
+
+const handleFormSubmit = (parameters) => {
+  if (parameters?.type === 'login') {
+    handleLoginSubmit(parameters?.username, parameters?.password);
+  }
+
+  else if (type === 'register') {
+    handleRegisterSubmit(parameters?.username, parameters?.password, parameters?.confirmedPassword);
+  }
+
+  else {
+    console.error('invalid form input emit type')
+    return;
+  }
+};
+
+
+const handleLoginSubmit = (username, password) => {
+  const loginBody = {
+    username: username,
+    password: password
+  };
+
+  fetch(`${apiUrl}/login`, {
+    method: 'POST',
+    header: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(loginBody),
+  })
+    .then(result => {
+      if (!result.ok) {
+        throw new Error('login failed');
+      }
+      router.push('/');
+    })
+    .catch(error => {
+      toast.error('Login denied but we dont have endpoints so move forward carefully');
+      console.error(error);
+      router.push('/');
+    });
+};
+
+
+const handleRegisterSubmit = (username, password, confirmedPassword) => {
+  return;
+};
 
 
 
