@@ -71,7 +71,7 @@ const getMediaReviews = () => {
     .then(jsonData => data.value = jsonData)
 
     .catch(error => {
-      toast.error('Failed to load data');
+      toast.error('reviews data connection error');
       console.error('Failed to fetch data: ', error)
     })
 };

@@ -1,7 +1,7 @@
 <template>
   <div class="search-input-component">
-    <input ref="inputRef" class="search-component" placeholder="Search" type="text" @focus="onInputFocus"
-      @blur="active = false" />
+    <input ref="inputRef" class="search-component" v-model="inputText" placeholder="Search" type="text"
+      @focus="onInputFocus" @blur="active = false" />
     <div class="search-results" v-if="active" @mousedown.prevent>
       <MediaSearchResultItem v-for="(item, index) in data" :key="index" :title="item?.title" :id="item?.id"
         @onChildPressedEvent="unfocusInput" />
@@ -11,9 +11,15 @@
 
 
 <script setup>
+const apiUrl = import.meta.env.VITE_API_URL;
 import { ref } from 'vue';
+import { useToast } from 'vue-toast-notification'
+
+
+const toast = useToast();
 
 const active = ref(false);
+const inputText = ref('');
 const inputRef = ref(null);
 
 const data = [{
@@ -43,13 +49,25 @@ const data = [{
 
 const onInputFocus = () => {
   active.value = true;
+  console.log(getMediaQueryData());
 }
 
 
 // get media query data from backend
 
 const getMediaQueryData = () => {
-  return;
+  fetch(`${apiUrl}/media/search?query=sup`)
+    .then(result => {
+      if (!result.ok) {
+        throw new Error('error');
+      }
+      return result.json();
+    })
+    .then(response => data.value = response)
+    .catch(error => {
+      toast.error('Connection error');
+      console.error('Error while searching media');
+    })
 };
 
 

@@ -3,9 +3,9 @@
     <div class="item-page-container">
       <div class="item-page-container-head">
         <div class="item-page-container-left">
-          <h1 class="item-page-container-title"> {{ route.params.id }}</h1>
+          <h1 class="item-page-container-title"> {{ data?.title }}</h1>
           <span class="item-page-container-details">
-            {{ details }}
+            {{ data?.details ? data.details : 'No description available.' }}
           </span>
         </div>
         <div class="item-page-container-right">
@@ -16,12 +16,13 @@
 
             <div class="right-details-availability-container">
               <p class="right-details-availability-text g-text-a"> Availability: </p>
-              <p class="right-details-availability g-text"> {{ `${available}` }} </p>
+              <p class="right-details-availability g-text"> {{ data?.available ? `available` : `out
+                of stock` }} </p>
             </div>
 
             <div class="right-details-price-container">
               <p class="right-details-price-text g-text-a line-fix"> Price: </p>
-              <p class="right-details-price g-text line-fix"> {{ `starting at ${price.toFixed(2)}€` }} </p>
+              <p class="right-details-price g-text line-fix"> {{ `starting at ${data?.price.toFixed(2)}€` }} </p>
             </div>
           </div>
           <div class="buttons">
@@ -50,27 +51,46 @@
 
 
 <script setup>
+
+const apiUrl = import.meta.env.VITE_API_URL;
 import { useRoute, useRouter } from 'vue-router';
 import { ref, watch, onMounted } from 'vue';
-
+import { useToast } from 'vue-toast-notification';
 
 const route = useRoute();
 const router = useRouter();
+const toast = useToast();
 
-const details = "Lorem ipsum dolor sit amet, consetetur sadipscing elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam voluptua.At vero eos et accusam et justo duo dolores et ea rebum.Stet clita kasd gubergren, no sea takimata sanctus est Lorem ipsum dolor sit amet."
-const price = 2.30;
-const available = "available";
-const watchlistAdded = true;
+const data = ref(null);
 const currentlyWritingReview = ref(false);
+const watchlistAdded = true;
+
 
 onMounted(() => {
   window.scrollTo({ top: -100, left: 0 })
+  getItemData(route.params?.id);
 });
 
 
 watch(currentlyWritingReview, (newVal) => {
   document.documentElement.style.overflow = newVal ? 'hidden' : 'auto'
 })
+
+
+const getItemData = (id) => {
+  fetch(`${apiUrl}/media/item/${id}`)
+    .then(result => {
+      if (!result.ok) {
+        throw new Error('error');
+      }
+      return result.json();
+    })
+    .then(response => data.value = response)
+    .catch(error => {
+      toast.error('Item data connection error')
+      console.error(error);
+    })
+};
 
 const onLendPressed = () => {
   router.push(`/checkout/item/${route.params.title}`);
