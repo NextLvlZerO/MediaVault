@@ -8,6 +8,7 @@ import org.example.mediavaultbackend.services.MediaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.StreamingHttpOutputMessage;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -23,9 +24,25 @@ public class MediaController {
     private final MediaService mediaService;
 
     @GetMapping("/movies/best-rated")
-    public ResponseEntity<List<MediaResponseDto>> getBestRatedMovies(@RequestParam int amount) {
+    public ResponseEntity<List<MediaResponseDto>> getBestRatedMovies(@RequestParam("page") int page, @RequestParam("page-size") int pageSize) {
 
-        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(mediaService.getBestRatedMovies(amount));
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(mediaService.getBestRatedMovies(page, pageSize));
+    }
+
+    @GetMapping("/movies/all")
+    public ResponseEntity<List<MediaResponseDto>> getMovies(@RequestParam("page") int page, @RequestParam("page-size") int pageSize) {
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(mediaService.getMovies(page, pageSize));
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<MediaResponseDto> searchMedia(@RequestParam("query") String mediaTitle) {
+
+        return mediaService.searchMovies(mediaTitle)
+                .map(dto -> ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(dto))
+                .orElse(ResponseEntity.notFound().build());
+
     }
 
 }

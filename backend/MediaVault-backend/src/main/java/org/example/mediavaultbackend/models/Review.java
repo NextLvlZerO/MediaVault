@@ -9,7 +9,6 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
@@ -18,12 +17,18 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class Rating {
+public class Review {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "rating_id")
     private Long ratingId;
+
+    @Column(name = "title")
+    private String title;
+
+    @Column(name = "details")
+    private String details;
 
     @ManyToOne
     @JoinColumn(name = "user_id", referencedColumnName = "user_id")
@@ -44,10 +49,6 @@ public class Rating {
     @Column(name = "verified")
     private Boolean verified;
 
-    @Column(name = "title")
-    private String title;
 
-    @Column(name = "details")
-    private String details;
 
 }

@@ -124,13 +124,18 @@ public class DataService {
                             .orElse(null);
 
 
+                    Random r = new Random();
+
                     mediaRepository.save(Media.builder()
+                            .type("movie")
                             .title(title)
                             .description(description)
                             .isAdult(isAdult)
                             .releaseDate(releaseDate)
                             .genres(genres)
                             .poster(poster)
+                            .amount(r.nextInt(50))
+                            .price(r.nextDouble(12.0))
                             .build());
 
 
