@@ -2,6 +2,7 @@ package org.example.mediavaultbackend.controller;
 
 
 import lombok.RequiredArgsConstructor;
+import org.example.mediavaultbackend.dtos.MediaItemResponseDto;
 import org.example.mediavaultbackend.dtos.MediaResponseDto;
 import org.example.mediavaultbackend.models.Media;
 import org.example.mediavaultbackend.services.MediaService;
@@ -9,10 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.StreamingHttpOutputMessage;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -43,6 +41,15 @@ public class MediaController {
                     .body(dto))
                 .orElse(ResponseEntity.notFound().build());
 
+    }
+
+    @GetMapping("/item/{id}")
+    public ResponseEntity<MediaItemResponseDto> getMediaItem(@PathVariable("id") Long id) {
+        return mediaService.getMediaItem(id)
+                .map(dto -> ResponseEntity.ok()
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(dto))
+                .orElse(ResponseEntity.notFound().build());
     }
 
 }

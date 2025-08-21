@@ -135,7 +135,7 @@ public class DataService {
                             .genres(genres)
                             .poster(poster)
                             .amount(r.nextInt(50))
-                            .price(r.nextDouble(12.0))
+                            .price(Math.round(r.nextDouble(12.0)*100.0)/100.0)
                             .build());
 
 
