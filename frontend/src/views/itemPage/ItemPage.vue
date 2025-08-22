@@ -11,8 +11,8 @@
         <div class="item-page-container-right">
           <div class="right-details">
 
-            <div class="right-details-media">
-            </div>
+            <Item :title="data?.title" :rating="data?.rating" :poster="data?.poster" :clickable="false"
+              :id="data?.id" />
 
             <div class="right-details-availability-container">
               <p class="right-details-availability-text g-text-a"> Availability: </p>
@@ -66,16 +66,30 @@ const currentlyWritingReview = ref(false);
 const watchlistAdded = true;
 
 
+// load data when mounted and scroll to top
+
 onMounted(() => {
   window.scrollTo({ top: -100, left: 0 })
   getItemData(route.params?.id);
 });
 
 
+// check if review writing is active and disable scroll if the case
+
 watch(currentlyWritingReview, (newVal) => {
   document.documentElement.style.overflow = newVal ? 'hidden' : 'auto'
 })
 
+
+// check if other items need to be loaded
+
+watch(() => route.params.id, (newVal) => {
+  window.scrollTo({ top: -100, left: 0 })
+  getItemData(newVal);
+})
+
+
+// method for loading item data aligned with the params id
 
 const getItemData = (id) => {
   fetch(`${apiUrl}/media/item/${id}`)
@@ -92,17 +106,23 @@ const getItemData = (id) => {
     })
 };
 
+
+// methods for button pressed
+
 const onLendPressed = () => {
-  router.push(`/checkout/item/${route.params.title}`);
+  router.push(`/checkout/item/${route.params?.id}`);
+};
+
+const onWatchlistPressed = () => {
+  return;
 };
 
 const onWriteButtonPressed = () => {
   currentlyWritingReview.value = true;
 };
 
-
-
 </script>
+
 
 
 <style scoped>
@@ -216,8 +236,8 @@ const onWriteButtonPressed = () => {
 
 
 .right-details-media {
-  height: 200px;
-  width: 150px;
+  height: 300px;
+  width: 200px;
   border-radius: 5px;
   border: 1px solid #ffffff44;
 }

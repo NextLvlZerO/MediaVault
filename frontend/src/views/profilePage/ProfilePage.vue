@@ -35,9 +35,10 @@
           </div>
         </div>
         <HSeperator class="five-rem-distance" />
-        <MediaContainer :fontSize="3" prename="H" name="istory" dataType="history" :clickable="false" />
+        <MediaContainer :fontSize="3" :pageSize="4" prename="H" name="istory" dataType="history" :clickable="false" />
         <HSeperator style="margin-top: 5rem;" class="five-rem-distance upper-distance" />
-        <MediaContainer :fontSize="3" prename="W" name="atchlist" dataType="watchlist" :clickable="true" />
+        <MediaContainer :fontSize="3" :pageSize="4" prename="W" name="atchlist" dataType="watchlist"
+          :clickable="true" />
       </div>
     </div>
   </div>

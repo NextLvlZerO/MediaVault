@@ -2,18 +2,35 @@
   <div class="add-background">
     <div class="add-container">
       <form class="input-forms" @submit.prevent="handleReviewSubmit">
-        <h1 class="add-title"> Add review</h1>
+        <h1 class="add-title"> Review</h1>
         <div class="mb-3">
-          <label for="exampleInputEmail1" class="form-label g-text">Title</label>
+          <label class="form-label g-text-a">Title</label>
           <input class="form-control input-field" v-model="reviewTitle">
         </div>
         <div class="mb-3 content-input-container">
-          <label for="exampleInputPassword1" class="form-label g-text">Content</label>
+          <label class="form-label g-text-a">Content</label>
           <textarea class="form-control input-field content-input" v-model="reviewContent" />
         </div>
-        <div class="add-buttons">
-          <button class="cancel-button" :onclick="onCancelButtonPressed"> cancel </button>
-          <button class="confirm-button" type="submit"> confirm </button>
+        <div class="footer">
+
+
+          <div>
+            <label class="form-label g-text-a">Rating</label>
+            <select class="form-select rating-select" v-model="reviewRating" aria-label="Rating
+              selection">
+              <option class="rating-select-item" selected value="5">5</option>
+              <option value="4">4</option>
+              <option value="3">3</option>
+              <option value="2">2</option>
+              <option value="1">1</option>
+            </select>
+          </div>
+
+          <div class="add-buttons">
+
+            <button class="cancel-button" :onclick="onCancelButtonPressed"> cancel </button>
+            <button class="confirm-button" type="submit"> confirm </button>
+          </div>
         </div>
       </form>
     </div>
@@ -31,6 +48,7 @@ const toast = useToast();
 
 const reviewTitle = ref('');
 const reviewContent = ref('');
+const reviewRating = ref(5);
 
 
 const onCancelButtonPressed = () => {
@@ -96,7 +114,7 @@ const handleReviewSubmit = () => {
   max-height: 70%;
   border: 1px solid #ffffff44;
   border-radius: 10px;
-  background-color: #181818dd;
+  background-color: #202020cc;
 }
 
 .input-forms {
@@ -163,7 +181,7 @@ const handleReviewSubmit = () => {
   margin-top: 1rem;
   align-self: flex-start;
   cursor: pointer;
-  transition: 0.2s ease-in-out all;
+  transition: 0.1s ease-in-out all;
 }
 
 .confirm-button:hover {
@@ -184,5 +202,17 @@ const handleReviewSubmit = () => {
   display: flex;
   flex-direction: column;
   flex: 1;
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+}
+
+.rating-select {
+  width: min-content;
+  background-color: transparent;
+  border: 1px solid #ffffff44;
+  color: #fff;
 }
 </style>

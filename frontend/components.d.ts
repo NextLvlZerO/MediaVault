@@ -24,6 +24,8 @@ declare module 'vue' {
     LoginForm: typeof import('./src/components/login/LoginForm.vue')['default']
     Main: typeof import('./src/components/Main.vue')['default']
     MediaContainer: typeof import('./src/components/media/MediaContainer.vue')['default']
+    MediaFilterComponent: typeof import('./src/components/navigation/MediaFilterComponent.vue')['default']
+    MediaFilterTag: typeof import('./src/components/navigation/MediaFilterTag.vue')['default']
     MediaList: typeof import('./src/components/media/MediaList.vue')['default']
     MediaSearchInput: typeof import('./src/components/navigation/MediaSearchInput.vue')['default']
     MediaSearchResultItem: typeof import('./src/components/navigation/MediaSearchResultItem.vue')['default']

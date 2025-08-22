@@ -1,16 +1,26 @@
 <template>
-  <div class="search-input-component">
-    <input ref="inputRef" class="search-component" v-model="inputText" placeholder="Search" type="text"
-      @focus="onInputFocus" @blur="active = false" />
-    <div class="search-results" v-if="active" @mousedown.prevent>
-      <MediaSearchResultItem v-for="(item, index) in data" :key="index" :title="item?.title" :id="item?.id"
-        @onChildPressedEvent="unfocusInput" />
+  <div class="search-filter-component">
+    <div class="search-input-component">
+      <input ref="inputRef" class="search-component" v-model="inputText" placeholder="Search" type="text"
+        @focus="onInputFocus" @blur="status = 0" />
+      <div class="search-results" v-if="status === 1" @mousedown.prevent>
+        <MediaSearchResultItem v-for="(item, index) in data" :key="index" :title="item?.title" :id="item?.id"
+          @onChildPressedEvent="unfocusInput" />
+      </div>
+      <div class="filter-options" v-if="status === 2" @mousedown.prevent>
+        <MediaFilterComponent v-for="(item, index) in filterOptions" :key="index" :data="item"
+          @onTagClickedEmit="updateFilterOptions" />
+      </div>
+    </div>
+    <div class="filter-component" @click="status = (status === 2 ? 0 : 2)">
+      <i class="bi bi-filter filter-icon" />
     </div>
   </div>
 </template>
 
 
 <script setup>
+
 const apiUrl = import.meta.env.VITE_API_URL;
 import { ref } from 'vue';
 import { useToast } from 'vue-toast-notification'
@@ -18,9 +28,48 @@ import { useToast } from 'vue-toast-notification'
 
 const toast = useToast();
 
-const active = ref(false);
+const status = ref(0);
 const inputText = ref('');
 const inputRef = ref(null);
+
+
+const filterOptions = ref([{
+  componentId: 0,
+  title: 'Genres',
+  filter: [
+    {
+      id: 0,
+      title: 'Action',
+      status: true
+    },
+    {
+      id: 1,
+      title: 'Horror',
+      status: false
+    },
+    {
+      id: 2,
+      title: 'Fantasy',
+      status: false
+    },
+    {
+      id: 3,
+      title: 'Romance',
+      status: true
+    },
+    {
+      id: 4,
+      title: 'Arthouse',
+      status: false
+    },
+    {
+      id: 5,
+      title: 'Drama',
+      status: false
+    },
+  ]
+}]);
+
 
 const data = [{
   "title": "Avengers Infinity war",
@@ -48,8 +97,8 @@ const data = [{
 // when focused update list
 
 const onInputFocus = () => {
-  active.value = true;
-  console.log(getMediaQueryData());
+  status.value = 1;
+  getMediaQueryData();
 }
 
 
@@ -71,8 +120,23 @@ const getMediaQueryData = () => {
 };
 
 
+// update filter when tag is pressed
+
+const updateFilterOptions = (parameters) => {
+
+  if (typeof (parameters.componentId) === 'undefined') {
+    return;
+  }
+
+  filterOptions.value[parameters.componentId].filter = filterOptions.value[parameters.componentId].filter.map(item => {
+    const updatedFilterItem = item.id === parameters?.id ? { ...item, status: parameters.status } : item;
+    return updatedFilterItem;
+  })
+};
+
+
 const unfocusInput = () => {
-  active.value = false;
+  status.value = 0;
   inputRef.value?.blur();
 };
 
@@ -90,6 +154,7 @@ const unfocusInput = () => {
   color: #fff;
   border-radius: 100px;
   padding-left: 15px;
+  padding-right: 50px;
   border: 1px solid #ffffff44;
   outline: none;
 }
@@ -108,5 +173,48 @@ const unfocusInput = () => {
   background-color: var(--color-background);
   width: 100%;
   padding: .5rem;
+}
+
+.filter-options {
+  z-index: 10;
+  position: absolute;
+  bottom: 1;
+  transform: translateY(50px);
+  border: solid 1px #ffffff44;
+  border-radius: 10px;
+  background-color: var(--color-background);
+  width: 100%;
+  padding: .5rem;
+}
+
+.search-filter-component {
+  display: flex;
+  position: relative;
+}
+
+.filter-component {
+  position: absolute;
+  right: 0%;
+  top: 50%;
+  transform: translate(-0%, -50%);
+  border-radius: 100px;
+  height: 80%;
+  margin-right: 4px;
+  aspect-ratio: 1/1;
+  cursor: pointer;
+  transition: .2s ease-in-out all;
+}
+
+.filter-component:hover {
+  background-color: #ffffff44;
+}
+
+.filter-icon {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 24px;
+  color: #fff;
 }
 </style>

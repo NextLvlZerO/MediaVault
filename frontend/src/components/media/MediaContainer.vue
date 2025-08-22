@@ -11,6 +11,7 @@
       </div>
     </div>
     <MediaList :data="data" :clickable="props?.clickable" />
+    <button class="g-button-s" style="margin-top: 2rem" @click="onLoadMoreButtonClick"> load more </button>
   </div>
 
 </template>
@@ -22,27 +23,39 @@ const apiUrl = import.meta.env.VITE_API_URL;
 import { ref, onMounted } from 'vue';
 import { useToast } from 'vue-toast-notification';
 
-const props = defineProps(['prename', 'name', 'clickable', 'fontSize']);
+const props = defineProps(['prename', 'name', 'clickable', 'fontSize', 'pageSize']);
 const toast = useToast();
 
 const data = ref([null, null, null, null, null]);
+const pageCount = ref(0);
 
 
 
-
-const getMediaItemData = () => {
-  fetch(`${apiUrl}/media/movies/best-rated?page=0&page-size=15`)
+const getMediaItemData = (append) => {
+  fetch(`${apiUrl}/media/movies/best-rated?page=${pageCount.value}&page-size=${props?.pageSize ?
+    props.pageSize : 5}`)
     .then(response => {
       if (!response.ok) { throw new Error('error') }
       return response.json()
     })
     .then(json => {
-      data.value = json
+      if (append) {
+        data.value = [...data.value, ...json];
+      }
+      else {
+        data.value = json
+      }
     })
     .catch(error => {
       toast.error('Failed to load data');
       console.error('Failed to fetch data: ', error)
     })
+};
+
+
+const onLoadMoreButtonClick = () => {
+  pageCount.value += 1;
+  getMediaItemData(true);
 };
 
 
@@ -55,6 +68,12 @@ onMounted(() => {
 
 
 <style scoped>
+.mediaC-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
 .mediaC-container-title {
   position: relative;
   display: flex;
