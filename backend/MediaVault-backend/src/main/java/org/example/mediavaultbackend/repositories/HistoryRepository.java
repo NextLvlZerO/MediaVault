@@ -1,6 +1,7 @@
 package org.example.mediavaultbackend.repositories;
 
 import org.example.mediavaultbackend.models.CurrentlyLending;
+import org.example.mediavaultbackend.models.History;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
@@ -8,9 +9,9 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface CurrentlyLendingRepository extends JpaRepository<CurrentlyLending, Integer> {
+public interface HistoryRepository extends JpaRepository<History, Long> {
 
-    @Query("SELECT l FROM CurrentlyLending l WHERE l.account.accountId = :accountId AND l.media.mediaId = :mediaId")
-    public Optional<CurrentlyLending> findByMediaUser(Long accountId, Long mediaId);
+    @Query("SELECT h FROM History h WHERE h.account.accountId = :accountId AND h.media.mediaId = :mediaId")
+public Optional<History> findByMediaAccount(Long accountId, Long mediaId);
 
 }

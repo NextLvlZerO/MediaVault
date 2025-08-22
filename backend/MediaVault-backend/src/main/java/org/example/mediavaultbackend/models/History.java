@@ -29,7 +29,10 @@ public class History {
     @JoinColumn(name = "media_id", referencedColumnName = "media_id")
     private Media media;
 
-    @Column(name = "date")
-    private LocalDateTime date;
+    @Column(name = "start_date")
+    private LocalDateTime startDate;
+
+    @Column(name = "end_date")
+    private LocalDateTime endDate;
 
 }

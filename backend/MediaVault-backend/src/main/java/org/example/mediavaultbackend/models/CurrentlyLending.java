@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Data
@@ -29,7 +30,10 @@ public class CurrentlyLending {
     @JoinColumn(name = "media_id", referencedColumnName = "media_id")
     private Media media;
 
-    @Column(name = "date")
-    private Date date;
+    @Column(name = "start_date")
+    private LocalDateTime startDate;
+
+    @Column(name = "end_date")
+    private LocalDateTime endDate;
 
 }

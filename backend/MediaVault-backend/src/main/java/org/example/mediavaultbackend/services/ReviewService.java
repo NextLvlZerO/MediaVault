@@ -8,10 +8,7 @@ import org.example.mediavaultbackend.dtos.ReviewResponseDto;
 import org.example.mediavaultbackend.models.Account;
 import org.example.mediavaultbackend.models.Media;
 import org.example.mediavaultbackend.models.Review;
-import org.example.mediavaultbackend.repositories.CurrentlyLendingRepository;
-import org.example.mediavaultbackend.repositories.MediaRepository;
-import org.example.mediavaultbackend.repositories.ReviewRepository;
-import org.example.mediavaultbackend.repositories.AccountRepository;
+import org.example.mediavaultbackend.repositories.*;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -27,6 +24,7 @@ public class ReviewService {
     private final AccountRepository accountRepository;
     private final MediaRepository mediaRepository;
     private final CurrentlyLendingRepository currentlyLendingRepository;
+    private final HistoryRepository historyRepository;
 
     public List<ReviewResponseDto> getReviews(Long id, int page, int pageSize) {
 
@@ -65,8 +63,7 @@ public class ReviewService {
                     Media media = mediaRepository.findById(id)
                             .orElseThrow(() -> new IllegalArgumentException("Media not found"));
 
-                    Boolean verified = currentlyLendingRepository.findByMediaUser(media.getMediaId(), account.getAccountId()).isPresent();
-
+                    Boolean verified = historyRepository.findByMediaAccount(account.getAccountId(), media.getMediaId()).isPresent();
 
                     Review review = Review.builder()
                             .title(reviewCreateRequestDto.getTitle())
