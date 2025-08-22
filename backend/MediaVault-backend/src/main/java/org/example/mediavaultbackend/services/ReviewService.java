@@ -11,7 +11,7 @@ import org.example.mediavaultbackend.models.Review;
 import org.example.mediavaultbackend.repositories.CurrentlyLendingRepository;
 import org.example.mediavaultbackend.repositories.MediaRepository;
 import org.example.mediavaultbackend.repositories.ReviewRepository;
-import org.example.mediavaultbackend.repositories.UserRepository;
+import org.example.mediavaultbackend.repositories.AccountRepository;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 public class ReviewService {
 
     private final ReviewRepository reviewRepository;
-    private final UserRepository userRepository;
+    private final AccountRepository accountRepository;
     private final MediaRepository mediaRepository;
     private final CurrentlyLendingRepository currentlyLendingRepository;
 
@@ -59,7 +59,7 @@ public class ReviewService {
                     return Optional.empty();
                 } else {
 
-                    Account account = userRepository.findByUsername(username)
+                    Account account = accountRepository.findByUsername(username)
                             .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
                     Media media = mediaRepository.findById(id)
