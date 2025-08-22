@@ -33,14 +33,8 @@ public class MediaController {
     }
 
     @GetMapping("/search")
-    public ResponseEntity<MediaResponseDto> searchMedia(@RequestParam("query") String mediaTitle) {
-
-        return mediaService.searchMovies(mediaTitle)
-                .map(dto -> ResponseEntity.ok()
-                    .contentType(MediaType.APPLICATION_JSON)
-                    .body(dto))
-                .orElse(ResponseEntity.notFound().build());
-
+    public ResponseEntity<List<MediaResponseDto>> searchMedia(@RequestParam("query") String mediaTitle) {
+        return ResponseEntity.ok().body(mediaService.searchMovies(mediaTitle));
     }
 
     @GetMapping("/item/{id}")

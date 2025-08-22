@@ -51,18 +51,18 @@ public class MediaService {
 
     }
 
-    public Optional<MediaResponseDto> searchMovies(String mediaTitle) {
-        return mediaRepository.findByTitle(mediaTitle)
-                .map(m -> MediaResponseDto.builder()
-                        .id(m.getMediaId())
-                        .type(m.getType())
-                        .title(m.getTitle())
-                        .details(m.getDescription())
-                        .poster(m.getPoster())
-                        .rating(m.getAverageRating())
-                        .amount(m.getAmount())
-                        .build()
-                );
+    public List<MediaResponseDto> searchMovies(String mediaTitle) {
+        Page<Media> mediaPage = mediaRepository.findByTitle(mediaTitle, PageRequest.of(0,5));
+        System.out.println(mediaPage.getTotalElements());
+        return mediaPage.getContent().stream().map(m -> MediaResponseDto.builder()
+                .id(m.getMediaId())
+                .type(m.getType())
+                .title(m.getTitle())
+                .details(m.getDescription())
+                .poster(m.getPoster())
+                .rating(m.getAverageRating())
+                .amount(m.getAmount())
+                .build()).collect(Collectors.toList());
     }
 
 
