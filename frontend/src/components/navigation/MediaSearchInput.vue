@@ -7,9 +7,9 @@
         <MediaSearchResultItem v-for="(item, index) in data" :key="index" :title="item?.title" :id="item?.id"
           @onChildPressedEvent="unfocusInput" />
       </div>
-      <div class="filter-options" v-if="status === 2" @mousedown.prevent>
+      <div class="filter-options" v-if="status === 2">
         <MediaFilterComponent v-for="(item, index) in filterOptions" :key="index" :data="item"
-          @onTagClickedEmit="updateFilterOptions" />
+          @onTagClickedEmit="updateFilterOptions" @onInputChangedEmit="updateFilterInput" />
       </div>
     </div>
     <div class="filter-component" @click="status = (status === 2 ? 0 : 2)">
@@ -35,6 +35,8 @@ const inputRef = ref(null);
 
 const filterOptions = ref([{
   componentId: 0,
+  type: 'tag',
+  onlyOne: false,
   title: 'Genres',
   filter: [
     {
@@ -68,7 +70,20 @@ const filterOptions = ref([{
       status: false
     },
   ]
-}]);
+},
+{
+  componentId: 1,
+  type: 'input',
+  title: 'Min rating',
+  filter: null
+},
+{
+  componentId: 2,
+  type: 'input',
+  title: 'Max price',
+  filter: null
+}
+]);
 
 
 const data = [{
@@ -105,7 +120,7 @@ const onInputFocus = () => {
 // get media query data from backend
 
 const getMediaQueryData = () => {
-  fetch(`${apiUrl}/media/search?query=sup`)
+  fetch(`${apiUrl}/media/search?query=Superman`)
     .then(result => {
       if (!result.ok) {
         throw new Error('error');
@@ -129,9 +144,25 @@ const updateFilterOptions = (parameters) => {
   }
 
   filterOptions.value[parameters.componentId].filter = filterOptions.value[parameters.componentId].filter.map(item => {
-    const updatedFilterItem = item.id === parameters?.id ? { ...item, status: parameters.status } : item;
-    return updatedFilterItem;
+    if (parameters?.onlyOne) {
+      const updatedFilterItem = item.id === parameters?.id ? { ...item, status: parameters.status }
+        : { ...item, status: false };
+      return updatedFilterItem;
+
+    }
+    else {
+      const updatedFilterItem = item.id === parameters?.id ? { ...item, status: parameters.status } : item;
+      return updatedFilterItem;
+    }
   })
+};
+
+
+// update filter when input is changed
+
+const updateFilterInput = (parameters) => {
+  filterOptions.value[parameters.componentId].filter = parameters?.filter;
+  console.log(filterOptions);
 };
 
 
@@ -176,6 +207,8 @@ const unfocusInput = () => {
 }
 
 .filter-options {
+  display: flex;
+  flex-direction: column;
   z-index: 10;
   position: absolute;
   bottom: 1;
@@ -185,6 +218,7 @@ const unfocusInput = () => {
   background-color: var(--color-background);
   width: 100%;
   padding: .5rem;
+  gap: .5rem;
 }
 
 .search-filter-component {

@@ -39,7 +39,7 @@
         <UserMessage />
       </div>
       <div class="message-input">
-        <textarea class="message-input-area" placeholder="Ende-zu-Ende-unverschlüsselt" v-model="message"
+        <textarea class="message-input-area" placeholder="End-to-end-unencrypted" v-model="message"
           @input="resizeTextarea" ref="textarea" />
         <button class="send-button g-button-p">
           <i class="bi bi-send-fill" style="color: #000; font-size: 18px; margin: 0px" />
