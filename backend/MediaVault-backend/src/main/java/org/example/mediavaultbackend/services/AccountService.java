@@ -2,15 +2,20 @@ package org.example.mediavaultbackend.services;
 
 import lombok.RequiredArgsConstructor;
 import org.example.mediavaultbackend.dtos.AccountRequestDto;
+import org.example.mediavaultbackend.dtos.AccountResponseDto;
 import org.example.mediavaultbackend.models.Account;
 import org.example.mediavaultbackend.repositories.AccountRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.security.auth.login.CredentialException;
+import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -21,6 +26,15 @@ public class AccountService {
     private final BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
     private final WatchlistService watchlistService;
 
+
+    public List<AccountResponseDto> searchAccounts(String username) {
+        Page<Account> accountPage = accountRepository.findByQueryUsername(username, PageRequest.of(0, 5));
+
+        return accountPage.getContent().stream().map(a -> AccountResponseDto.builder()
+                .username(a.getUsername())
+                .id(a.getAccountId())
+                .build()).collect(Collectors.toList());
+    }
 
     public String register(AccountRequestDto accountRequestDto) {
 

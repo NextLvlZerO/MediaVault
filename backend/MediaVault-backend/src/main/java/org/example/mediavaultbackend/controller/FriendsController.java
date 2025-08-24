@@ -6,6 +6,7 @@ import org.example.mediavaultbackend.dtos.AccountResponseDto;
 import org.example.mediavaultbackend.models.Account;
 import org.example.mediavaultbackend.models.UserFriendsRequest;
 import org.example.mediavaultbackend.models.UserFriendsWith;
+import org.example.mediavaultbackend.services.AccountService;
 import org.example.mediavaultbackend.services.FriendsService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -21,10 +22,11 @@ import java.util.List;
 public class FriendsController {
 
     private final FriendsService friendsService;
+    private final AccountService accountService;
 
     @GetMapping("/find-user")
-    public ResponseEntity<List<AccountResponseDto>> searchUser(@RequestParam("query") String searchQuery) {
-        return ResponseEntity.ok().body(friendsService.searchAccounts(searchQuery));
+    public ResponseEntity<List<AccountResponseDto>> searchAccounts(@RequestParam("query") String searchQuery) {
+        return ResponseEntity.ok().body(accountService.searchAccounts(searchQuery));
     }
 
     @GetMapping("{account-id}/friends")

@@ -73,15 +73,6 @@ public class FriendsService {
         return List.of(userFriendsWith1, userFriendsWith2);
     }
 
-    public List<AccountResponseDto> searchAccounts(String searchQuery) {
-        Page<Account> accountPage = accountRepository.findByQueryUsername(searchQuery, PageRequest.of(0, 5));
-
-        return accountPage.getContent().stream().map(a -> AccountResponseDto.builder()
-                .username(a.getUsername())
-                .id(a.getAccountId())
-                .build()).collect(Collectors.toList());
-    }
-
     public List<AccountResponseDto> getFriends(Long accountId) {
         Account account = accountRepository.findById(accountId).orElseThrow(() -> new NoSuchElementException("Account not found"));
 
