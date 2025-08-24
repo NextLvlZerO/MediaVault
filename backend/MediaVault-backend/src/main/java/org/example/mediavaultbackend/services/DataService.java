@@ -7,6 +7,8 @@ import org.example.mediavaultbackend.models.Genre;
 import org.example.mediavaultbackend.models.Media;
 import org.example.mediavaultbackend.repositories.GenreRepository;
 import org.example.mediavaultbackend.repositories.MediaRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -22,16 +24,22 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class DataService {
 
-    private final MediaRepository mediaRepository;
+    private static final Logger log = LoggerFactory.getLogger(DataService.class);
+    private final MediaService mediaService;
     private final GenreRepository genreRepository;
 
     private final String API_KEY = "a80a453e831efa922a44cb8a54281aee"; //TODO: Make environmental var
     private final String BASE_URL = "https://api.themoviedb.org/3";
+    private final GenreService genreService;
 
-    public void importMedia() {
+    public void importData() {
+        log.info("Importing data...");
         importGenres();
+        log.info("Importied genres");
         importMovies();
+        log.info("Imported movies");
         importSeries();
+        log.info("Imported series");
     }
 
 
@@ -62,10 +70,15 @@ public class DataService {
                         continue;
                     }
 
-                    genreRepository.save(Genre.builder()
-                            .tmdbId(tmdbId)
-                            .genreName(genreName)
-                            .build());
+                    try {
+                        genreService.saveGenre(Genre.builder()
+                                .tmdbId(tmdbId)
+                                .genreName(genreName)
+                                .build());
+                    } catch (Exception e) {
+                        log.error(e.getMessage());
+                    }
+
                 }
             } else {
                 System.out.println(genreResponse.statusCode());
@@ -126,17 +139,13 @@ public class DataService {
 
                     Random r = new Random();
 
-                    mediaRepository.save(Media.builder()
-                            .type("movie")
-                            .title(title)
-                            .description(description)
-                            .isAdult(isAdult)
-                            .releaseDate(releaseDate)
-                            .genres(genres)
-                            .poster(poster)
-                            .amount(r.nextInt(50))
-                            .price(Math.round(r.nextDouble(12.0)*100.0)/100.0)
-                            .build());
+
+                    try {
+                        mediaService.saveMedia("movie", title, description, isAdult, releaseDate, genres, poster, r.nextInt(50),Math.round(r.nextDouble() *100.0) /100.0 );
+                    } catch (Exception e) {
+                        log.error(e.getMessage());
+                    }
+
 
 
 

@@ -22,16 +22,12 @@ public class ReviewController {
 
     @GetMapping("/{id}/reviews")
     public ResponseEntity<List<ReviewResponseDto>> getReviews(@PathVariable Long id, @RequestParam("page") int page, @RequestParam("page-size") int pageSize) {
-        return ResponseEntity.ok().body(reviewService.getReviews(id,page, pageSize));
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(reviewService.getReviews(id,page, pageSize));
     }
 
     @PostMapping("/{id}/review/create")
     public ResponseEntity<ReviewResponseDto> createReview(HttpServletRequest request, @PathVariable Long id, @RequestBody ReviewCreateRequestDto reviewCreateRequestDto) {
-        return reviewService.createReview(request , id, reviewCreateRequestDto)
-                .map(dto -> ResponseEntity.ok()
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .body(dto))
-                .orElseGet(() -> ResponseEntity.notFound().build());
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(reviewService.createReview(request , id, reviewCreateRequestDto));
     }
 
 }

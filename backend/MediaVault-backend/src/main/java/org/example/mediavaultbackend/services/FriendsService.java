@@ -7,20 +7,28 @@ import org.example.mediavaultbackend.models.UserFriendsWith;
 import org.example.mediavaultbackend.repositories.AccountRepository;
 import org.example.mediavaultbackend.repositories.UserFriendsRequestRepository;
 import org.example.mediavaultbackend.repositories.UserFriendsWithRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.NoSuchElementException;
 
 @Service
 @RequiredArgsConstructor
 public class FriendsService {
 
+    private static final Logger log = LoggerFactory.getLogger(FriendsService.class);
     private final AccountRepository accountRepository;
     private final UserFriendsRequestRepository userFriendsRequestRepository;
     private final UserFriendsWithRepository userFriendsWithRepository;
 
 
     public UserFriendsRequest sendFriendRequest(Long account1Id, Long account2Id) {
+
+        if (account1Id.equals(account2Id)) {
+            throw new IllegalArgumentException("account1Id and account2Id cannot be the same");
+        }
 
         Account account1 = accountRepository.findById(account1Id).orElseThrow(() -> new NoSuchElementException("Account not found"));
         Account account2 = accountRepository.findById(account2Id).orElseThrow(() -> new NoSuchElementException("Account not found"));
@@ -31,11 +39,11 @@ public class FriendsService {
                 .build();
 
         userFriendsRequestRepository.save(userFriendsRequest);
-
+        log.info("Friend request sent from account1: {} to account2: {}", account1Id, account2Id);
         return userFriendsRequest;
     }
 
-    public UserFriendsWith acceptFriendRequest(Long account1Id, Long account2Id) {
+    public List<UserFriendsWith> acceptFriendRequest(Long account1Id, Long account2Id) {
 
         Account account1 = accountRepository.findById(account1Id).orElseThrow(() -> new NoSuchElementException("Account not found"));
         Account account2 = accountRepository.findById(account2Id).orElseThrow(() -> new NoSuchElementException("Account not found"));
@@ -44,12 +52,19 @@ public class FriendsService {
 
         userFriendsRequestRepository.delete(userFriendsRequest);
 
-        UserFriendsWith userFriendsWith = UserFriendsWith.builder()
+        UserFriendsWith userFriendsWith1 = UserFriendsWith.builder()
                 .account1(account1)
                 .account2(account2)
                 .build();
-        userFriendsWithRepository.save(userFriendsWith);
 
-        return userFriendsWith;
+        UserFriendsWith userFriendsWith2 = UserFriendsWith.builder()
+                .account1(account2)
+                .account2(account1)
+                .build();
+        userFriendsWithRepository.saveAll(List.of(userFriendsWith1, userFriendsWith2));
+
+        log.info("Account1: {} accepted friend request from account2: {}", account2Id, account1Id);
+
+        return List.of(userFriendsWith1, userFriendsWith2);
     }
 }

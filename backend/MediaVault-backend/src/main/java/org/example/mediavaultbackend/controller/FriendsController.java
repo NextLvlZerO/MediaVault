@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.util.List;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/user")
@@ -24,7 +26,7 @@ public class FriendsController {
     }
 
     @PostMapping("/{account1-id}/accept-user/{account2-id}")
-    public ResponseEntity<UserFriendsWith> acceptFriendRequest(@PathVariable("account1-id") Long account1Id, @PathVariable("account2-id") Long account2Id) {
+    public ResponseEntity<List<UserFriendsWith>> acceptFriendRequest(@PathVariable("account1-id") Long account1Id, @PathVariable("account2-id") Long account2Id) {
         return ResponseEntity.ok().body(friendsService.acceptFriendRequest(account1Id, account2Id));
     }
 

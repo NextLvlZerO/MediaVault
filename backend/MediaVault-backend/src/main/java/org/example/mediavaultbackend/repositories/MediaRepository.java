@@ -22,6 +22,7 @@ public interface MediaRepository extends JpaRepository<Media, Long> {
     public Page<Media> getMovies(Pageable pageable);
 
     @Query("SELECT m FROM Media m where LOWER(m.title) LIKE LOWER(CONCAT('%', :title, '%'))")
-    public Page<Media> findByTitle(String title, Pageable pageable);
+    public Page<Media> findByTitleSubstring(String title, Pageable pageable);
 
+    public Optional<Media> findByTitle(String title);
 }

@@ -23,7 +23,6 @@ public class MediaController {
 
     @GetMapping("/movies/best-rated")
     public ResponseEntity<List<MediaResponseDto>> getBestRatedMovies(@RequestParam("page") int page, @RequestParam("page-size") int pageSize) {
-
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(mediaService.getBestRatedMovies(page, pageSize));
     }
 
@@ -34,16 +33,12 @@ public class MediaController {
 
     @GetMapping("/search")
     public ResponseEntity<List<MediaResponseDto>> searchMedia(@RequestParam("query") String mediaTitle) {
-        return ResponseEntity.ok().body(mediaService.searchMovies(mediaTitle));
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(mediaService.searchMovies(mediaTitle));
     }
 
     @GetMapping("/item/{id}")
     public ResponseEntity<MediaItemResponseDto> getMediaItem(@PathVariable("id") Long id) {
-        return mediaService.getMediaItem(id)
-                .map(dto -> ResponseEntity.ok()
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .body(dto))
-                .orElse(ResponseEntity.notFound().build());
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(mediaService.getMediaItem(id));
     }
 
 }

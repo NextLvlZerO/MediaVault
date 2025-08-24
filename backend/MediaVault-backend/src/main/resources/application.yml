@@ -7,6 +7,9 @@ spring:
   application:
     name: RestAPI
 
+  profiles:
+    active: prod
+
   datasource:
     url: jdbc:h2:mem:mediaVault-db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
     driver-class-name: org.h2.Driver
@@ -34,4 +37,6 @@ logging:
     org.springframework: FATAL
   file:
     path: ./logs
-
+  pattern:
+    console: "%d{yyyy-MM-dd HH:mm:ss} %-5level [%thread] %logger{36} - %msg%n"
+    file:    "%d{yyyy-MM-dd HH:mm:ss} %-5level [%thread] %logger{36} - %msg%n"

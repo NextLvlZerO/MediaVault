@@ -11,5 +11,5 @@ public interface GenreRepository extends JpaRepository<Genre, Long> {
 
     public Optional<Genre> findByTmdbId(Long tmdbId);
 
-
+    public Optional<Genre> findByGenreName(String genreName);
 }
