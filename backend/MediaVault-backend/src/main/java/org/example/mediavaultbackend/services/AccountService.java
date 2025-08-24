@@ -1,5 +1,7 @@
 package org.example.mediavaultbackend.services;
 
+import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.example.mediavaultbackend.dtos.AccountRequestDto;
 import org.example.mediavaultbackend.models.Account;
@@ -20,12 +22,12 @@ public class AccountService {
     public String register(AccountRequestDto accountRequestDto) {
         String hash = bCryptPasswordEncoder.encode(accountRequestDto.getPassword());
 
-        accountRepository.save(Account.builder()
+        Account account = accountRepository.save(Account.builder()
                 .username(accountRequestDto.getUsername())
                 .password(hash)
                 .build());
 
-        return "account successfully created";
+        return account.getAccountId().toString();
     }
 
 
@@ -36,7 +38,7 @@ public class AccountService {
             throw new RuntimeException(new CredentialException("bad credentials"));
         }
 
-        return "account successfully logged in";
+        return account.getAccountId().toString();
     }
 
 
