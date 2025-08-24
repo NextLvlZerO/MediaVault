@@ -12,13 +12,13 @@
         color: props.active ? 'var(--color-primary)' :
           '#ffffffaa'
       }"> {{ props.username
-        }} </p>
+      }} </p>
     </div>
     <div class="request-buttons" v-if="props?.request">
       <button class="g-button-b request-button-item" @click="() => requestButtonPressed(false)">
         <i class="bi bi-x button-icon" />
       </button>
-      <button class="g-button-s request-button-item" @click="() => requestButtonPressed(true)">
+      <button class="g-button-b request-button-item" @click="() => requestButtonPressed(true)">
         <i class="bi bi-check button-icon" />
       </button>
     </div>
@@ -84,6 +84,7 @@ const requestButtonPressed = (value) => {
 .request-buttons {
   display: flex;
   gap: .5rem;
+  border-radius: 10px;
 }
 
 .request-button-item {

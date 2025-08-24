@@ -1,6 +1,6 @@
 <template>
 
-  <div class="mediaC-container">
+  <div class="mediaC-container" v-if="data && data.length > 0">
     <div class="mediaC-container-title-space">
       <div :style="{
         fontSize: `${props.fontSize ? props.fontSize : 5}rem`, marginTop:
@@ -61,19 +61,21 @@ const getMediaItemData = (append) => {
 
   fetch(`${fetchUrl}`)
     .then(response => {
-      if (!response.ok) { throw new Error('error') }
+      if (!response.ok) { throw new Error('fetch data error') }
       return response.json()
     })
     .then(json => {
       if (append) {
         data.value = [...data.value, ...json];
+
+        if (!json || json.length == 0) { throw new Error('No more data available'); }
       }
       else {
         data.value = json
       }
     })
     .catch(error => {
-      toast.error('Failed to load data');
+      toast.error(error);
       console.error('Failed to fetch data: ', error)
     })
 };

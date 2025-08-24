@@ -13,6 +13,8 @@
       </div>
       <Rating v-for="(item, index) in data" :key="index" :user="item?.username" :title="item?.title"
         :details="item?.details" :rating="item?.rating" :verified="item?.verified" />
+      <p v-if="!data || data.length == 0" class="g-text-a" style="width:
+        70%;"> No reviews found. Be the first to post a review!</p>
     </div>
   </div>
 </template>

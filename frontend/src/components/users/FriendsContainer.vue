@@ -137,13 +137,17 @@ const handleUserRequestEvent = (accept, user2Id) => {
   })
     .then(response => {
       if (!response.ok) {
-        throw new Error('error');
+        throw new Error('connection request error');
+        console.error(error);
       }
     })
     .then(() => {
       const message = accept ? 'Successfully accepted friend request' : `Successfully denied friend
         request`
       toast.success(message);
+    })
+    .catch(error => {
+      toast.error(error.message);
     })
 
 };

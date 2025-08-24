@@ -16,10 +16,17 @@
 </template>
 
 <script setup>
+
+const apiUrl = import.meta.env.VITE_API_URL;
 import { useRoute, useRouter } from 'vue-router';
+import { useToast } from 'vue-toast-notification';
+import { ref } from 'vue';
 
 const route = useRoute();
 const router = useRouter();
+const toast = useToast();
+
+const data = ref([]);
 
 const freeTierDetails = [
   { eigenschaft: "Zugriff auf Basis-Inhalte", available: true },
@@ -44,6 +51,22 @@ const deluxeTierDetails = [
   { eigenschaft: "Werbefrei", available: true },
   { eigenschaft: "Exklusive Premium-Inhalte", available: true }
 ];
+
+
+const getSubscriptionData = () => {
+  fetch(`${apiUrl}/subscription/types`)
+    .then(result => {
+      if (!result.ok) {
+        throw new Error('connection subscription error');
+      }
+      return result.json()
+    })
+    .then(response => data.value = response)
+    .catch(error => {
+      console.error(error);
+      toast.error(error);
+    })
+};
 
 </script>
 
