@@ -30,8 +30,8 @@
           <label class="form-label g-text-a">Requests</label>
         </div>
         <div class="request-results">
-          <SingleFriend v-for="(friend, index) in requestData" :username="friend?.username"
-            @userClickedEmit="onUserChange" :userId="friend?.id" />
+          <SingleFriend v-for="(friend, index) in requestData" :username="friend?.username" :userId="friend?.id"
+            :request="true" @userRequestsClickedEmit="handleUserRequestEvent" />
         </div>
       </div>
     </div>
@@ -122,6 +122,31 @@ const handleUserAddition = (id) => {
       toast.error('connection add error');
     })
 }
+
+
+// method for handling request when one of the request buttons is pressed
+
+const handleUserRequestEvent = (accept, user2Id) => {
+  const method = accept ? 'accept-user' : 'deny-user';
+
+  fetch(`${apiUrl}/user/${userId}/${method}/${user2Id}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('error');
+      }
+    })
+    .then(() => {
+      const message = accept ? 'Successfully accepted friend request' : `Successfully denied friend
+        request`
+      toast.success(message);
+    })
+
+};
 
 
 // method for waiting .5sec till getting  data

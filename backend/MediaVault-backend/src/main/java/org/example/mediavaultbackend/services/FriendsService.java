@@ -64,7 +64,7 @@ public class FriendsService {
         Account account1 = accountRepository.findById(account1Id).orElseThrow(() -> new NoSuchElementException("Account not found"));
         Account account2 = accountRepository.findById(account2Id).orElseThrow(() -> new NoSuchElementException("Account not found"));
 
-        UserFriendsRequest userFriendsRequest = userFriendsRequestRepository.findByAccounts(account1Id, account2Id).orElseThrow(() -> new NoSuchElementException("Request not found"));
+        UserFriendsRequest userFriendsRequest = userFriendsRequestRepository.findByAccounts(account2Id, account1Id).orElseThrow(() -> new NoSuchElementException("Request not found"));
 
         userFriendsRequestRepository.delete(userFriendsRequest);
 

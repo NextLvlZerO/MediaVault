@@ -137,4 +137,22 @@ onMounted(() => {
 .g-button-s:hover {
   background-color: var(--color-primary);
 }
+
+.g-button-b {
+  display: flex;
+  background-color: transparent;
+  color: #ffffffdd;
+  font-family: var(--font-family-main);
+  font-size: 1rem;
+  font-weight: 600;
+  border: 1px solid #ffffff44;
+  border-radius: 100px;
+  padding: 8px 13px;
+  cursor: pointer;
+  transition: 0.2s ease-in-out all;
+}
+
+.g-button-b:hover {
+  background-color: #ffffff22;
+}
 </style>
