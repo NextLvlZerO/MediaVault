@@ -15,14 +15,32 @@ import java.util.Optional;
 @Repository
 public interface MediaRepository extends JpaRepository<Media, Long> {
 
-    @Query("SELECT m FROM Media m WHERE m.type = 'movie' ORDER BY m.averageRating DESC")
-    public Page<Media> getBestRatedMovies(Pageable pageable);
+    @Query("SELECT m FROM Media m WHERE m.type = :type ORDER BY m.averageRating DESC")
+    public Page<Media> getBestRatedMedia(String type, Pageable pageable);
 
-    @Query(value = "SELECT m FROM Media m WHERE m.type = 'movie'")
-    public Page<Media> getMovies(Pageable pageable);
+    @Query(value = "SELECT m FROM Media m WHERE m.type = :type")
+    public Page<Media> getAllMedia(String type, Pageable pageable);
 
-    @Query("SELECT m FROM Media m where LOWER(m.title) LIKE LOWER(CONCAT('%', :title, '%'))")
+    @Query("SELECT m FROM Media m WHERE LOWER(m.title) LIKE LOWER(CONCAT('%', :title, '%'))")
     public Page<Media> findByTitleSubstring(String title, Pageable pageable);
 
+    @Query(value = """
+            SELECT *
+            FROM media m
+            WHERE m.type = :type
+            AND m.price <= :price
+            AND m.average_rating > :rating
+            AND (
+                SELECT COUNT(DISTINCT mg.genre_id)
+                FROM media_genre mg
+                JOIN genre g ON g.genre_id = mg.genre_id
+                WHERE mg.media_id = m.media_id
+                AND g.genre_name IN (:genres)
+            ) = :genreCount
+          """, nativeQuery = true)
+    public Page<Media> getFilteredMedia(String type, Pageable pageable, List<String> genres, int genreCount, Double price, Integer rating);
+
     public Optional<Media> findByTitle(String title);
+
+
 }

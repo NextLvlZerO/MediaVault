@@ -2,6 +2,7 @@ package org.example.mediavaultbackend.controller;
 
 
 import lombok.RequiredArgsConstructor;
+import org.example.mediavaultbackend.dtos.MediaFilterRequestDto;
 import org.example.mediavaultbackend.dtos.MediaItemResponseDto;
 import org.example.mediavaultbackend.dtos.MediaResponseDto;
 import org.example.mediavaultbackend.models.Media;
@@ -21,20 +22,27 @@ public class MediaController {
 
     private final MediaService mediaService;
 
-    @GetMapping("/movies/best-rated")
-    public ResponseEntity<List<MediaResponseDto>> getBestRatedMovies(@RequestParam("page") int page, @RequestParam("page-size") int pageSize) {
-        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(mediaService.getBestRatedMovies(page, pageSize));
+    @GetMapping("/{type}/best-rated")
+    public ResponseEntity<List<MediaResponseDto>> getBestRatedMedia(@PathVariable("type") String type , @RequestParam("page") int page, @RequestParam("page-size") int pageSize) {
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(mediaService.getBestRatedMedia(type, page, pageSize));
     }
 
-    @GetMapping("/movies/all")
-    public ResponseEntity<List<MediaResponseDto>> getMovies(@RequestParam("page") int page, @RequestParam("page-size") int pageSize) {
-        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(mediaService.getMovies(page, pageSize));
+    @GetMapping("/{type}/all")
+    public ResponseEntity<List<MediaResponseDto>> getAllMedia(@PathVariable("type") String type , @RequestParam("page") int page, @RequestParam("page-size") int pageSize) {
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(mediaService.getAllMedia(type, page, pageSize));
+    }
+
+    @PostMapping("/{type}/filter")
+    public ResponseEntity<List<MediaResponseDto>> getFilteredMedia(@PathVariable("type") String type , @RequestParam("page") int page, @RequestParam("page-size") int pageSize, @RequestBody MediaFilterRequestDto mediaFilterRequestDto) {
+        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(mediaService.getFilteredMedia(type, page, pageSize, mediaFilterRequestDto));
     }
 
     @GetMapping("/search")
     public ResponseEntity<List<MediaResponseDto>> searchMedia(@RequestParam("query") String mediaTitle) {
         return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(mediaService.searchMovies(mediaTitle));
     }
+
+
 
     @GetMapping("/item/{id}")
     public ResponseEntity<MediaItemResponseDto> getMediaItem(@PathVariable("id") Long id) {

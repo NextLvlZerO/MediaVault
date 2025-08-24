@@ -6,6 +6,7 @@ import org.example.mediavaultbackend.dtos.ReviewCreateRequestDto;
 import org.example.mediavaultbackend.dtos.ReviewResponseDto;
 import org.example.mediavaultbackend.models.Review;
 import org.example.mediavaultbackend.services.ReviewService;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,7 +28,7 @@ public class ReviewController {
 
     @PostMapping("/{id}/review/create")
     public ResponseEntity<ReviewResponseDto> createReview(HttpServletRequest request, @PathVariable Long id, @RequestBody ReviewCreateRequestDto reviewCreateRequestDto) {
-        return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(reviewService.createReview(request , id, reviewCreateRequestDto));
+        return ResponseEntity.status(HttpStatus.CREATED).contentType(MediaType.APPLICATION_JSON).body(reviewService.createReview(request , id, reviewCreateRequestDto));
     }
 
 }

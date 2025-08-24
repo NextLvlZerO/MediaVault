@@ -1,6 +1,7 @@
 package org.example.mediavaultbackend.services;
 
 import lombok.RequiredArgsConstructor;
+import org.example.mediavaultbackend.dtos.MediaFilterRequestDto;
 import org.example.mediavaultbackend.dtos.MediaItemResponseDto;
 import org.example.mediavaultbackend.dtos.MediaResponseDto;
 import org.example.mediavaultbackend.models.Genre;
@@ -27,9 +28,9 @@ public class MediaService {
     private static final Logger log = LoggerFactory.getLogger(MediaService.class);
     private final MediaRepository mediaRepository;
 
-    public List<MediaResponseDto> getBestRatedMovies(int page, int pageSize) {
+    public List<MediaResponseDto> getBestRatedMedia(String type, int page, int pageSize) {
         Pageable pageable = PageRequest.of(page, pageSize);
-        Page<Media> mediaPage = mediaRepository.getBestRatedMovies(pageable);
+        Page<Media> mediaPage = mediaRepository.getBestRatedMedia(type, pageable);
         return mediaPage.getContent().stream().map(m -> MediaResponseDto.builder()
                 .id(m.getMediaId())
                 .type(m.getType())
@@ -41,10 +42,10 @@ public class MediaService {
                 .build()).collect(Collectors.toList());
     }
 
-    public List<MediaResponseDto> getMovies(int page, int pageSize) {
+    public List<MediaResponseDto> getAllMedia(String type, int page, int pageSize) {
 
         Pageable pageable = PageRequest.of(page, pageSize);
-        Page<Media> mediaPage = mediaRepository.getMovies(pageable);
+        Page<Media> mediaPage = mediaRepository.getAllMedia(type, pageable);
         return mediaPage.getContent().stream().map(m -> MediaResponseDto.builder()
                 .id(m.getMediaId())
                 .type(m.getType())
@@ -54,6 +55,22 @@ public class MediaService {
                 .rating(m.getAverageRating())
                 .amount(m.getAmount())
                 .build()).collect(Collectors.toList());
+
+    }
+
+    public List<MediaResponseDto> getFilteredMedia(String type, int page, int pageSize, MediaFilterRequestDto mediaFilterRequestDto) {
+        Pageable pageable = PageRequest.of(page, pageSize);
+        Page<Media> mediaPage = mediaRepository.getFilteredMedia(type, pageable, mediaFilterRequestDto.getGenre(), mediaFilterRequestDto.getGenre().size(), mediaFilterRequestDto.getPrice(), mediaFilterRequestDto.getRating());
+        return mediaPage.getContent().stream().map(m -> MediaResponseDto.builder()
+                .id(m.getMediaId())
+                .type(m.getType())
+                .title(m.getTitle())
+                .details(m.getDescription())
+                .poster(m.getPoster())
+                .rating(m.getAverageRating())
+                .amount(m.getAmount())
+                .build()).collect(Collectors.toList());
+
 
     }
 
@@ -105,11 +122,13 @@ public class MediaService {
                 .poster(poster)
                 .amount(amount)
                 .price(price)
+                .averageRating(4.0)
                 .build();
 
         mediaRepository.save(media);
         log.info("Media saved: {}", media);
         return media;
     }
+
 
 }

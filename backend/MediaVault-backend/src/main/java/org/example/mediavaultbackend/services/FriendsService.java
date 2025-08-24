@@ -49,6 +49,13 @@ public class FriendsService {
         Account account1 = accountRepository.findById(account1Id).orElseThrow(() -> new NoSuchElementException("Account not found"));
         Account account2 = accountRepository.findById(account2Id).orElseThrow(() -> new NoSuchElementException("Account not found"));
 
+        if (userFriendsRequestRepository.findByAccounts(account1Id, account2Id).isPresent()) {
+            throw new IllegalArgumentException("Friend request already exists");
+        } else if(userFriendsRequestRepository.findByAccounts(account2Id, account1Id).isPresent()) {
+            acceptFriendRequest(account1Id, account2Id);
+            userFriendsRequestRepository.delete(userFriendsRequestRepository.findByAccounts(account2Id, account1Id).get());
+        }
+
         UserFriendsRequest userFriendsRequest = UserFriendsRequest.builder()
                 .account1(account1)
                 .account2(account2)

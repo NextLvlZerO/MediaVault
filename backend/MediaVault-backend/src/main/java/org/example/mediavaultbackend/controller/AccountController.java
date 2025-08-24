@@ -7,6 +7,7 @@ import org.apache.tomcat.util.http.parser.HttpParser;
 import org.example.mediavaultbackend.dtos.AccountRequestDto;
 import org.example.mediavaultbackend.services.AccountService;
 import org.example.mediavaultbackend.utility.Cookies;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -20,7 +21,7 @@ public class AccountController {
 
     @PostMapping("/register")
     public ResponseEntity<String> register(@RequestBody AccountRequestDto accountRequestDto, HttpServletResponse response) {
-        ResponseEntity<String> responseData = ResponseEntity.ok().body(accountService.register(accountRequestDto));
+        ResponseEntity<String> responseData = ResponseEntity.status(HttpStatus.CREATED).body(accountService.register(accountRequestDto));
 
         cookies.setUserCookies(responseData, accountRequestDto, response);
 
