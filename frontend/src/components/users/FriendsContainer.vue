@@ -107,7 +107,7 @@ const handleUserAddition = (id) => {
       if (!result.ok) {
         throw new Error('error');
       }
-      return result.json();
+      toast.success('successfully added user');
     })
     .catch(error => {
       console.error(error);
