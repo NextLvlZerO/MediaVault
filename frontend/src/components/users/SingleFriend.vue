@@ -1,5 +1,5 @@
 <template>
-  <div class="single-friend-container" :style="{ backgroundColor: props.active ? '#ffffff08' : none }"
+  <div class="single-friend-container" :style="{ backgroundColor: props?.active ? '#ffffff08' : none }"
     :onclick="onUserClick">
     <i class="bi bi-person-fill" style="color: #fff; font-size: 18px" :style="{
       color: props.active ? 'var(--color-primary)' :
@@ -18,7 +18,7 @@
 import { ref, watch, defineProps, defineEmits } from 'vue';
 
 const emits = defineEmits(['userClickedEmit']);
-const props = defineProps(['username', 'active']);
+const props = defineProps(['username', 'userId', 'active']);
 
 const active = ref(false);
 
@@ -29,8 +29,7 @@ watch(active, (newVal, oldVal) => {
 
 
 const onUserClick = () => {
-  emits('userClickedEmit', props?.username);
-  console.log('active');
+  emits('userClickedEmit', props?.username, props?.userId);
 }
 
 </script>

@@ -39,6 +39,8 @@
 
 
 <script setup>
+
+const apiUrl = import.meta.env.VITE_API_URL;
 import { defineEmits, defineProps, ref } from 'vue';
 import { useToast } from 'vue-toast-notification';
 
@@ -52,7 +54,7 @@ const reviewRating = ref(5);
 
 
 const onCancelButtonPressed = () => {
-  emits('goBackEvent');
+  emits('goBackEvent', 'reviewSubmitEmit');
 };
 
 
@@ -66,22 +68,23 @@ const handleReviewSubmit = () => {
   }
 
   const reviewBody = {
-    'user': 'NextLvlBulian',
     'title': reviewTitle.value,
     'details': reviewContent.value,
-    'rating': 2
+    'rating': reviewRating.value
   }
 
-  fetch(`http://localhost:8080/api/v1/media/${props?.movieId}/review/create`, {
+  fetch(`${apiUrl}/media/${props?.movieId}/review/create`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json'
     },
-    body: JSON.stringify(reviewBody)
+    body: JSON.stringify(reviewBody),
+    credentials: 'include'
   })
     .then(result => {
       if (!result.ok) throw new Error('error');
       toast.success('Successfully posted review!');
+      emits('reviewSubmitEmit');
     })
     .catch(error => {
       toast.error('Failed to load data');

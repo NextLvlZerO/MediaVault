@@ -1,7 +1,11 @@
 package org.example.mediavaultbackend.repositories;
 
 import org.example.mediavaultbackend.models.Account;
+import org.example.mediavaultbackend.models.Media;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -11,4 +15,6 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
 
     public Optional<Account> findByUsername(String username);
 
+    @Query("SELECT m FROM Account m where LOWER(m.username) LIKE LOWER(CONCAT('%', :username, '%'))")
+    public Page<Account> findByQueryUsername(String username, Pageable pageable);
 }

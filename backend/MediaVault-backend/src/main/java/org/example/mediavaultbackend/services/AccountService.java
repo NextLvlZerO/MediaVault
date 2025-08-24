@@ -38,7 +38,7 @@ public class AccountService {
         Account account = accountRepository.findByUsername(accountRequestDto.getUsername()).orElseThrow(() -> new NoSuchElementException("User not found"));
         watchlistService.createWatchlist(account.getAccountId());
 
-        return "account successfully created";
+        return account.getAccountId().toString();
     }
 
 
@@ -49,7 +49,7 @@ public class AccountService {
             throw new RuntimeException(new CredentialException("bad credentials"));
         }
 
-        return "account successfully logged in";
+        return account.getAccountId().toString();
     }
 
 

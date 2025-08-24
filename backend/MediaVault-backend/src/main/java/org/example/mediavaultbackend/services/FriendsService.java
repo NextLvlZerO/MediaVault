@@ -1,6 +1,7 @@
 package org.example.mediavaultbackend.services;
 
 import lombok.RequiredArgsConstructor;
+import org.example.mediavaultbackend.dtos.AccountResponseDto;
 import org.example.mediavaultbackend.models.Account;
 import org.example.mediavaultbackend.models.UserFriendsRequest;
 import org.example.mediavaultbackend.models.UserFriendsWith;
@@ -9,10 +10,14 @@ import org.example.mediavaultbackend.repositories.UserFriendsRequestRepository;
 import org.example.mediavaultbackend.repositories.UserFriendsWithRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.querydsl.QPageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -66,5 +71,24 @@ public class FriendsService {
         log.info("Account1: {} accepted friend request from account2: {}", account2Id, account1Id);
 
         return List.of(userFriendsWith1, userFriendsWith2);
+    }
+
+    public List<AccountResponseDto> searchAccounts(String searchQuery) {
+        Page<Account> accountPage = accountRepository.findByQueryUsername(searchQuery, PageRequest.of(0, 5));
+
+        return accountPage.getContent().stream().map(a -> AccountResponseDto.builder()
+                .username(a.getUsername())
+                .id(a.getAccountId())
+                .build()).collect(Collectors.toList());
+    }
+
+    public List<AccountResponseDto> getFriends(Long accountId) {
+        Account account = accountRepository.findById(accountId).orElseThrow(() -> new NoSuchElementException("Account not found"));
+
+        List<Account> accounts = userFriendsWithRepository.findFriendsOfAccount(account);
+        return accounts.stream().map(a -> AccountResponseDto.builder()
+                .username(a.getUsername())
+                .id(a.getAccountId())
+                .build()).collect(Collectors.toList());
     }
 }
