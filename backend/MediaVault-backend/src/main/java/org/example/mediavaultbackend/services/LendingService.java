@@ -1,6 +1,7 @@
 package org.example.mediavaultbackend.services;
 
 import lombok.RequiredArgsConstructor;
+import org.example.mediavaultbackend.dtos.MediaResponseDto;
 import org.example.mediavaultbackend.models.Account;
 import org.example.mediavaultbackend.models.CurrentlyLending;
 import org.example.mediavaultbackend.models.History;
@@ -13,7 +14,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -69,5 +72,20 @@ public class LendingService {
 
         return media;
 
+    }
+
+    public List<MediaResponseDto> getCurrentlyLending(Long accountId) {
+
+        Account account = accountRepository.findById(accountId).orElseThrow(() -> new NoSuchElementException("Account not found"));
+
+        return currentlyLendingRepository.findByAccount_AccountId(accountId).stream().map(CurrentlyLending::getMedia).map(m -> MediaResponseDto.builder()
+                .id(m.getMediaId())
+                .type(m.getType())
+                .title(m.getTitle())
+                .details(m.getDescription())
+                .poster(m.getPoster())
+                .rating(m.getAverageRating())
+                .amount(m.getAmount())
+                .build()).collect(Collectors.toList());
     }
 }

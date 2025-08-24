@@ -25,6 +25,7 @@ public class AccountService {
     private final AccountRepository accountRepository;
     private final BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder();
     private final WatchlistService watchlistService;
+    private final SubscriptionService subscriptionService;
 
 
     public List<AccountResponseDto> searchAccounts(String username) {
@@ -51,6 +52,7 @@ public class AccountService {
 
         Account account = accountRepository.findByUsername(accountRequestDto.getUsername()).orElseThrow(() -> new NoSuchElementException("User not found"));
         watchlistService.createWatchlist(account.getAccountId());
+        subscriptionService.createSubscription(account.getAccountId(), "Free", null);
 
         return account.getAccountId().toString();
     }

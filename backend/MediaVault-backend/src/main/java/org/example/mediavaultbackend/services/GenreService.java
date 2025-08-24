@@ -7,6 +7,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Service
 @RequiredArgsConstructor
 public class GenreService {
@@ -26,4 +28,7 @@ public class GenreService {
         return genre;
     }
 
+    public List<Genre> getAllGenres() {
+        return genreRepository.findAll();
+    }
 }

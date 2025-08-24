@@ -56,7 +56,7 @@ public class WatchlistService {
 
     }
 
-    public Media updateWatchlist(Long accountId, Long mediaId) {
+    public MediaResponseDto updateWatchlist(Long accountId, Long mediaId) {
         Account account = accountRepository.findById(accountId).orElseThrow(() -> new NoSuchElementException("user not found"));
         Media media = mediaRepository.findById(mediaId).orElseThrow(() -> new NoSuchElementException("media not found"));
         Watchlist watchlist = watchlistRepository.findByAccount_AccountId(accountId).orElseThrow(() -> new NoSuchElementException("watchlist not found"));
@@ -74,7 +74,15 @@ public class WatchlistService {
 
         watchlistRepository.save(watchlist);
 
-        return media;
+        return MediaResponseDto.builder()
+                .id(media.getMediaId())
+                .type(media.getType())
+                .title(media.getTitle())
+                .details(media.getDescription())
+                .poster(media.getPoster())
+                .rating(media.getAverageRating())
+                .amount(media.getAmount())
+                .build();
     }
 
     public void createWatchlist(Long accountId) {

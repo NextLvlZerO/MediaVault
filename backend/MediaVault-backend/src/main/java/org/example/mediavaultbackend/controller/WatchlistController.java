@@ -30,7 +30,7 @@ public class WatchlistController {
     }
 
     @PutMapping("/{account-id}/watchlist/media/{media-id}")
-    public ResponseEntity<Media> updateWatchlist(@PathVariable("account-id") Long accountId, @PathVariable("media-id") Long mediaId) {
+    public ResponseEntity<MediaResponseDto> updateWatchlist(@PathVariable("account-id") Long accountId, @PathVariable("media-id") Long mediaId) {
         return ResponseEntity.ok().body(watchlistService.updateWatchlist(accountId, mediaId));
     }
 

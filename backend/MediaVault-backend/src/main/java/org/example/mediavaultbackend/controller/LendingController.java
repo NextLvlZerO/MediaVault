@@ -2,11 +2,14 @@ package org.example.mediavaultbackend.controller;
 
 import lombok.RequiredArgsConstructor;
 import org.example.mediavaultbackend.dtos.LendingRequestDto;
+import org.example.mediavaultbackend.dtos.MediaResponseDto;
 import org.example.mediavaultbackend.models.Media;
 import org.example.mediavaultbackend.services.LendingService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -23,6 +26,11 @@ public class LendingController {
     @PutMapping("/{account-id}/expand/media/{media-id}")
     public ResponseEntity<Media> expandMedia(@PathVariable("account-id") Long accountId, @PathVariable("media-id") Long mediaId, @RequestBody LendingRequestDto lendingRequestDto) {
         return ResponseEntity.status(HttpStatus.CREATED).body(lendingService.expandMedia(accountId, mediaId, lendingRequestDto.getDays()));
+    }
+
+    @GetMapping("/{id}/currently-lending")
+    public ResponseEntity<List<MediaResponseDto>> getCurrentlyLending(@PathVariable("id") Long accountId) {
+        return ResponseEntity.ok().body(lendingService.getCurrentlyLending(accountId));
     }
 
 

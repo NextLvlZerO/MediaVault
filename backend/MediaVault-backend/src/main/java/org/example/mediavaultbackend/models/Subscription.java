@@ -10,7 +10,7 @@ import java.time.LocalDate;
 
 @Data
 @Entity
-@Table(name = "subscriptions")
+@Table(name = "subscription")
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
@@ -25,8 +25,9 @@ public class Subscription {
     @JoinColumn(name = "account_id", referencedColumnName = "account_id")
     private Account account;
 
-    @Column(name = "type")
-    private String type;
+    @ManyToOne
+    @JoinColumn(name = "type", referencedColumnName = "subscription_type_id")
+    private SubscriptionType type;
 
     @Column(name = "active")
     private Boolean active;

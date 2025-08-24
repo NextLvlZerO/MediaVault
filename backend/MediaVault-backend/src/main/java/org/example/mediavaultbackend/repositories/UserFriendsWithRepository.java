@@ -9,11 +9,16 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface UserFriendsWithRepository extends JpaRepository<UserFriendsWith, Long> {
 
     @Query("SELECT uf.account2 FROM UserFriendsWith uf WHERE uf.account1 = :account")
     List<Account> findFriendsOfAccount(Account account);
+
+    @Query("SELECT uf FROM UserFriendsWith uf WHERE uf.account1.accountId = :account1Id AND uf.account2 = :account2Id")
+    Optional<UserFriendsWith> findByAccounts(Long account1Id, Long account2Id);
+
 
 }
