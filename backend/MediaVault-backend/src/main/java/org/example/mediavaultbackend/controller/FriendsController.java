@@ -34,6 +34,11 @@ public class FriendsController {
         return ResponseEntity.ok().body(friendsService.getFriends(accountId));
     }
 
+    @GetMapping("{account-id}/friend-requests")
+    public ResponseEntity<List<AccountResponseDto>> getFriendRequests(@PathVariable("account-id") Long accountId) {
+        return ResponseEntity.ok().body(friendsService.getFriendRequests(accountId));
+    }
+
     @PostMapping("/{account1-id}/add-user/{account2-id}")
     public ResponseEntity<UserFriendsRequest> sendFriendRequest(@PathVariable("account1-id") Long account1Id, @PathVariable("account2-id") Long account2Id) {
         return ResponseEntity.ok().body(friendsService.sendFriendRequest(account1Id, account2Id));

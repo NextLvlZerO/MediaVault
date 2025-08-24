@@ -26,6 +26,13 @@
           <SingleFriend v-for="(friend, index) in searchData" :username="friend?.username"
             @userClickedEmit="onUserChange" :userId="friend?.id" />
         </div>
+        <div style="margin-top: 4rem;">
+          <label class="form-label g-text-a">Requests</label>
+        </div>
+        <div class="request-results">
+          <SingleFriend v-for="(friend, index) in requestData" :username="friend?.username"
+            @userClickedEmit="onUserChange" :userId="friend?.id" />
+        </div>
       </div>
     </div>
     <div class="right">
@@ -50,7 +57,7 @@
 <script setup>
 
 const apiUrl = import.meta.env.VITE_API_URL;
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
 import { getCookie } from '../utility/cookies.js';
 import { useToast } from 'vue-toast-notification';
 
@@ -58,6 +65,7 @@ const toast = useToast();
 
 const userId = getCookie('userId');
 const friendsData = ref([]);
+const requestData = ref([]);
 const searchData = ref([]);
 
 const activeUser = ref('Lars');
@@ -144,6 +152,27 @@ const getFriendsQueryData = () => {
 }
 
 
+// method for getting request data
+
+const getRequestData = () => {
+  fetch(`${apiUrl}/user/${userId}/friend-requests`)
+    .then(result => {
+      if (!result.ok) {
+        throw new Error('error');
+      }
+      return result.json();
+    })
+    .then(response => requestData.value = response)
+    .catch(error => {
+      console.error(error);
+      toast.error('connection request data error');
+    })
+};
+
+
+onMounted(() => {
+  getRequestData();
+});
 
 
 
@@ -252,6 +281,12 @@ const getFriendsQueryData = () => {
 }
 
 .add-results {
+  display: flex;
+  flex-direction: column;
+  gap: .2rem;
+}
+
+.request-results {
   display: flex;
   flex-direction: column;
   gap: .2rem;

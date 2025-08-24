@@ -24,8 +24,8 @@ p {
 .media-list-container {
   width: 100%;
   display: grid;
-  gap: 25px;
+  gap: 35px;
   justify-content: center;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, 200px);
 }
 </style>

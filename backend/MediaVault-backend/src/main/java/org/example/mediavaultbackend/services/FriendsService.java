@@ -29,6 +29,17 @@ public class FriendsService {
     private final UserFriendsWithRepository userFriendsWithRepository;
 
 
+    public List<AccountResponseDto> getFriendRequests(Long accountId){
+        Account account = accountRepository.findById(accountId).orElseThrow(() -> new NoSuchElementException("Account not found"));
+        List<Account> accounts = userFriendsRequestRepository.findRequestsByAccount(accountId);
+
+        return accounts.stream()
+                .map(a -> AccountResponseDto.builder()
+                .username(a.getUsername())
+                        .id(a.getAccountId())
+                        .build()).collect(Collectors.toList());
+    }
+
     public UserFriendsRequest sendFriendRequest(Long account1Id, Long account2Id) {
 
         if (account1Id.equals(account2Id)) {

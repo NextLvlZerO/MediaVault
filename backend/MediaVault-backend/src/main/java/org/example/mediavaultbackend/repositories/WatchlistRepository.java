@@ -11,4 +11,6 @@ public interface WatchlistRepository extends JpaRepository<Watchlist, Long> {
 
     public Optional<Watchlist> findByAccount_AccountId(Long accountId);
 
+    public Optional<Watchlist> findByAccount_AccountIdAndMedia_MediaId(Long accountId, Long mediaId);
+
 }

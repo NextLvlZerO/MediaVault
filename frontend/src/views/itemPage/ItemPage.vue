@@ -67,7 +67,7 @@ const reviewContainerRef = ref(null);
 const data = ref(null);
 const currentlyWritingReview = ref(false);
 const userId = getCookie('userId');
-const watchlistAdded = true;
+const watchlistAdded = ref(false);
 const movieId = ref(route.params?.id);
 
 
@@ -76,6 +76,7 @@ const movieId = ref(route.params?.id);
 onMounted(() => {
   window.scrollTo({ top: -100, left: 0 })
   getItemData(route.params?.id);
+  getWatchlistStatus(route.params?.id);
 });
 
 
@@ -91,6 +92,7 @@ watch(currentlyWritingReview, (newVal) => {
 watch(() => route.params.id, (newVal) => {
   window.scrollTo({ top: -100, left: 0 })
   getItemData(newVal);
+  getWatchlistStatus(newVal);
   movieId.value = newVal;
 })
 
@@ -113,6 +115,26 @@ const getItemData = (id) => {
 };
 
 
+// method for loading watchlist button
+
+const getWatchlistStatus = (movieId) => {
+  fetch(`${apiUrl}/user/${userId}/media/${movieId}/watchlist`)
+    .then(result => {
+      if (!result.ok) {
+        throw new Error('error');
+      }
+      return result.json();
+    })
+    .then(response => {
+      watchlistAdded.value = response?.exists ? true : false;
+    })
+    .catch(error => {
+      console.error(error);
+      toast.error('connection error watchlist');
+    })
+};
+
+
 // methods for button pressed
 
 const onLendPressed = () => {
@@ -127,7 +149,13 @@ const onWatchlistPressed = () => {
       if (!result.ok) {
         throw new Error('error');
       }
-      return result.json();
+
+      watchlistAdded.value = !watchlistAdded.value;
+
+      const message = watchlistAdded.value ? 'successfully added to watchlist' : `successfully removed from
+        watchlist`;
+
+      toast.success(message);
     })
     .catch(error => {
       console.error(error);

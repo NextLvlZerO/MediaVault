@@ -1,6 +1,7 @@
 package org.example.mediavaultbackend.services;
 
 import lombok.RequiredArgsConstructor;
+import org.example.mediavaultbackend.dtos.MediaResponseDto;
 import org.example.mediavaultbackend.models.Account;
 import org.example.mediavaultbackend.models.Media;
 import org.example.mediavaultbackend.models.Watchlist;
@@ -11,8 +12,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -24,11 +25,34 @@ public class WatchlistService {
     private final AccountRepository accountRepository;
 
 
-    public List<Media> getUserWatchlist(Long id) throws NoSuchElementException {
+    public Map<String, Boolean> getUserMediaWatchlist(Long accountId, Long mediaId) {
+        Account account = accountRepository.findById(accountId).orElseThrow(() -> new NoSuchElementException("Account not found"));
+        Media media = mediaRepository.findById(mediaId).orElseThrow(() -> new NoSuchElementException("Media not found"));
 
-        return watchlistRepository.findByAccount_AccountId(id)
+        Optional<Watchlist> watchlistItem = watchlistRepository.findByAccount_AccountIdAndMedia_MediaId(accountId, mediaId);
+
+        Map<String, Boolean> result = new HashMap<>();
+        result.put("exists", watchlistItem.isPresent());
+
+        return result;
+    }
+
+
+    public List<MediaResponseDto> getUserWatchlist(Long id) throws NoSuchElementException {
+
+        List<Media> watchlist =  watchlistRepository.findByAccount_AccountId(id)
                 .orElseThrow(() -> new NoSuchElementException("no watchlist found"))
                 .getMedia();
+
+        return watchlist.stream()
+                .map(m -> MediaResponseDto.builder()
+                .id(m.getMediaId())
+                .type(m.getType())
+                .title(m.getTitle())
+                .details(m.getDescription())
+                .poster(m.getPoster())
+                .rating(m.getAverageRating())
+                .amount(m.getAmount()).build()).collect(Collectors.toList());
 
     }
 
