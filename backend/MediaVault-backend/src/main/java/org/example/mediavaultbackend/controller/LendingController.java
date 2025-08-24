@@ -14,12 +14,12 @@ public class LendingController {
 
     private final LendingService lendingService;
 
-    @PostMapping("/{account-id}/lend/media({media-id}")
+    @PostMapping("/{account-id}/lend/media/{media-id}")
     public ResponseEntity<Media> lendMedia(@PathVariable("account-id") Long accountId, @PathVariable("media-id") Long mediaId, @RequestBody LendingRequestDto lendingRequestDto) {
         return ResponseEntity.ok().body(lendingService.lendMedia(accountId, mediaId, lendingRequestDto.getDays()));
     }
 
-    @PutMapping("/{account-id}/expand/media({media-id}")
+    @PutMapping("/{account-id}/expand/media/{media-id}")
     public ResponseEntity<Media> expandMedia(@PathVariable("account-id") Long accountId, @PathVariable("media-id") Long mediaId, @RequestBody LendingRequestDto lendingRequestDto) {
         return ResponseEntity.ok().body(lendingService.expandMedia(accountId, mediaId, lendingRequestDto.getDays()));
     }

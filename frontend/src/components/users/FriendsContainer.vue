@@ -20,14 +20,11 @@
       <div v-if="addState" class="add-body">
         <div class="mb-3">
           <label class="form-label g-text-a">Username</label>
-          <input class="form-control input-field" placeholder="search" />
+          <input class="form-control input-field" placeholder="search" @input="onSearchInput" v-model="searchQuery" />
         </div>
         <div class="add-results">
-          <SingleFriend username="Lars" @userClickedEmit="onUserChange" :active="activeUser === 'Lars'" />
-          <SingleFriend username="Larss" @userClickedEmit="onUserChange" :active="activeUser ===
-            'Larss'" />
-          <SingleFriend username="Larsss" @userClickedEmit="onUserChange" :active="activeUser ===
-            'Larsss'" />
+          <SingleFriend v-for="(friend, index) in searchData" :username="friend?.username"
+            @userClickedEmit="onUserChange" :userId="friend?.id" />
         </div>
       </div>
     </div>
@@ -52,12 +49,23 @@
 
 <script setup>
 
+const apiUrl = import.meta.env.VITE_API_URL;
 import { ref } from 'vue'
+import { getCookie } from '../utility/cookies.js';
+import { useToast } from 'vue-toast-notification';
+
+const toast = useToast();
+
+const userId = getCookie('userId');
+const friendsData = ref([]);
+const searchData = ref([]);
 
 const activeUser = ref('Lars');
 const message = ref("");
 const textarea = ref(null);
 
+const debounceTimeout = ref(null);
+const searchQuery = ref('');
 const addState = ref(false);
 
 
@@ -75,15 +83,66 @@ const onAddButtonClicked = () => {
 };
 
 
-const onUserChange = (username) => {
-
+const onUserChange = (username, id) => {
 
   if (addState.value) {
+    handleUserAddition(id);
 
     return;
   }
   activeUser.value = username;
 };
+
+
+// method for adding user friend request
+
+const handleUserAddition = (id) => {
+  fetch(`${apiUrl}/user/${userId}/add-user/${id}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  })
+    .then(result => {
+      if (!result.ok) {
+        throw new Error('error');
+      }
+      return result.json();
+    })
+    .catch(error => {
+      console.error(error);
+      toast.error('connection add error');
+    })
+}
+
+
+// method for waiting .5sec till getting  data
+
+const onSearchInput = () => {
+  clearTimeout(debounceTimeout.value);
+
+  debounceTimeout.value = setTimeout(() => {
+    getFriendsQueryData();
+  }, 500);
+};
+
+// method for getting query search data
+
+const getFriendsQueryData = () => {
+  fetch(`${apiUrl}/user/find-user?query=${searchQuery.value}`)
+    .then(result => {
+      if (!result.ok) {
+        throw new Error('error');
+      }
+      return result.json();
+    })
+    .then(response => searchData.value = response)
+    .catch(error => {
+      console.error(error);
+      toast.error('connection search error');
+    })
+}
+
 
 
 

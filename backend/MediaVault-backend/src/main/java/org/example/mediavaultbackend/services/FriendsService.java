@@ -1,15 +1,21 @@
 package org.example.mediavaultbackend.services;
 
 import lombok.RequiredArgsConstructor;
+import org.example.mediavaultbackend.dtos.AccountResponseDto;
 import org.example.mediavaultbackend.models.Account;
 import org.example.mediavaultbackend.models.UserFriendsRequest;
 import org.example.mediavaultbackend.models.UserFriendsWith;
 import org.example.mediavaultbackend.repositories.AccountRepository;
 import org.example.mediavaultbackend.repositories.UserFriendsRequestRepository;
 import org.example.mediavaultbackend.repositories.UserFriendsWithRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.querydsl.QPageRequest;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -51,5 +57,24 @@ public class FriendsService {
         userFriendsWithRepository.save(userFriendsWith);
 
         return userFriendsWith;
+    }
+
+    public List<AccountResponseDto> searchAccounts(String searchQuery) {
+        Page<Account> accountPage = accountRepository.findByQueryUsername(searchQuery, PageRequest.of(0, 5));
+
+        return accountPage.getContent().stream().map(a -> AccountResponseDto.builder()
+                .username(a.getUsername())
+                .id(a.getAccountId())
+                .build()).collect(Collectors.toList());
+    }
+
+    public List<AccountResponseDto> getFriends(Long accountId) {
+        Account account = accountRepository.findById(accountId).orElseThrow(() -> new NoSuchElementException("Account not found"));
+
+        List<Account> accounts = userFriendsWithRepository.findFriendsOfAccount(account);
+        return accounts.stream().map(a -> AccountResponseDto.builder()
+                .username(a.getUsername())
+                .id(a.getAccountId())
+                .build()).collect(Collectors.toList());
     }
 }

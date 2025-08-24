@@ -20,51 +20,54 @@
 const apiUrl = import.meta.env.VITE_API_URL;
 import { useRoute, useRouter } from 'vue-router';
 import { getCookie } from '../../components/utility/cookies.js'
-import { toast } from 'vue-toast-notification';
+import { useToast } from 'vue-toast-notification';
 
 const route = useRoute();
 const router = useRouter();
 const userId = getCookie('userId');
+const toast = useToast();
+
 
 const onBackClick = () => {
   router.back();
 };
 
 
-const onPurchaseClick = () => {
-  if (handlePurchase()) {
+const onPurchaseClick = async () => {
+  if (await handlePurchase()) {
     router.push('/media/item/lend/purchase-confirmation');
   }
 };
 
 
 
-const handlePurchase = () => {
+const handlePurchase = async () => {
 
-  const returnResult = false;
+  try {
+    const result = await fetch(`${apiUrl}/user/${userId}/lend/media/${route.params?.item}`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        days: 100
+      }),
+      credentials: 'include'
+    });
 
-  fetch(`${apiUrl}/user/${userId}/lend/media/${route.params?.item}`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      days: 100
-    }),
-    credentials: 'include'
-  })
-    .then(result => {
-      if (!result.ok) {
-        throw new Error('error');
-      }
-      return result.json();
-    })
-    .then(result => returnResult = true)
-    .catch(error => {
-      console.error(error);
-      toast.error('lend connection error');
-    })
-  return returnResult;
+    if (!result.ok) {
+      throw new Error('error');
+    }
+    else {
+      toast.success('successfully lent media');
+      return true;
+    }
+  }
+  catch (error) {
+    console.error(error);
+    toast.error('lend connection error');
+    return false;
+  }
 };
 
 
