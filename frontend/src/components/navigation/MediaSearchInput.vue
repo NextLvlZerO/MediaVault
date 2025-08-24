@@ -2,8 +2,8 @@
   <div class="search-filter-component">
     <div class="search-input-component">
       <input ref="inputRef" class="search-component" v-model="inputText" placeholder="Search" type="text"
-        @focus="onInputFocus" @blur="status = 0" />
-      <div class="search-results" v-if="status === 1" @mousedown.prevent>
+        @input="onSearchInput" @focus="onInputFocus" @blur="status = 0" />
+      <div class="search-results" v-if="status === 1 && data && data.length > 0" @mousedown.prevent>
         <MediaSearchResultItem v-for="(item, index) in data" :key="index" :title="item?.title" :id="item?.id"
           @onChildPressedEvent="unfocusInput" />
       </div>
@@ -29,6 +29,8 @@ import { useToast } from 'vue-toast-notification'
 const toast = useToast();
 
 const status = ref(0);
+const debounceTimeout = ref(null);
+
 const inputText = ref('');
 const inputRef = ref(null);
 
@@ -86,41 +88,32 @@ const filterOptions = ref([{
 ]);
 
 
-const data = [{
-  "title": "Avengers Infinity war",
-  "id": 2
-},
-{
-  "title": "Avengers Infinity war",
-  "id": 2
-},
-{
-  "title": "Avengers Infinity war",
-  "id": 2
-},
-{
-  "title": "Avengers Infinity war",
-  "id": 2
-},
-{
-  "title": "Avengers Infinity war",
-  "id": 2
-}
-]
+const data = ref(null);
+
+
+// wait 2 seconds till fetching backend for movie search input data
+
+const onSearchInput = () => {
+
+  clearTimeout(debounceTimeout.value);
+
+  debounceTimeout.value = setTimeout(() => {
+    getMediaQueryData();
+  }, 500);
+};
 
 
 // when focused update list
 
 const onInputFocus = () => {
   status.value = 1;
-  getMediaQueryData();
 }
 
 
 // get media query data from backend
 
 const getMediaQueryData = () => {
-  fetch(`${apiUrl}/media/search?query=Superman`)
+  fetch(`${apiUrl}/media/search?query=${inputText.value}`)
     .then(result => {
       if (!result.ok) {
         throw new Error('error');

@@ -22,18 +22,44 @@
 const apiUrl = import.meta.env.VITE_API_URL;
 import { ref, onMounted } from 'vue';
 import { useToast } from 'vue-toast-notification';
+import { getCookie } from '../utility/cookies.js';
 
-const props = defineProps(['prename', 'name', 'clickable', 'fontSize', 'pageSize']);
+const props = defineProps(['prename', 'name', 'dataType', 'clickable', 'fontSize', 'pageSize']);
 const toast = useToast();
 
 const data = ref([null, null, null, null, null]);
 const pageCount = ref(0);
+const userId = getCookie('userId');
 
 
 
 const getMediaItemData = (append) => {
-  fetch(`${apiUrl}/media/movies/best-rated?page=${pageCount.value}&page-size=${props?.pageSize ?
-    props.pageSize : 5}`)
+
+
+  // fetch only the requested type
+
+  let fetchUrl = `${apiUrl}/media/movies/all?page=${pageCount.value}&page-size=${props?.pageSize ?
+    props.pageSize : 5}`;
+
+  switch (props?.dataType) {
+    case 'rating':
+      fetchUrl = `${apiUrl}/media/movies/best-rated?page=${pageCount.value}&page-size=${props?.pageSize ?
+        props.pageSize : 5}`;
+      break;
+
+    case 'watchlist':
+      fetchUrl = `${apiUrl}/user/${userId}/watchlist`;
+      break;
+
+    case 'history':
+      fetchUrl = `${apiUrl}/user/${userId}/history`;
+      break;
+  }
+
+
+  // real fetch process
+
+  fetch(`${fetchUrl}`)
     .then(response => {
       if (!response.ok) { throw new Error('error') }
       return response.json()

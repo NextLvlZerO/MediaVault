@@ -16,10 +16,15 @@
 </template>
 
 <script setup>
+
+const apiUrl = import.meta.env.VITE_API_URL;
 import { useRoute, useRouter } from 'vue-router';
+import { getCookie } from '../../components/utility/cookies.js'
+import { toast } from 'vue-toast-notification';
 
 const route = useRoute();
 const router = useRouter();
+const userId = getCookie('userId');
 
 const onBackClick = () => {
   router.back();
@@ -27,7 +32,39 @@ const onBackClick = () => {
 
 
 const onPurchaseClick = () => {
-  router.push('/media/item/lend/purchase-confirmation');
+  if (handlePurchase()) {
+    router.push('/media/item/lend/purchase-confirmation');
+  }
+};
+
+
+
+const handlePurchase = () => {
+
+  const returnResult = false;
+
+  fetch(`${apiUrl}/user/${userId}/lend/media/${route.params?.item}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      days: 100
+    }),
+    credentials: 'include'
+  })
+    .then(result => {
+      if (!result.ok) {
+        throw new Error('error');
+      }
+      return result.json();
+    })
+    .then(result => returnResult = true)
+    .catch(error => {
+      console.error(error);
+      toast.error('lend connection error');
+    })
+  return returnResult;
 };
 
 

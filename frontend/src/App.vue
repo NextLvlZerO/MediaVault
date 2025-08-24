@@ -1,22 +1,3 @@
-<script setup>
-import { RouterLink, RouterView, useRoute } from 'vue-router'
-import Header from './components/navigation/Header.vue'
-import Footer from './components/navigation/Footer.vue'
-
-const Route = useRoute();
-
-const checkHeaderVisibility = () => {
-  return !(Route.path.startsWith('/media/item/lend')) && !(Route.path.startsWith('/login'));
-};
-
-const checkFooterVisibility = () => {
-  return !(Route.path.startsWith('/login'));
-
-};
-
-
-</script>
-
 <template>
   <div class="app-component">
     <Header v-if="checkHeaderVisibility()" />
@@ -24,6 +5,43 @@ const checkFooterVisibility = () => {
     <Footer v-if="checkFooterVisibility()" />
   </div>
 </template>
+
+
+<script setup>
+import { RouterLink, RouterView, useRoute, useRouter } from 'vue-router'
+import Header from './components/navigation/Header.vue'
+import Footer from './components/navigation/Footer.vue'
+import { watch, onMounted } from 'vue'
+import { getCookie } from './components/utility/cookies.js';
+
+const Route = useRoute();
+const Router = useRouter();
+
+const checkHeaderVisibility = () => {
+  return !(Route.path.startsWith('/media/item/lend')) && !(Route.path.startsWith('/login'));
+};
+
+const checkFooterVisibility = () => {
+  return !(Route.path.startsWith('/login'));
+};
+
+const checkForLogin = () => {
+  if (!getCookie('username') || !getCookie('userId')) {
+    Router.push('/login');
+  }
+};
+
+
+watch(() => Route.path, newVal => {
+  checkForLogin();
+})
+
+onMounted(() => {
+  checkForLogin();
+});
+
+
+</script>
 
 
 <style>

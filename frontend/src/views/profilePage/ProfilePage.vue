@@ -13,7 +13,7 @@
           </h2>
           <div class="user-info-item user-information-username">
             <p class="g-text-b-a"> {{ `Username: \b` }} </p>
-            <p class="g-text-b"> NextLvlZer0</p>
+            <p class="g-text-b"> {{ username }}</p>
           </div>
         </div>
         <HSeperator class="five-rem-distance" />
@@ -46,9 +46,19 @@
 
 <script setup>
 import { useRoute, useRouter } from 'vue-router';
+import { onMounted, ref } from 'vue';
+import { getCookie } from './../../components/utility/cookies.js';
 
 const route = useRoute();
 const router = useRouter();
+
+const username = ref('');
+
+onMounted(() => {
+  username.value = getCookie('username');
+  console.log(getCookie('username'));
+  console.log(document.cookie);
+});
 
 
 </script>

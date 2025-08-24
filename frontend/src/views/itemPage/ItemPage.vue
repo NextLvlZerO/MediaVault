@@ -39,11 +39,12 @@
       <div class="item-page-container-body">
         <MediaContainer :fontSize="3" prename="R" name="elevant" dataType="relevant" :clickable="true" />
         <HSeperator class="five-rem-distance" />
-        <RatingsContainer :fontSize="3" :movieId="route.params?.id" @toggleWriteEvent="onWriteButtonPressed" />
+        <RatingsContainer ref="reviewContainerRef" :fontSize="3" :movieId="movieId" :key="movieId"
+          @toggleWriteEvent="onWriteButtonPressed" />
       </div>
     </div>
-    <RatingAddition v-if="currentlyWritingReview" :movieId="route.params?.id"
-      @goBackEvent="currentlyWritingReview = false" />
+    <RatingAddition v-if="currentlyWritingReview" :movieId="movieId" @goBackEvent="currentlyWritingReview = false"
+      @reviewSubmitEmit="onReviewSubmit" />
   </div>
 
 </template>
@@ -56,14 +57,18 @@ const apiUrl = import.meta.env.VITE_API_URL;
 import { useRoute, useRouter } from 'vue-router';
 import { ref, watch, onMounted } from 'vue';
 import { useToast } from 'vue-toast-notification';
+import { getCookie } from './../../components/utility/cookies.js';
 
 const route = useRoute();
 const router = useRouter();
 const toast = useToast();
+const reviewContainerRef = ref(null);
 
 const data = ref(null);
 const currentlyWritingReview = ref(false);
+const userId = getCookie('userId');
 const watchlistAdded = true;
+const movieId = ref(route.params?.id);
 
 
 // load data when mounted and scroll to top
@@ -86,6 +91,7 @@ watch(currentlyWritingReview, (newVal) => {
 watch(() => route.params.id, (newVal) => {
   window.scrollTo({ top: -100, left: 0 })
   getItemData(newVal);
+  movieId.value = newVal;
 })
 
 
@@ -114,11 +120,28 @@ const onLendPressed = () => {
 };
 
 const onWatchlistPressed = () => {
-  return;
+  fetch(`${apiUrl}/user/${userId}/watchlist/media/${route.params?.id}`, {
+    method: 'PUT',
+  })
+    .then(result => {
+      if (!result.ok) {
+        throw new Error('error');
+      }
+      return result.json();
+    })
+    .catch(error => {
+      console.error(error);
+      toast.error('connection watchlist error');
+    })
 };
 
 const onWriteButtonPressed = () => {
   currentlyWritingReview.value = true;
+};
+
+const onReviewSubmit = () => {
+  currentlyWritingReview.value = false;
+  reviewContainerRef.value?.getMediaReviews();
 };
 
 </script>

@@ -33,8 +33,7 @@
             <li style="cursor: pointer;"><a class="dropdown-item" :onclick="() =>
               Router.push('/user/friends')">Friends</a></li>
             <li style="cursor: pointer;"><a class="dropdown-item">Settings</a></li>
-            <li style="cursor: pointer;"><a class="dropdown-item" :onclick="() =>
-              Router.push('/login')">Logout</a></li>
+            <li style="cursor: pointer;"><a class="dropdown-item" :onclick="onLogoutClicked">Logout</a></li>
           </ul>
         </div>
 
@@ -50,8 +49,15 @@
 
 import { RouterLink, RouterView, useRouter } from 'vue-router';
 import { motion } from 'motion-v';
+import { deleteAllCookies } from './../utility/cookies.js';
 
 const Router = useRouter();
+
+
+const onLogoutClicked = () => {
+  deleteAllCookies();
+  Router.push('/login')
+};
 
 </script>
 

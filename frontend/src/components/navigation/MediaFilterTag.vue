@@ -50,6 +50,7 @@ const onTagClicked = () => {
   margin-left: .6rem;
   margin-right: .6rem;
   transform: translateY(7px);
+  user-select: none;
 }
 
 .filter-text-active {

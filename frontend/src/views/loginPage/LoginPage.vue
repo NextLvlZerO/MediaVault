@@ -41,7 +41,7 @@ const handleFormSubmit = (parameters) => {
     handleLoginSubmit(parameters?.username, parameters?.password);
   }
 
-  else if (type === 'register') {
+  else if (parameters?.type === 'register') {
     handleRegisterSubmit(parameters?.username, parameters?.password, parameters?.confirmedPassword);
   }
 
@@ -60,10 +60,11 @@ const handleLoginSubmit = (username, password) => {
 
   fetch(`${apiUrl}/login`, {
     method: 'POST',
-    header: {
+    headers: {
       'Content-Type': 'application/json'
     },
     body: JSON.stringify(loginBody),
+    credentials: 'include'
   })
     .then(result => {
       if (!result.ok) {
@@ -72,15 +73,37 @@ const handleLoginSubmit = (username, password) => {
       router.push('/');
     })
     .catch(error => {
-      toast.error('Login denied but we dont have endpoints so move forward carefully');
+      toast.error('Login denied');
       console.error(error);
-      router.push('/');
     });
 };
 
 
 const handleRegisterSubmit = (username, password, confirmedPassword) => {
-  return;
+
+  const registerBody = {
+    username: username,
+    password: password
+  };
+
+  fetch(`${apiUrl}/register`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(registerBody),
+    credentials: 'include'
+  })
+    .then(result => {
+      if (!result.ok) {
+        throw new Error('error');
+      }
+    })
+    .then(response => router.push('/'))
+    .catch(error => {
+      toast.error('Register request failed');
+      console.error(error);
+    })
 };
 
 

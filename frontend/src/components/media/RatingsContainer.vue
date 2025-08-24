@@ -11,7 +11,7 @@
         </div>
         <button class="ratings-page-write-button" :onclick="onWritePressed"> write review </button>
       </div>
-      <Rating v-for="(item, index) in data" :key="index" :user="item?.user" :title="item?.title"
+      <Rating v-for="(item, index) in data" :key="index" :user="item?.username" :title="item?.title"
         :details="item?.details" :rating="item?.rating" :verified="item?.verified" />
     </div>
   </div>
@@ -21,7 +21,7 @@
 <script setup>
 
 const apiUrl = import.meta.env.VITE_API_URL;
-import { defineEmits, onMounted } from 'vue';
+import { defineEmits, defineExpose, onMounted, ref } from 'vue';
 import { useToast } from 'vue-toast-notification'
 
 const emit = defineEmits(['toggleWriteEvent']);
@@ -29,43 +29,17 @@ const props = defineProps(['movieId', 'fontSize']);
 const toast = useToast();
 
 
-const data = [
-  {
-    title: 'Best Film ever', user: 'NextLvlZer0', verified: true, rating: 5, details: `Lorem ipsum dolor sit amet, consetetur sadipscing
-    elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam
-    voluptua.At vero eos et accusam et justo duo dolores et ea rebum.Stet clita kasd gubergren, no
-    sea takimata sanctus est Lorem ipsum dolor sit amet.`},
-  {
-    title: 'Best Film ever', user: 'NextLvlZer0', rating: 5, details: `Lorem ipsum dolor sit amet, consetetur sadipscing
-    elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam
-    voluptua.At vero eos et accusam et justo duo dolores et ea rebum.Stet clita kasd gubergren, no
-    sea takimata sanctus est Lorem ipsum dolor sit amet.`},
-  {
-    title: 'Best Film ever', user: 'NextLvlZer0', rating: 5, details: `Lorem ipsum dolor sit amet, consetetur sadipscing
-    elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam
-    voluptua.At vero eos et accusam et justo duo dolores et ea rebum.Stet clita kasd gubergren, no
-    sea takimata sanctus est Lorem ipsum dolor sit amet.`},
-  {
-    title: 'Best Film ever', user: 'NextLvlZer0', rating: 5, details: `Lorem ipsum dolor sit amet, consetetur sadipscing
-    elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam
-    voluptua.At vero eos et accusam et justo duo dolores et ea rebum.Stet clita kasd gubergren, no
-    sea takimata sanctus est Lorem ipsum dolor sit amet.`},
-  {
-    title: 'Best Film ever', user: 'NextLvlZer0', rating: 5, details: `Lorem ipsum dolor sit amet, consetetur sadipscing
-    elitr, sed diam nonumy eirmod tempor invidunt ut labore et dolore magna aliquyam erat, sed diam
-    voluptua.At vero eos et accusam et justo duo dolores et ea rebum.Stet clita kasd gubergren, no
-    sea takimata sanctus est Lorem ipsum dolor sit amet.`},
-];
+const data = ref([]);
 
 
 
 // method for getting the reviews of the media id
 
 const getMediaReviews = () => {
-  fetch(`${apiUrl}/media/${props?.movieId}/reviews`)
+  fetch(`${apiUrl}/media/${props?.movieId}/reviews?page=0&page-size=10`)
     .then(result => {
       if (!result.ok) throw new Error('error');
-      return response
+      return result;
     })
     .then(response => response.json())
     .then(jsonData => data.value = jsonData)
@@ -76,6 +50,9 @@ const getMediaReviews = () => {
     })
 };
 
+defineExpose({
+  getMediaReviews
+});
 
 const onWritePressed = () => {
   emit('toggleWriteEvent');
