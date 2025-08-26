@@ -60,10 +60,17 @@ const getMediaItemData = (append) => {
   // real fetch process
 
   fetch(`${fetchUrl}`)
-    .then(response => {
-      if (!response.ok) { throw new Error('fetch data error') }
-      return response.json()
-    })
+    .then(request => {
+      if (!request.ok) {
+        return request.json()
+          .then(response => {
+            const errorMessage = response?.error;
+            throw new Error(errorMessage);
+          })
+      }
+      return request.json()
+    }
+    )
     .then(json => {
       if (append) {
         data.value = [...data.value, ...json];
@@ -75,7 +82,7 @@ const getMediaItemData = (append) => {
       }
     })
     .catch(error => {
-      toast.error(error);
+      toast.error(error.message);
       console.error('Failed to fetch data: ', error)
     })
 };

@@ -10,12 +10,10 @@
         </button>
       </div>
       <div v-if="!addState" class="friends-body">
-        <SingleFriend username="Lars" @userClickedEmit="onUserChange" :active="activeUser === 'Lars'" />
-        <SingleFriend username="Julian Hensel" @userClickedEmit="onUserChange"
-          :active="activeUser === 'Julian Hensel'" />
-        <SingleFriend username="Fortniteenjoyer123" @userClickedEmit="onUserChange"
-          :active="activeUser === 'Fortniteenjoyer123'" />
-        <SingleFriend username="NextLvlZer0" @userClickedEmit="onUserChange" :active="activeUser === 'NextLvlZer0'" />
+        <p v-if="!friendsData || friendsData.length == 0" class="g-text-a"> No friends found :/ </p>
+        <SingleFriend v-else v-for="(friend, index) in friendsData" :key="index" :username="friend?.username"
+          @userClickedEmit="onUserChange" :active="activeUser ===
+            friend?.id" :userId="friend?.id" :request="false" />
       </div>
       <div v-if="addState" class="add-body">
         <div class="mb-3">
@@ -24,9 +22,9 @@
         </div>
         <div class="add-results">
           <SingleFriend v-for="(friend, index) in searchData" :username="friend?.username"
-            @userClickedEmit="onUserChange" :userId="friend?.id" />
+            @userClickedEmit="onUserChange" :userId="friend?.id" :request="false" />
         </div>
-        <div style="margin-top: 4rem;">
+        <div v-if="requestData && requestData.length > 0" style="margin-top: 4rem;">
           <label class="form-label g-text-a">Requests</label>
         </div>
         <div class="request-results">
@@ -37,15 +35,13 @@
     </div>
     <div class="right">
       <div class="right-messages">
-        <UserMessage type="received" />
-        <UserMessage type="sent" />
-        <UserMessage />
-        <UserMessage />
+        <UserMessage v-for="(item, index) in messageData[activeUser]" :key="index" :type="item?.type" :text="item?.text"
+          :date="item?.date" />
       </div>
       <div class="message-input">
         <textarea class="message-input-area" placeholder="End-to-end-unencrypted" v-model="message"
           @input="resizeTextarea" ref="textarea" />
-        <button class="send-button g-button-p">
+        <button class="send-button g-button-p" @click="sendMessage(message)">
           <i class="bi bi-send-fill" style="color: #000; font-size: 18px; margin: 0px" />
         </button>
       </div>
@@ -62,13 +58,16 @@ import { getCookie } from '../utility/cookies.js';
 import { useToast } from 'vue-toast-notification';
 
 const toast = useToast();
+const s = ref(null);
 
 const userId = getCookie('userId');
 const friendsData = ref([]);
 const requestData = ref([]);
 const searchData = ref([]);
+const messageData = ref({});
+const messageActiveData = ref([]);
 
-const activeUser = ref('Lars');
+const activeUser = ref(0);
 const message = ref("");
 const textarea = ref(null);
 
@@ -95,10 +94,50 @@ const onUserChange = (username, id) => {
 
   if (addState.value) {
     handleUserAddition(id);
-
     return;
   }
-  activeUser.value = username;
+
+  activeUser.value = id;
+  updateUserMessages(id);
+};
+
+
+// method for getting messages
+
+const updateUserMessages = (id) => {
+
+  if (!id) {
+    return;
+  }
+
+  if (!messageData.value[id]) {
+
+    messageData.value[id] = [];
+
+    fetch(`${apiUrl}/user/${userId}/message/${id}`)
+      .then(result => {
+        if (!result.ok) {
+          return result.json()
+            .then(response => {
+              const errorMessage = response?.error;
+              throw new Error(errorMessage);
+            })
+        }
+        return result.json()
+      })
+      .then(response => {
+        const messages = Array.isArray(response) ? response : [response];
+        messageData.value[id] = messages.map(i => {
+          i["date"] = new
+            Date(i["date"]).toLocaleDateString("de-DE")
+          return i;
+        })
+      })
+      .catch(error => {
+        toast.error(error.message);
+        console.error(error);
+      })
+  }
 };
 
 
@@ -113,13 +152,21 @@ const handleUserAddition = (id) => {
   })
     .then(result => {
       if (!result.ok) {
-        throw new Error('error');
+        return result.json()
+          .then(response => {
+            const errorMessage = response?.error;
+            throw new Error(errorMessage);
+          })
+          .catch((error) => {
+            console.error(error);
+            toast.error(error.message);
+          })
       }
-      toast.success('successfully added user');
+
+      toast.success('Successfully added user');
     })
     .catch(error => {
       console.error(error);
-      toast.error('connection add error');
     })
 }
 
@@ -137,17 +184,23 @@ const handleUserRequestEvent = (accept, user2Id) => {
   })
     .then(response => {
       if (!response.ok) {
-        throw new Error('connection request error');
-        console.error(error);
+        return response.json()
+          .then(response => {
+            const errorMessage = response?.error;
+            throw new Error(errorMessage);
+          })
       }
     })
     .then(() => {
       const message = accept ? 'Successfully accepted friend request' : `Successfully denied friend
         request`
       toast.success(message);
+      getRequestData();
+      getFriendsData();
     })
     .catch(error => {
       toast.error(error.message);
+      console.error(error);
     })
 
 };
@@ -164,19 +217,26 @@ const onSearchInput = () => {
 };
 
 // method for getting query search data
+// only reveals users, that are no friends yet
 
 const getFriendsQueryData = () => {
   fetch(`${apiUrl}/user/find-user?query=${searchQuery.value}`)
     .then(result => {
       if (!result.ok) {
-        throw new Error('error');
+        return result.json()
+          .then(response => {
+            const errorMessage = response?.error;
+            throw new Error(errorMessage);
+          })
       }
       return result.json();
     })
-    .then(response => searchData.value = response)
+    .then(response => searchData.value = response.filter(r => {
+      return r?.id != userId && !friendsData.value.map(f => f?.id).includes(r?.id);
+    }))
     .catch(error => {
       console.error(error);
-      toast.error('connection search error');
+      toast.error(error.message);
     })
 }
 
@@ -187,19 +247,182 @@ const getRequestData = () => {
   fetch(`${apiUrl}/user/${userId}/friend-requests`)
     .then(result => {
       if (!result.ok) {
-        throw new Error('error');
+        return result.json()
+          .then(response => {
+            const errorMessage = response?.error;
+            throw new Error(errorMessage);
+          })
       }
       return result.json();
     })
     .then(response => requestData.value = response)
     .catch(error => {
       console.error(error);
-      toast.error('connection request data error');
+      toast.error(error.message);
     })
 };
 
 
+// method for getting friends data
+
+const getFriendsData = () => {
+  fetch(`${apiUrl}/user/${userId}/friends`)
+    .then(result => {
+      if (!result.ok) {
+        return result.json()
+          .then(response => {
+            const errorMessage = response?.error;
+            throw new Error(errorMessage);
+          })
+      }
+      return result.json();
+    })
+    .then(response => friendsData.value = response)
+    .catch(error => {
+      console.error(error);
+      toast.error(error.message);
+    })
+};
+
+
+// method for socket config
+
+s.value = new WebSocket(`ws://localhost:8080/message`);
+console.log('Socket connected');
+
+
+s.value.onopen = () => {
+  s.value.send(`REGISTER;${userId}`);
+  console.log('init socket');
+};
+
+
+s.value.onmessage = (message) => {
+  handleIncomingMessage(message.data);
+  console.log(message.data);
+}
+
+
+
+const handleIncomingMessage = (message) => {
+
+  // message = MESSAGE;id;id;message
+
+  if (!message) {
+    console.error('invalid Message');
+    toast.error('invalid Message');
+    return;
+  }
+
+  const data = message.split(';');
+  const method = data[0];
+
+  if (!method) {
+    console.error('invalid Message');
+    toast.error('invalid Message');
+  }
+
+  switch (method) {
+    case 'MESSAGE':
+      handleMessageType(data);
+      break;
+
+    default:
+      toast.error('invalid message type');
+      console.error('invalid message type');
+      return;
+  }
+
+};
+
+
+// handling normal incoming message
+
+const handleMessageType = (data) => {
+
+  if (data.length < 4) {
+    console.error('invalid message arguments');
+    toast.error('invalid message arguments')
+    return;
+  }
+
+  const friendId = data[1];
+  const message = data[3];
+
+  if (!friendId || !message) {
+    console.error('invalid message arguments');
+    toast.error('invalid message arguments')
+    return;
+  }
+
+
+  const messageObject = {
+    text: message,
+    date: new Date().toLocaleDateString('de-DE'),
+    type: 'received'
+  };
+
+  if (!messageData.value[friendId]) {
+    updateUserMessages(friendId);
+  }
+
+
+  // just to be safe, shouldn't happen 4sure
+
+  if (!messageData.value[friendId]) {
+    console.error('this error is impossible');
+    toast.error('this error is impossible')
+    return;
+  }
+
+  messageData.value[friendId].push(messageObject);
+
+  console.log(messageData.value);
+  console.log(friendId);
+  console.log(activeUser.value);
+
+};
+
+
+
+const sendMessage = (m) => {
+
+  const messageObject = {
+    text: m,
+    date: new Date().toLocaleDateString("de-DE"),
+    type: 'sent'
+  }
+
+  if (!activeUser.value) {
+    console.error('no friend specified');
+    toast.error('no friend specified');
+    return;
+  }
+
+  if (!messageData.value[activeUser.value]) {
+    console.error('something went wrong');
+    toast.error('something went wrong');
+    return;
+  }
+
+  if (m.length == 0) {
+    console.error('message is empty');
+    toast.error('message is empty');
+  }
+
+  s.value.send(`MESSAGE;${userId};${activeUser.value};${m}`);
+  console.log(`MESSAGE;${userId};${activeUser.value};${m}`);
+
+  messageData.value[activeUser.value].push(messageObject);
+  message.value = '';
+  resizeTextarea();
+
+  console.log("message sent: ", m);
+};
+
+
 onMounted(() => {
+  getFriendsData();
   getRequestData();
 });
 

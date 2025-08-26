@@ -56,7 +56,11 @@ const handlePurchase = async () => {
     });
 
     if (!result.ok) {
-      throw new Error('error');
+      return result.json()
+        .then(response => {
+          const errorMessage = response?.error;
+          throw new Error(errorMessage);
+        })
     }
     else {
       toast.success('successfully lent media');
@@ -65,7 +69,7 @@ const handlePurchase = async () => {
   }
   catch (error) {
     console.error(error);
-    toast.error('lend connection error');
+    toast.error(error.message);
     return false;
   }
 };

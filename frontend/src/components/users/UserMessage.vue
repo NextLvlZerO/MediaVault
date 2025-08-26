@@ -1,9 +1,10 @@
 <template>
   <div class="message-container" :class="props?.type === 'received' ? 'received' : 'sent'">
     <p :class="props?.type === 'received' ? 'g-text' : 'g-text-d'" style="margin-bottom: 1.6rem;">
-      {{ text }}
+      {{ props?.text }}
     </p>
-    <p class="container-time" :class="props?.type === 'received' ? 'g-text-a' : 'g-text-d-a'">11:00</p>
+    <p class="container-time" :class="props?.type === 'received' ? 'g-text-a' :
+      'g-text-d-a'">{{ props?.date }}</p>
   </div>
 
 </template>

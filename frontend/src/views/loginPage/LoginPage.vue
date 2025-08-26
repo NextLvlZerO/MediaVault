@@ -68,12 +68,16 @@ const handleLoginSubmit = (username, password) => {
   })
     .then(result => {
       if (!result.ok) {
-        throw new Error('login failed');
+        return result.json()
+          .then(response => {
+            const errorMessage = response?.error;
+            throw new Error(errorMessage);
+          })
       }
       router.push('/');
     })
     .catch(error => {
-      toast.error('Login denied');
+      toast.error(error.message);
       console.error(error);
     });
 };
@@ -96,12 +100,16 @@ const handleRegisterSubmit = (username, password, confirmedPassword) => {
   })
     .then(result => {
       if (!result.ok) {
-        throw new Error('error');
+        return result.json()
+          .then(response => {
+            const errorMessage = response?.error;
+            throw new Error(errorMessage);
+          })
       }
     })
     .then(response => router.push('/'))
     .catch(error => {
-      toast.error('Register request failed');
+      toast.error(error.message);
       console.error(error);
     })
 };

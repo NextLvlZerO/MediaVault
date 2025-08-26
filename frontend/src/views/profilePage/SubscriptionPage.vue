@@ -57,14 +57,18 @@ const getSubscriptionData = () => {
   fetch(`${apiUrl}/subscription/types`)
     .then(result => {
       if (!result.ok) {
-        throw new Error('connection subscription error');
+        return result.json()
+          .then(response => {
+            const errorMessage = response?.error;
+            throw new Error(errorMessage);
+          })
       }
       return result.json()
     })
     .then(response => data.value = response)
     .catch(error => {
       console.error(error);
-      toast.error(error);
+      toast.error(error.message);
     })
 };
 

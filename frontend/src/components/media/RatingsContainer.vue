@@ -39,15 +39,21 @@ const data = ref([]);
 
 const getMediaReviews = () => {
   fetch(`${apiUrl}/media/${props?.movieId}/reviews?page=0&page-size=10`)
-    .then(result => {
-      if (!result.ok) throw new Error('error');
-      return result;
+    .then(request => {
+      if (!request.ok) {
+        return request.json()
+          .then(response => {
+            const errorMessage = response?.error;
+            throw new Error(errorMessage);
+          })
+      }
+      return request;
     })
     .then(response => response.json())
     .then(jsonData => data.value = jsonData)
 
     .catch(error => {
-      toast.error('reviews data connection error');
+      toast.error(error.message);
       console.error('Failed to fetch data: ', error)
     })
 };

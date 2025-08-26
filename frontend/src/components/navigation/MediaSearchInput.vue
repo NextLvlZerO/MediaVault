@@ -116,7 +116,11 @@ const getMediaQueryData = () => {
   fetch(`${apiUrl}/media/search?query=${inputText.value}`)
     .then(result => {
       if (!result.ok) {
-        throw new Error('error');
+        return result.json()
+          .then(response => {
+            const errorMessage = response?.error;
+            throw new Error(errorMessage);
+          })
       }
       return result.json();
     })

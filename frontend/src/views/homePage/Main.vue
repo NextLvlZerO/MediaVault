@@ -47,6 +47,7 @@
 
   background:
     radial-gradient(ellipse 150px 50% at center, #ffffff22 0%, transparent 100%), linear-gradient(to bottom, var(--color-background-lighter) 20%, var(--color-background) 100%);
+  min-height: 500px;
 }
 
 .main-container-title {
