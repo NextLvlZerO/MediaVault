@@ -28,4 +28,10 @@ public class SubscriptionController {
     }
 
 
+    @GetMapping("/user/{account-id}")
+    public SubscriptionResponseDto getSubscription(@PathVariable("account-id") Long accountId) {
+        return subscriptionService.getSubscription(accountId);
+    }
+
+
 }

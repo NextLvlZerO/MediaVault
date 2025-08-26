@@ -7,6 +7,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @Entity
@@ -33,6 +34,6 @@ public class Message {
     private String message;
 
     @Column(name = "date")
-    private LocalDate date;
+    private LocalDateTime date;
 
 }

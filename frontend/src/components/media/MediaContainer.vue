@@ -20,11 +20,12 @@
 <script setup>
 
 const apiUrl = import.meta.env.VITE_API_URL;
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { useToast } from 'vue-toast-notification';
 import { getCookie } from '../utility/cookies.js';
 
-const props = defineProps(['prename', 'name', 'dataType', 'clickable', 'fontSize', 'pageSize']);
+const props = defineProps(['prename', 'name', 'dataType', 'clickable', 'fontSize', 'pageSize',
+  'filterData']);
 const toast = useToast();
 
 const data = ref([null, null, null, null, null]);
@@ -33,17 +34,38 @@ const userId = getCookie('userId');
 
 
 
+
+watch(() => props.filterData, (newVal) => {
+  getMediaItemData();
+}
+);
+
+
+
 const getMediaItemData = (append) => {
+
+  console.log(props.filterData);
+
+  if (props?.filterData) {
+
+    getMediaFilterData(props.filterData, append);
+    return;
+  }
 
 
   // fetch only the requested type
 
-  let fetchUrl = `${apiUrl}/media/movies/all?page=${pageCount.value}&page-size=${props?.pageSize ?
+  let fetchUrl = `${apiUrl}/media/movie/all?page=${pageCount.value}&page-size=${props?.pageSize ?
     props.pageSize : 5}`;
 
   switch (props?.dataType) {
-    case 'rating':
-      fetchUrl = `${apiUrl}/media/movies/best-rated?page=${pageCount.value}&page-size=${props?.pageSize ?
+    case 'media-rating':
+      fetchUrl = `${apiUrl}/media/movie/best-rated?page=${pageCount.value}&page-size=${props?.pageSize ?
+        props.pageSize : 5}`;
+      break;
+
+    case 'series-all':
+      fetchUrl = `${apiUrl}/media/series/all?page=${pageCount.value}&page-size=${props?.pageSize ?
         props.pageSize : 5}`;
       break;
 
@@ -52,7 +74,7 @@ const getMediaItemData = (append) => {
       break;
 
     case 'history':
-      fetchUrl = `${apiUrl}/user/${userId}/history`;
+      fetchUrl = `${apiUrl}/history/user/${userId}`;
       break;
   }
 
@@ -60,10 +82,17 @@ const getMediaItemData = (append) => {
   // real fetch process
 
   fetch(`${fetchUrl}`)
-    .then(response => {
-      if (!response.ok) { throw new Error('fetch data error') }
-      return response.json()
-    })
+    .then(request => {
+      if (!request.ok) {
+        return request.json()
+          .then(response => {
+            const errorMessage = response?.error;
+            throw new Error(errorMessage);
+          })
+      }
+      return request.json()
+    }
+    )
     .then(json => {
       if (append) {
         data.value = [...data.value, ...json];
@@ -75,10 +104,50 @@ const getMediaItemData = (append) => {
       }
     })
     .catch(error => {
-      toast.error(error);
+      toast.error(error.message);
       console.error('Failed to fetch data: ', error)
     })
 };
+
+
+
+
+const getMediaFilterData = (currentFilterData, append) => {
+  fetch(`${apiUrl}/media/movie/filter?page=${pageCount.value}&page-size=${props?.pageSize ?
+    props.pageSize : 5}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(currentFilterData)
+  })
+    .then(result => {
+      if (!result.ok) {
+        return result.json()
+          .then(response => {
+            const errorMessage = response?.error;
+            throw new Error(errorMessage);
+          })
+      }
+      return result.json();
+    })
+    .then(json => {
+
+      if (append) {
+        data.value = [...data.value, ...json];
+
+        if (!json || json.length == 0) { throw new Error('No more data available'); }
+      }
+      else {
+        data.value = json
+      }
+    })
+    .catch(error => {
+      toast.error(error);
+      console.error('Error while searching media');
+    })
+}
+
 
 
 const onLoadMoreButtonClick = () => {

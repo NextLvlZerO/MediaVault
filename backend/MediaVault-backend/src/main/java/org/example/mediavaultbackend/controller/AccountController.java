@@ -23,7 +23,9 @@ public class AccountController {
     public ResponseEntity<String> register(@RequestBody AccountRequestDto accountRequestDto, HttpServletResponse response) {
         ResponseEntity<String> responseData = ResponseEntity.status(HttpStatus.CREATED).body(accountService.register(accountRequestDto));
 
-        cookies.setUserCookies(responseData, accountRequestDto, response);
+        if (responseData.getStatusCode().is2xxSuccessful()) {
+            cookies.setUserCookies(responseData.getBody().toString(), accountRequestDto.getUsername(), response);
+        }
 
         return responseData;
     }
@@ -32,7 +34,9 @@ public class AccountController {
     public ResponseEntity<String> login(@RequestBody AccountRequestDto accountRequestDto, HttpServletResponse response) {
         ResponseEntity<String> responseData = ResponseEntity.ok().body(accountService.login(accountRequestDto));
 
-        cookies.setUserCookies(responseData, accountRequestDto, response);
+        if (responseData.getStatusCode().is2xxSuccessful()) {
+            cookies.setUserCookies(responseData.getBody().toString(), accountRequestDto.getUsername(), response);
+        }
 
         return responseData;
     }

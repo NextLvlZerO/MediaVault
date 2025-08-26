@@ -9,9 +9,15 @@ import java.time.LocalDateTime;
 @Builder
 public class HistoryResponseDto {
 
-    private Long historyId;
-    private Long accountId;
-    private Long mediaId;
+    private Long id;
+    private String type;
+    private String title;
+    private String details;
+    private String poster;
+    private Double rating;
+    private Integer amount;
+    private Boolean available;
+    private Double price;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
 

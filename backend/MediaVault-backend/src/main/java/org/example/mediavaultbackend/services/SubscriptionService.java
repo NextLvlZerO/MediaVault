@@ -94,4 +94,23 @@ public class SubscriptionService {
 
         return sessionId;
     }
+
+
+    public SubscriptionResponseDto getSubscription(Long accountId) {
+        Account account = accountRepository.findById(accountId).orElseThrow(() -> new RuntimeException("Account not found"));
+
+        Subscription subscription = subscriptionRepository.findByAccount(account).orElseThrow(() -> new NoSuchElementException("Subscription not found"));
+
+        SubscriptionResponseDto subscriptionResponseDto = SubscriptionResponseDto.builder()
+                .subscriptionId(subscription.getSubscriptionId())
+                .accountId(subscription.getAccount().getAccountId())
+                .type(subscription.getType())
+                .active(subscription.getActive())
+                .expireDate(subscription.getExpireDate())
+                .build();
+
+        return subscriptionResponseDto;
+    }
+
+
 }

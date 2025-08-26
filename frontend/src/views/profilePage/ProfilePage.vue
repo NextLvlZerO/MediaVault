@@ -56,8 +56,6 @@ const username = ref('');
 
 onMounted(() => {
   username.value = getCookie('username');
-  console.log(getCookie('username'));
-  console.log(document.cookie);
 });
 
 

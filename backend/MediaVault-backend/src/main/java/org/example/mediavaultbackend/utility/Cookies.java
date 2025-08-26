@@ -2,29 +2,39 @@ package org.example.mediavaultbackend.utility;
 
 import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.example.mediavaultbackend.dtos.AccountRequestDto;
+import org.example.mediavaultbackend.dtos.SubscriptionResponseDto;
+import org.example.mediavaultbackend.services.SubscriptionService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 @Component
+@RequiredArgsConstructor
 public class Cookies {
 
-    public void setUserCookies(ResponseEntity<String> responseData, AccountRequestDto accountRequestDto, HttpServletResponse response) {
+    private final SubscriptionService subscriptionService;
 
-        if (responseData.getStatusCode().is2xxSuccessful()) {
-            Cookie nameCookie = new Cookie("username", accountRequestDto.getUsername());
-            nameCookie.setPath("/");
-            nameCookie.setMaxAge(7 * 24 * 60 * 60);
-            nameCookie.setAttribute("SameSite", "None");
-            response.addCookie(nameCookie);
+    public void setUserCookies(String accountId, String username, HttpServletResponse response) {
 
-            String accountId = responseData.getBody();
-            if (accountId != null) {
-                Cookie idCookie = new Cookie("userId", accountId);
-                idCookie.setPath("/");
-                idCookie.setMaxAge(7 * 24 * 60 * 60);
-                response.addCookie(idCookie);
-            }
+        Cookie nameCookie = new Cookie("username", username);
+        nameCookie.setPath("/");
+        nameCookie.setMaxAge(7 * 24 * 60 * 60);
+        response.addCookie(nameCookie);
+
+        if (accountId != null) {
+            Cookie idCookie = new Cookie("userId", accountId);
+            idCookie.setPath("/");
+            idCookie.setMaxAge(7 * 24 * 60 * 60);
+            response.addCookie(idCookie);
         }
     }
+
+    /*
+    public void setSubscriptionCookies(HttpServletResponse response, Long accountId) {
+        SubscriptionResponseDto subscriptionResponseDto = subscriptionService.getSubscription(accountId);
+        Cookie subscriptionName = new Cookie("")
+    }
+
+     */
 }

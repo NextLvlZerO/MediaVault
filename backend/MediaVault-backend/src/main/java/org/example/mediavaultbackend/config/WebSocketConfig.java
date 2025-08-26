@@ -1,16 +1,22 @@
 package org.example.mediavaultbackend.config;
 
-
+import org.example.mediavaultbackend.utility.MessageServerSocket;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
-import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
-import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
-import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
+import org.springframework.web.socket.config.annotation.*;
 
 @Configuration
+@EnableWebSocket
 @EnableWebSocketMessageBroker
-public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
+public class WebSocketConfig implements WebSocketConfigurer, WebSocketMessageBrokerConfigurer {
 
+    private final MessageServerSocket messageServerSocket;
+
+    public WebSocketConfig(MessageServerSocket messageServerSocket) {
+        this.messageServerSocket = messageServerSocket;
+    }
+
+    // STOMP Config
     @Override
     public void configureMessageBroker(MessageBrokerRegistry config) {
         config.enableSimpleBroker("/topic");
@@ -22,4 +28,10 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         registry.addEndpoint("/ws/payment").setAllowedOriginPatterns("*").withSockJS();
     }
 
+    // Simple WebSocket Handler Config
+    @Override
+    public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
+        registry.addHandler(messageServerSocket, "/message")
+                .setAllowedOrigins("*");
+    }
 }

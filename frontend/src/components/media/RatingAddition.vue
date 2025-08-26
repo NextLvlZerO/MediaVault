@@ -82,12 +82,18 @@ const handleReviewSubmit = () => {
     credentials: 'include'
   })
     .then(result => {
-      if (!result.ok) throw new Error('error');
+      if (!result.ok) {
+        return result.json()
+          .then(response => {
+            const errorMessage = response?.error;
+            throw new Error(errorMessage);
+          })
+      }
       toast.success('Successfully posted review!');
       emits('reviewSubmitEmit');
     })
     .catch(error => {
-      toast.error('Failed to load data');
+      toast.error(error.message);
       console.error('Failed to fetch data: ', error)
     })
 };

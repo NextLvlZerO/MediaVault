@@ -7,9 +7,33 @@
         </h1>
       </div>
       <div class="lend-body">
-        <p class="g-text"> {{ route.params.item }}</p>
-        <button class="go-back-button" :onclick="onBackClick">Back</button>
-        <button class="lend-button" :onclick="onPurchaseClick">Confirm purchase</button>
+        <div class="body-item">
+          <p class="g-text-a" style="margin-right: .5rem;"> Item: </p>
+          <p class="g-text"> {{ itemData?.title }}</p>
+        </div>
+        <HSeperator class="five-rem-distance" />
+        <div class="body-item">
+          <p class="g-text-a" style="margin-right: .5rem;"> Price per day: </p>
+          <p class="g-text"> {{ itemData?.price ? `${itemData.price.toFixed(2)}€` : '0€' }}</p>
+        </div>
+        <div class="body-item">
+          <p class="g-text-a" style="margin-right: .5rem;"> Discount: </p>
+          <p class="g-text"> {{ subscriptionData ? '' : 'None' }}</p>
+        </div>
+        <div v-if="routeType == 'item'" class="body-item">
+          <p class="g-text-a" style="margin-right: .5rem;"> Lending span: </p>
+          <input class="days-input" v-model="lendingDays" @input="onInput" />
+          <p class="g-text"> days </p>
+        </div>
+        <HSeperator class="five-rem-distance" />
+        <div class="body-item">
+          <p class="g-text-a" style="margin-right: .5rem;"> Total: </p>
+          <p class="g-text"> {{ itemData?.price ? `${totalPrice.toFixed(2)}€` : '0€' }}</p>
+        </div>
+        <div class="lend-buttons">
+          <button class="go-back-button" :onclick="onBackClick">Back</button>
+          <button class="lend-button" :onclick="onPurchaseClick">Confirm purchase</button>
+        </div>
       </div>
     </div>
   </div>
@@ -21,11 +45,34 @@ const apiUrl = import.meta.env.VITE_API_URL;
 import { useRoute, useRouter } from 'vue-router';
 import { getCookie } from '../../components/utility/cookies.js'
 import { useToast } from 'vue-toast-notification';
+import { ref, onMounted, watch } from 'vue';
 
 const route = useRoute();
 const router = useRouter();
 const userId = getCookie('userId');
 const toast = useToast();
+
+const routeType = route.params?.type;
+const routeItem = route.params?.item;
+
+
+const itemData = ref(null);
+const subscriptionData = ref(null);
+const lendingDays = ref(7);
+const totalPrice = ref(0);
+
+
+
+
+watch(itemData, (newValue, oldValue) => {
+  getTotalPrice();
+});
+
+
+const onInput = (event) => {
+  lendingDays.value = event.target.value.replace(/\D/g, "");
+  getTotalPrice();
+}
 
 
 const onBackClick = () => {
@@ -34,41 +81,119 @@ const onBackClick = () => {
 
 
 const onPurchaseClick = async () => {
-  if (await handlePurchase()) {
+  if (await handleItemPurchase()) {
     router.push('/media/item/lend/purchase-confirmation');
   }
 };
 
 
+const getTotalPrice = () => {
+  if (!itemData.value?.price) { return; }
 
-const handlePurchase = async () => {
+  totalPrice.value = itemData.value.price * lendingDays.value;
+}
 
-  try {
-    const result = await fetch(`${apiUrl}/user/${userId}/lend/media/${route.params?.item}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        days: 100
-      }),
-      credentials: 'include'
-    });
 
-    if (!result.ok) {
-      throw new Error('error');
+
+const handleItemPurchase = async () => {
+
+  if (routeType == 'item') {
+
+    try {
+      const result = await fetch(`${apiUrl}/user/${userId}/lend/media/${routeItem}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          days: lendingDays.value
+        }),
+        credentials: 'include'
+      });
+
+      if (!result.ok) {
+        return result.json()
+          .then(response => {
+            const errorMessage = response?.error;
+            throw new Error(errorMessage);
+          })
+      }
+      else {
+        toast.success('successfully lent media');
+        return true;
+      }
     }
-    else {
-      toast.success('successfully lent media');
-      return true;
+    catch (error) {
+      console.error(error);
+      toast.error(error.message);
+      return false;
     }
+  };
+  return false;
+}
+
+
+
+const getCheckoutData = () => {
+
+  getCheckoutItem(routeType, routeItem);
+  getSubscription();
+}
+
+
+const getCheckoutItem = (type, id) => {
+
+  if (routeType == 'item') {
+
+    fetch(`${apiUrl}/media/item/${id}`)
+      .then(result => {
+        if (!result.ok) {
+          return result.json()
+            .then(response => {
+              const errorMessage = response?.error;
+              throw new Error(errorMessage);
+            })
+        }
+        return result.json();
+      })
+      .then(response => itemData.value = response)
+      .catch(error => {
+        toast.error(error.message)
+        console.error(error);
+      })
+
   }
-  catch (error) {
-    console.error(error);
-    toast.error('lend connection error');
-    return false;
-  }
-};
+}
+
+
+const getSubscription = () => {
+  fetch(`${apiUrl}/user/${userId}`)
+    .then(result => {
+      if (!result.ok) {
+        if (result.status === 404) {
+          subscriptionData.value = null;
+          return;
+        }
+
+        return result.json()
+          .then(response => {
+            const errorMessage = response?.error;
+            throw new Error(errorMessage);
+          })
+      }
+      return result.json()
+    })
+    .then(response => subscriptionData.value = response)
+    .catch(error => {
+      console.error(error);
+      toast.error(error.message);
+    })
+}
+
+
+onMounted(() => {
+  getCheckoutData();
+});
 
 
 </script>
@@ -94,17 +219,23 @@ const handlePurchase = async () => {
 }
 
 .lend-header {
-  margin-top: 5rem;
+  margin-top: 8rem;
+  margin-bottom: 3rem;
 }
 
 .lend-body {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  margin-top: 2rem;
+  width: 50%;
+}
+
+.body-item {
+  display: flex;
 }
 
 .lend-title {
-  font-size: 2rem !important;
+  font-size: 3rem !important;
   font-weight: 500;
 }
 
@@ -140,10 +271,31 @@ const handlePurchase = async () => {
   align-self: flex-start;
   cursor: pointer;
   transition: 0.2s ease-in-out all;
-  margin-right: 2rem;
+  margin-right: .5rem;
 }
 
 .go-back-button:hover {
   background-color: var(--color-primary);
+}
+
+.five-rem-distance {
+  margin-bottom: .6rem;
+}
+
+.lend-buttons {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}
+
+.days-input {
+  background-color: transparent;
+  color: #fff;
+  border: 1px solid #ffffff44;
+  border-radius: 8px;
+  width: 80px;
+  margin-right: .8rem;
+  transform: translateY(-5px);
+  padding-left: .5rem;
 }
 </style>

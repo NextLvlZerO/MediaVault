@@ -22,18 +22,20 @@ public class HistoryService {
     private final HistoryRepository historyRepository;
     private final AccountRepository accountRepository;
 
-    public List<MediaResponseDto> getUserHistory(Long accountId) {
+    public List<HistoryResponseDto> getUserHistory(Long accountId) {
 
         Account account = accountRepository.findById(accountId).orElseThrow(() -> new NoSuchElementException("Account not found"));
 
-        return historyRepository.findByAccount(account).stream().map(History::getMedia).map(media -> MediaResponseDto.builder()
-                .id(media.getMediaId())
-                .type(media.getType())
-                .title(media.getTitle())
-                .details(media.getDescription())
-                .poster(media.getPoster())
-                .rating(media.getAverageRating())
-                .amount(media.getAmount())
+        return historyRepository.findByAccount(account).stream().map(media -> HistoryResponseDto.builder()
+                .id(media.getMedia().getMediaId())
+                .type(media.getMedia().getType())
+                .title(media.getMedia().getTitle())
+                .details(media.getMedia().getDescription())
+                .poster(media.getMedia().getPoster())
+                .rating(media.getMedia().getAverageRating())
+                .amount(media.getMedia().getAmount())
+                .startDate(media.getStartDate())
+                .endDate(media.getEndDate())
                 .build()).collect(Collectors.toList());
     }
 }

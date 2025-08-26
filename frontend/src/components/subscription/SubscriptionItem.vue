@@ -22,15 +22,39 @@
 
 
 <script setup>
+const apiUrl = import.meta.env.VITE_API_URL;
 import { defineProps } from 'vue';
 import { useRouter } from 'vue-router';
+import { useToast } from 'vue-toast-notification';
 
 const props = defineProps(['title', 'details', 'price', 'type']);
 const router = useRouter();
+const toast = useToast();
 
 const onContinuePressed = () => {
   router.push(`/checkout/subscription/${props?.type}`);
 };
+
+
+
+const getSubscriptionItemData = () => {
+  fetch(`${apiUrl}/subscription/types`)
+    .then(result => {
+      if (!result.ok) {
+        return result.json()
+          .then(response => {
+            const errorMessage = response?.error;
+            throw new Error(errorMessage);
+          })
+      }
+      return result.json()
+    })
+    .catch(error => {
+      console.error(error);
+      toast.error(error.message);
+    })
+};
+
 
 </script>
 

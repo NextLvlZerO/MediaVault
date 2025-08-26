@@ -8,7 +8,7 @@
           @onChildPressedEvent="unfocusInput" />
       </div>
       <div class="filter-options" v-if="status === 2">
-        <MediaFilterComponent v-for="(item, index) in filterOptions" :key="index" :data="item"
+        <MediaFilterComponent v-for="(item, index) in filterOptions" :key="index" :data="item" :numeric="item?.numeric"
           @onTagClickedEmit="updateFilterOptions" @onInputChangedEmit="updateFilterInput" />
       </div>
     </div>
@@ -22,14 +22,16 @@
 <script setup>
 
 const apiUrl = import.meta.env.VITE_API_URL;
-import { ref } from 'vue';
+import { ref, onMounted, defineEmits } from 'vue';
 import { useToast } from 'vue-toast-notification'
 
 
 const toast = useToast();
+const emits = defineEmits(['filterChangedEmit']);
 
 const status = ref(0);
 const debounceTimeout = ref(null);
+const debounceFilterTimeout = ref(null);
 
 const inputText = ref('');
 const inputRef = ref(null);
@@ -41,47 +43,19 @@ const filterOptions = ref([{
   onlyOne: false,
   title: 'Genres',
   filter: [
-    {
-      id: 0,
-      title: 'Action',
-      status: true
-    },
-    {
-      id: 1,
-      title: 'Horror',
-      status: false
-    },
-    {
-      id: 2,
-      title: 'Fantasy',
-      status: false
-    },
-    {
-      id: 3,
-      title: 'Romance',
-      status: true
-    },
-    {
-      id: 4,
-      title: 'Arthouse',
-      status: false
-    },
-    {
-      id: 5,
-      title: 'Drama',
-      status: false
-    },
   ]
 },
 {
   componentId: 1,
   type: 'input',
+  numeric: true,
   title: 'Min rating',
   filter: null
 },
 {
   componentId: 2,
   type: 'input',
+  numeric: false,
   title: 'Max price',
   filter: null
 }
@@ -89,6 +63,37 @@ const filterOptions = ref([{
 
 
 const data = ref(null);
+const genreData = ref(null);
+
+
+onMounted(() => {
+  getGenres();
+});
+
+
+const getGenres = () => {
+  fetch(`${apiUrl}/genre/all`)
+    .then(request => {
+      if (!request.ok) {
+        return request.json()
+          .then(response => {
+            const errorMessage = response?.error;
+            throw new Error(errorMessage);
+          })
+      }
+      return request.json();
+    })
+    .then(response => {
+      genreData.value = response.map(item => ({
+        id: item?.genreId,
+        title: item?.genreName,
+        status: false
+      }));
+      filterOptions.value = filterOptions.value.map(item => item.componentId === 0 ? {
+        ...item, filter: genreData.value
+      } : item)
+    })
+};
 
 
 // wait 2 seconds till fetching backend for movie search input data
@@ -110,13 +115,34 @@ const onInputFocus = () => {
 }
 
 
+// get media filter data from backend
+
+const getMediaFilterData = () => {
+
+  const currentFilterData = {
+    genre: filterOptions.value[0].filter.filter(item => item.status).map(item => item.title),
+    rating: filterOptions.value[1].filter ? filterOptions.value[1].filter : 0,
+    price: filterOptions.value[2].filter ? filterOptions.value[2].filter : 100000
+  };
+
+  emits('filterChangedEmit', currentFilterData);
+
+  console.log(currentFilterData);
+
+};
+
+
 // get media query data from backend
 
 const getMediaQueryData = () => {
   fetch(`${apiUrl}/media/search?query=${inputText.value}`)
     .then(result => {
       if (!result.ok) {
-        throw new Error('error');
+        return result.json()
+          .then(response => {
+            const errorMessage = response?.error;
+            throw new Error(errorMessage);
+          })
       }
       return result.json();
     })
@@ -131,6 +157,13 @@ const getMediaQueryData = () => {
 // update filter when tag is pressed
 
 const updateFilterOptions = (parameters) => {
+
+  clearTimeout(debounceFilterTimeout.value);
+
+  debounceFilterTimeout.value = setTimeout(() => {
+    getMediaFilterData();
+  }, 500);
+
 
   if (typeof (parameters.componentId) === 'undefined') {
     return;
@@ -154,6 +187,14 @@ const updateFilterOptions = (parameters) => {
 // update filter when input is changed
 
 const updateFilterInput = (parameters) => {
+
+  clearTimeout(debounceFilterTimeout.value);
+
+  debounceFilterTimeout.value = setTimeout(() => {
+    getMediaFilterData();
+  }, 500);
+
+
   filterOptions.value[parameters.componentId].filter = parameters?.filter;
   console.log(filterOptions);
 };
@@ -163,6 +204,9 @@ const unfocusInput = () => {
   status.value = 0;
   inputRef.value?.blur();
 };
+
+
+
 
 </script>
 

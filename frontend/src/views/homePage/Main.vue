@@ -11,10 +11,11 @@
 
     <div class="main-section-body" id="body">
       <div class="main-container">
-        <MediaContainer fontSize="5" prename="Highest" name="Rated" dataType="rating" :clickable="true" />
+        <MediaContainer fontSize="5" prename="F" name="ilter" dataType="movie" :clickable="true" :filterData=filter />
+        <MediaContainer fontSize="5" prename="Highest" name="Rated" dataType="movie-rating" :clickable="true" />
         <MediaContainer fontSize="5" prename="W" name="atchlist" dataType="watchlist" :clickable="true" />
-        <MediaContainer fontSize="5" id="movies" prename="M" name="ovies" dataType="movies" :clickable="true" />
-        <MediaContainer id="series" prename="S" name="eries" dataType="series" :clickable="true" />
+        <MediaContainer fontSize="5" id="movies" prename="M" name="ovies" dataType="movies-all" :clickable="true" />
+        <MediaContainer id="series" prename="S" name="eries" dataType="series-all" :clickable="true" />
       </div>
     </div>
   </div>
@@ -23,6 +24,10 @@
 
 
 <script setup>
+import { ref, defineProps } from 'vue';
+
+
+const props = defineProps(['filter']);
 
 </script>
 
@@ -47,6 +52,7 @@
 
   background:
     radial-gradient(ellipse 150px 50% at center, #ffffff22 0%, transparent 100%), linear-gradient(to bottom, var(--color-background-lighter) 20%, var(--color-background) 100%);
+  min-height: 500px;
 }
 
 .main-container-title {

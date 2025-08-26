@@ -16,7 +16,8 @@
 
             <div class="right-details-availability-container">
               <p class="right-details-availability-text g-text-a"> Availability: </p>
-              <p class="right-details-availability g-text"> {{ data?.available ? `available` : `out
+              <p class="right-details-availability g-text"> {{ data?.available ? `${data?.amount}
+                ${data?.amount == 1 ? 'copie' : 'copies'} available` : `out
                 of stock` }} </p>
             </div>
 
@@ -103,13 +104,17 @@ const getItemData = (id) => {
   fetch(`${apiUrl}/media/item/${id}`)
     .then(result => {
       if (!result.ok) {
-        throw new Error('error');
+        return result.json()
+          .then(response => {
+            const errorMessage = response?.error;
+            throw new Error(errorMessage);
+          })
       }
       return result.json();
     })
     .then(response => data.value = response)
     .catch(error => {
-      toast.error('Item data connection error')
+      toast.error(error.message)
       console.error(error);
     })
 };
@@ -121,7 +126,11 @@ const getWatchlistStatus = (movieId) => {
   fetch(`${apiUrl}/user/${userId}/media/${movieId}/watchlist`)
     .then(result => {
       if (!result.ok) {
-        throw new Error('error');
+        return result.json()
+          .then(response => {
+            const errorMessage = response?.error;
+            throw new Error(errorMessage);
+          })
       }
       return result.json();
     })
@@ -130,7 +139,7 @@ const getWatchlistStatus = (movieId) => {
     })
     .catch(error => {
       console.error(error);
-      toast.error('connection error watchlist');
+      toast.error(error.message);
     })
 };
 
@@ -147,7 +156,11 @@ const onWatchlistPressed = () => {
   })
     .then(result => {
       if (!result.ok) {
-        throw new Error('error');
+        return result.json()
+          .then(response => {
+            const errorMessage = response?.error;
+            throw new Error(errorMessage);
+          })
       }
 
       watchlistAdded.value = !watchlistAdded.value;
@@ -159,7 +172,7 @@ const onWatchlistPressed = () => {
     })
     .catch(error => {
       console.error(error);
-      toast.error('connection watchlist error');
+      toast.error(error.message);
     })
 };
 
