@@ -42,6 +42,9 @@ public class LendingService {
         if (getCurrentlyLending(accountId).size() >= subscription.getType().getQuantity()) {
             throw new IllegalArgumentException("User is not permitted to lend more media");
         }
+        if (currentlyLendingRepository.findByMediaAccount(accountId, mediaId).isPresent()) {
+            throw new IllegalArgumentException("User is not permitted to lend same medium twice");
+        }
         if (media.getAmount() <= 0) {
             throw new IllegalArgumentException("Media not available for lending");
         }
@@ -97,7 +100,7 @@ public class LendingService {
         Subscription subscription = subscriptionRepository.findByAccount(account).orElseThrow(() -> new NoSuchElementException("Subscription not found"));
         History history = historyRepository.findByMediaAccount(accountId, mediaId).orElseThrow(() -> new NoSuchElementException("History not found"));
 
-        CurrentlyLending currentlyLending = currentlyLendingRepository.findByMediaUser(accountId, mediaId).orElseThrow(() -> new NoSuchElementException("CurrentlyLending not found"));
+        CurrentlyLending currentlyLending = currentlyLendingRepository.findByMediaAccount(accountId, mediaId).orElseThrow(() -> new NoSuchElementException("CurrentlyLending not found"));
 
         String sessionId = paymentSocketClient.payForMedium(media.getPrice(), days, subscription.getType().getPriceReduction(), request);
 

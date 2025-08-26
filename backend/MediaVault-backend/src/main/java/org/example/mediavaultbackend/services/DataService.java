@@ -74,7 +74,7 @@ public class DataService {
         try (HttpClient client = HttpClient.newHttpClient();) {
 
             HttpRequest genreRequest = HttpRequest.newBuilder()
-                    .uri(URI.create(BASE_URL + "/genre/movie/list?api_key=" + API_KEY + "&language=de-DE"))
+                    .uri(URI.create(BASE_URL + "/genre/movie/list?api_key=" + API_KEY + "&language=en-US"))
                     .GET()
                     .build();
 
