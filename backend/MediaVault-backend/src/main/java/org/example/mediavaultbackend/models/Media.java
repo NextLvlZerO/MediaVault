@@ -26,6 +26,9 @@ public class Media {
     @Column(name = "media_id")
     private Long mediaId;
 
+    @Version
+    private Long version;
+
     @Column(name = "type")
     private String type;
 

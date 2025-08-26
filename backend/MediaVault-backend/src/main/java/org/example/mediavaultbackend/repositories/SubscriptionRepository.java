@@ -13,4 +13,6 @@ public interface SubscriptionRepository extends JpaRepository<Subscription, Long
 
    public Optional<Subscription> findByAccount(Account account);
 
+   public Optional<Subscription> findByAccount_AccountId(Long accountId);
+
 }

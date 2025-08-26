@@ -22,4 +22,13 @@ public class SubscriptionType {
     @Column(name = "name", unique = true, nullable = false)
     private String name;
 
+    @Column(name = "price_reduction", nullable = false)
+    private Double priceReduction;
+
+    @Column(name = "quantity", nullable = false)
+    private Integer quantity;
+
+    @Column(name = "price", nullable = false)
+    private Double price;
+
 }

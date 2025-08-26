@@ -1,16 +1,26 @@
-services:
+version: "3.9"
 
+services:
   backend:
-    container_name: MediaVault-backend
+    container_name: mediavault-backend
     build: ./backend/MediaVault-backend
     ports:
-      - 8080:8080
+      - "8080:8080"
+      - "9092:9092"
+    depends_on:
+      - paymentservice
+
+  paymentservice:
+    container_name: mediavault-paymentservice
+    build: payment-service
+    ports:
+      - "9090:9090"
 
   frontend:
-    container_name: MediaVault-dev-frontend
-    image: nginx:alpine 
+    container_name: mediavault-frontend
+    image: nginx:alpine
     ports:
-      - 3000:80
+      - "3000:80"
     volumes:
       - ./frontend:/usr/share/nginx/html:ro
     depends_on:

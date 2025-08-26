@@ -1,6 +1,8 @@
 package org.example.mediavaultbackend.services;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
+import org.example.mediavaultbackend.dtos.PaymentSessionData;
 import org.example.mediavaultbackend.dtos.SubscriptionResponseDto;
 import org.example.mediavaultbackend.models.Account;
 import org.example.mediavaultbackend.models.Subscription;
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.concurrent.CompletableFuture;
 
 @Service
 @RequiredArgsConstructor
@@ -24,6 +27,7 @@ public class SubscriptionService {
     private final SubscriptionRepository subscriptionRepository;
     private final SubscriptionTypeRepository subscriptionTypeRepository;
     private final AccountRepository accountRepository;
+    private final PaymentSocketClient paymentSocketClient;
 
     public List<SubscriptionType> getSubscriptionTypes() {
         return subscriptionTypeRepository.findAll();
@@ -54,4 +58,40 @@ public class SubscriptionService {
     }
 
 
+    public String updateSubscriptionType(String type, Long accountId, HttpServletRequest request) {
+
+        Subscription subscription = subscriptionRepository.findByAccount_AccountId(accountId).orElseThrow(() -> new NoSuchElementException("Subscription not found"));
+        SubscriptionType subscriptionType = subscriptionTypeRepository.findByName(type).orElseThrow(() -> new NoSuchElementException("Subscription type not found"));
+        String sessionId = paymentSocketClient.sendPaymentRequest(subscriptionType.getPrice(), request);
+
+        CompletableFuture.runAsync(() -> {
+
+            PaymentSessionData paymentSessionData = paymentSocketClient.waitForStatus(sessionId);
+
+            if ("SUCCESS".equals(paymentSessionData.getStatus())) {
+
+                subscription.setType(subscriptionType);
+                subscriptionRepository.save(subscription);
+                SubscriptionResponseDto subscriptionResponseDto = SubscriptionResponseDto.builder()
+                        .subscriptionId(subscription.getSubscriptionId())
+                        .accountId(subscription.getAccount().getAccountId())
+                        .type(subscription.getType())
+                        .active(subscription.getActive())
+                        .expireDate(subscription.getExpireDate())
+                        .build();
+
+                log.info("Subscription updated: {}", subscriptionResponseDto);
+
+            } else {
+                log.error("Payment failed Subscription: {} not updated", subscription.getSubscriptionId());
+            }
+
+
+
+        });
+
+
+
+        return sessionId;
+    }
 }

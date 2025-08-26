@@ -1,76 +1,145 @@
 package org.example.mediavaultbackend.services;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.example.mediavaultbackend.dtos.MediaResponseDto;
-import org.example.mediavaultbackend.models.Account;
-import org.example.mediavaultbackend.models.CurrentlyLending;
-import org.example.mediavaultbackend.models.History;
-import org.example.mediavaultbackend.models.Media;
-import org.example.mediavaultbackend.repositories.AccountRepository;
-import org.example.mediavaultbackend.repositories.CurrentlyLendingRepository;
-import org.example.mediavaultbackend.repositories.HistoryRepository;
-import org.example.mediavaultbackend.repositories.MediaRepository;
+import org.example.mediavaultbackend.dtos.PaymentSessionData;
+import org.example.mediavaultbackend.models.*;
+import org.example.mediavaultbackend.repositories.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class LendingService {
 
+    private static final Logger log = LoggerFactory.getLogger(LendingService.class);
     private final AccountRepository accountRepository;
     private final MediaRepository mediaRepository;
     private final CurrentlyLendingRepository currentlyLendingRepository;
     private final HistoryRepository historyRepository;
+    private final SubscriptionRepository subscriptionRepository;
+    private final PaymentSocketClient paymentSocketClient;
 
 
-    public Media lendMedia(Long accountId, Long mediaId, int days) {
+    public String lendMedia(Long accountId, Long mediaId, int days, HttpServletRequest request) {
+
+
 
         Account account = accountRepository.findById(accountId).orElseThrow(() -> new NoSuchElementException("Account not found"));
         Media media = mediaRepository.findById(mediaId).orElseThrow(() -> new NoSuchElementException("Media not found"));
+        Subscription subscription = subscriptionRepository.findByAccount(account).orElseThrow(() -> new NoSuchElementException("Subscription not found"));
 
-        currentlyLendingRepository.save(CurrentlyLending.builder()
-                .account(account)
-                .media(media)
-                .startDate(LocalDateTime.now())
-                .endDate(LocalDateTime.now().plusDays(days))
-                .build());
+        if (getCurrentlyLending(accountId).size() >= subscription.getType().getQuantity()) {
+            throw new IllegalArgumentException("User is not permitted to lend more media");
+        }
+        if (media.getAmount() <= 0) {
+            throw new IllegalArgumentException("Media not available for lending");
+        }
 
-        historyRepository.save(History.builder()
-                .account(account)
-                .media(media)
-                .startDate(LocalDateTime.now())
-                .endDate(LocalDateTime.now().plusDays(days))
-                .build());
+        String sessionId = paymentSocketClient.payForMedium(media.getPrice(), days, subscription.getType().getPriceReduction(), request);
 
-        return media;
+        CompletableFuture.runAsync(() -> {
+            PaymentSessionData paymentSessionData = paymentSocketClient.waitForStatus(sessionId);
+
+            if ("SUCCESS".equals(paymentSessionData.getStatus())) {
+
+                currentlyLendingRepository.save(CurrentlyLending.builder()
+                        .account(account)
+                        .media(media)
+                        .startDate(LocalDateTime.now())
+                        .endDate(LocalDateTime.now().plusDays(days - 1))
+                        .build());
+
+                historyRepository.save(History.builder()
+                        .account(account)
+                        .media(media)
+                        .startDate(LocalDateTime.now())
+                        .endDate(LocalDateTime.now().plusDays(days - 1))
+                        .build());
+
+                media.setAmount(media.getAmount() - 1);
+                mediaRepository.save(media);
+                MediaResponseDto mediaResponseDto = MediaResponseDto.builder()
+                        .id(media.getMediaId())
+                        .type(media.getType())
+                        .title(media.getTitle())
+                        .details(media.getDescription())
+                        .poster(media.getPoster())
+                        .rating(media.getAverageRating())
+                        .amount(media.getAmount())
+                        .build();
+
+                log.info("User: {} Lending Media: {} for {} days", account.getUsername(), mediaResponseDto, days);
+
+            } else {
+                log.error("Payment failed for User: {} lending Media: {}", account.getUsername(), media.getMediaId());
+            }
+
+        });
+
+        return sessionId;
     }
 
-    public Media expandMedia(Long accountId, Long mediaId, int days) {
+    public String expandMedia(Long accountId, Long mediaId, int days, HttpServletRequest request) {
 
         Account account = accountRepository.findById(accountId).orElseThrow(() -> new NoSuchElementException("Account not found"));
         Media media = mediaRepository.findById(mediaId).orElseThrow(() -> new NoSuchElementException("Media not found"));
+        Subscription subscription = subscriptionRepository.findByAccount(account).orElseThrow(() -> new NoSuchElementException("Subscription not found"));
+        History history = historyRepository.findByMediaAccount(accountId, mediaId).orElseThrow(() -> new NoSuchElementException("History not found"));
 
         CurrentlyLending currentlyLending = currentlyLendingRepository.findByMediaUser(accountId, mediaId).orElseThrow(() -> new NoSuchElementException("CurrentlyLending not found"));
-        currentlyLending.setEndDate(LocalDateTime.now().plusDays(days));
+
+        String sessionId = paymentSocketClient.payForMedium(media.getPrice(), days, subscription.getType().getPriceReduction(), request);
+
+        CompletableFuture.runAsync(() -> {
+
+            PaymentSessionData paymentSessionData = paymentSocketClient.waitForStatus(sessionId);
+
+            if ("SUCCESS".equals(paymentSessionData.getStatus())) {
+
+                currentlyLending.setEndDate(LocalDateTime.now().plusDays(days));
 
 
-        History history = historyRepository.findByMediaAccount(accountId, mediaId).orElseThrow(() -> new NoSuchElementException("History not found"));
-        historyRepository.save(History.builder()
-                .account(account)
-                .media(media)
-                .startDate(history.getEndDate())
-                .endDate(history.getEndDate().plusDays(days))
-                .build());
 
-        currentlyLendingRepository.save(currentlyLending);
-        historyRepository.save(history);
+                historyRepository.save(History.builder()
+                        .account(account)
+                        .media(media)
+                        .startDate(history.getEndDate())
+                        .endDate(history.getEndDate().plusDays(days))
+                        .build());
 
-        return media;
+                currentlyLendingRepository.save(currentlyLending);
+                historyRepository.save(history);
+
+                MediaResponseDto mediaResponseDto = MediaResponseDto.builder()
+                        .id(media.getMediaId())
+                        .type(media.getType())
+                        .title(media.getTitle())
+                        .details(media.getDescription())
+                        .poster(media.getPoster())
+                        .rating(media.getAverageRating())
+                        .amount(media.getAmount())
+                        .build();
+
+                log.info("User: {} expanded Media: {} for {} days", account.getUsername(), mediaResponseDto, days);
+
+            } else {
+                log.error("Payment failed for User: {} expanding Media: {}", account.getUsername(), media.getMediaId());
+            }
+
+
+        });
+
+        return sessionId;
 
     }
 
@@ -88,4 +157,5 @@ public class LendingService {
                 .amount(m.getAmount())
                 .build()).collect(Collectors.toList());
     }
+
 }

@@ -48,9 +48,24 @@ public class DataService {
     }
 
     private void importSubscriptionTypes() {
-        subscriptionTypeRepository.save(SubscriptionType.builder().name("Free").build());
-        subscriptionTypeRepository.save(SubscriptionType.builder().name("Premium").build());
-        subscriptionTypeRepository.save(SubscriptionType.builder().name("Deluxe").build());
+        subscriptionTypeRepository.save(SubscriptionType.builder()
+                .name("Free")
+                .priceReduction(1.0)
+                .quantity(1)
+                .price(0.0)
+                .build());
+        subscriptionTypeRepository.save(SubscriptionType.builder()
+                .name("Premium")
+                .priceReduction(0.85)
+                .quantity(5)
+                .price(8.0)
+                .build());
+        subscriptionTypeRepository.save(SubscriptionType.builder()
+                .name("Deluxe")
+                .priceReduction(0.75)
+                .quantity(10)
+                .price(15.0)
+                .build());
     }
 
 
