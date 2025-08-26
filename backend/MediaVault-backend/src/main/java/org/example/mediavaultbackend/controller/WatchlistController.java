@@ -20,8 +20,8 @@ public class WatchlistController {
     private final WatchlistService watchlistService;
 
     @GetMapping("/{id}/watchlist")
-    public ResponseEntity<List<MediaResponseDto>> getUserWatchlist(@PathVariable("id") Long id) {
-        return ResponseEntity.ok().body(watchlistService.getUserWatchlist(id));
+    public ResponseEntity<List<MediaResponseDto>> getUserWatchlist(@PathVariable("id") Long id, @RequestParam("page") int page, @RequestParam("page-size") int pageSize) {
+        return ResponseEntity.ok().body(watchlistService.getUserWatchlist(id, page, pageSize));
     }
 
     @GetMapping("{account-id}/media/{media-id}/watchlist")

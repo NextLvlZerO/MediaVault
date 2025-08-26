@@ -10,6 +10,9 @@ import org.example.mediavaultbackend.repositories.AccountRepository;
 import org.example.mediavaultbackend.repositories.WatchlistRepository;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -38,11 +41,18 @@ public class WatchlistService {
     }
 
 
-    public List<MediaResponseDto> getUserWatchlist(Long id) throws NoSuchElementException {
+    public List<MediaResponseDto> getUserWatchlist(Long id, int page, int pageSize){
+
 
         List<Media> watchlist =  watchlistRepository.findByAccount_AccountId(id)
                 .orElseThrow(() -> new NoSuchElementException("no watchlist found"))
                 .getMedia();
+
+        int toal = watchlist.size();
+        int start = (page) * pageSize;
+        int end = start + pageSize - 1;
+
+        watchlist = watchlist.subList(start, end);
 
         return watchlist.stream()
                 .map(m -> MediaResponseDto.builder()

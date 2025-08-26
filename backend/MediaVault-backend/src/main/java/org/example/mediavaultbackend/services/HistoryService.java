@@ -9,6 +9,9 @@ import org.example.mediavaultbackend.models.Media;
 import org.example.mediavaultbackend.repositories.AccountRepository;
 import org.example.mediavaultbackend.repositories.HistoryRepository;
 import org.springframework.data.crossstore.ChangeSetPersister;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -22,11 +25,13 @@ public class HistoryService {
     private final HistoryRepository historyRepository;
     private final AccountRepository accountRepository;
 
-    public List<HistoryResponseDto> getUserHistory(Long accountId) {
+    public List<HistoryResponseDto> getUserHistory(Long accountId, int page, int pageSize) {
 
         Account account = accountRepository.findById(accountId).orElseThrow(() -> new NoSuchElementException("Account not found"));
 
-        return historyRepository.findByAccount(account).stream().map(media -> HistoryResponseDto.builder()
+        Pageable pageable = PageRequest.of(page, pageSize);
+
+        return historyRepository.findByAccount(account, pageable).stream().map(media -> HistoryResponseDto.builder()
                 .id(media.getMedia().getMediaId())
                 .type(media.getMedia().getType())
                 .title(media.getMedia().getTitle())
@@ -36,6 +41,6 @@ public class HistoryService {
                 .amount(media.getMedia().getAmount())
                 .startDate(media.getStartDate())
                 .endDate(media.getEndDate())
-                .build()).collect(Collectors.toList());
+                .build()).toList();
     }
 }

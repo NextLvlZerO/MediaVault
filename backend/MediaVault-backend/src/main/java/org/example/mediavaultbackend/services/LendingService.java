@@ -9,6 +9,8 @@ import org.example.mediavaultbackend.models.*;
 import org.example.mediavaultbackend.repositories.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -39,7 +41,7 @@ public class LendingService {
         Media media = mediaRepository.findById(mediaId).orElseThrow(() -> new NoSuchElementException("Media not found"));
         Subscription subscription = subscriptionRepository.findByAccount(account).orElseThrow(() -> new NoSuchElementException("Subscription not found"));
 
-        if (getCurrentlyLending(accountId).size() >= subscription.getType().getQuantity()) {
+        if (currentlyLendingRepository.findByAccount_AccountId(accountId).size() >= subscription.getType().getQuantity()) {
             throw new IllegalArgumentException("User is not permitted to lend more media");
         }
         if (currentlyLendingRepository.findByMediaAccount(accountId, mediaId).isPresent()) {
@@ -110,7 +112,7 @@ public class LendingService {
 
             if ("SUCCESS".equals(paymentSessionData.getStatus())) {
 
-                currentlyLending.setEndDate(LocalDateTime.now().plusDays(days));
+                currentlyLending.setEndDate(currentlyLending.getEndDate().plusDays(days));
 
 
 
@@ -147,11 +149,13 @@ public class LendingService {
 
     }
 
-    public List<HistoryResponseDto> getCurrentlyLending(Long accountId) {
+    public List<HistoryResponseDto> getCurrentlyLending(Long accountId, int page, int pageSize) {
 
         Account account = accountRepository.findById(accountId).orElseThrow(() -> new NoSuchElementException("Account not found"));
 
-        return currentlyLendingRepository.findByAccount_AccountId(accountId).stream().map(media -> HistoryResponseDto.builder()
+        Pageable pageable = PageRequest.of(page, pageSize);
+
+        return currentlyLendingRepository.findByAccount_AccountId(accountId, pageable).stream().map(media -> HistoryResponseDto.builder()
                 .id(media.getMedia().getMediaId())
                 .type(media.getMedia().getType())
                 .title(media.getMedia().getTitle())

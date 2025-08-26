@@ -32,8 +32,8 @@ public class LendingController {
     }
 
     @GetMapping("/{id}/currently-lending")
-    public ResponseEntity<List<HistoryResponseDto>> getCurrentlyLending(@PathVariable("id") Long accountId) {
-        return ResponseEntity.ok().body(lendingService.getCurrentlyLending(accountId));
+    public ResponseEntity<List<HistoryResponseDto>> getCurrentlyLending(@PathVariable("id") Long accountId, @RequestParam("page") int page, @RequestParam("page-size") int pageSize) {
+        return ResponseEntity.ok().body(lendingService.getCurrentlyLending(accountId, page, pageSize));
     }
 
 

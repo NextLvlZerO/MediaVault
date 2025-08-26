@@ -7,10 +7,7 @@ import org.example.mediavaultbackend.models.History;
 import org.example.mediavaultbackend.models.Media;
 import org.example.mediavaultbackend.services.HistoryService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -22,8 +19,8 @@ public class HistoryController {
     private final HistoryService historyService;
 
     @GetMapping("/user/{id}")
-    public ResponseEntity<List<HistoryResponseDto>> getUserHistory(@PathVariable("id") Long accountId) {
-        return ResponseEntity.ok().body(historyService.getUserHistory(accountId));
+    public ResponseEntity<List<HistoryResponseDto>> getUserHistory(@PathVariable("id") Long accountId, @RequestParam("page") int page, @RequestParam("page-size") int pageSize) {
+        return ResponseEntity.ok().body(historyService.getUserHistory(accountId, page, pageSize));
     }
 
 }
