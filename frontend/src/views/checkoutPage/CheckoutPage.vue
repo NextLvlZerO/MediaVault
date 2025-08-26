@@ -7,7 +7,17 @@
         </h1>
       </div>
       <div class="lend-body">
-        <p class="g-text"> {{ route.params.item }}</p>
+        <HSeperator class="five-rem-distance" />
+        <div class="body-item">
+          <p class="g-text-a" style="margin-right: .5rem;"> Item: </p>
+          <p class="g-text"> {{ itemData?.title }}</p>
+        </div>
+        <HSeperator class="five-rem-distance" />
+        <div class="body-item">
+          <p class="g-text-a" style="margin-right: .5rem;"> Discount: </p>
+          <p class="g-text"> {{ subscriptionData ? '' : 'None' }}</p>
+
+        </div>
         <button class="go-back-button" :onclick="onBackClick">Back</button>
         <button class="lend-button" :onclick="onPurchaseClick">Confirm purchase</button>
       </div>
@@ -21,11 +31,18 @@ const apiUrl = import.meta.env.VITE_API_URL;
 import { useRoute, useRouter } from 'vue-router';
 import { getCookie } from '../../components/utility/cookies.js'
 import { useToast } from 'vue-toast-notification';
+import { ref, onMounted } from 'vue';
 
 const route = useRoute();
 const router = useRouter();
 const userId = getCookie('userId');
 const toast = useToast();
+
+const routeType = route.params?.type;
+const routeItem = route.params?.item;
+
+const itemData = ref(null);
+const subscriptionData = ref(null);
 
 
 const onBackClick = () => {
@@ -34,17 +51,17 @@ const onBackClick = () => {
 
 
 const onPurchaseClick = async () => {
-  if (await handlePurchase()) {
+  if (await handleItemPurchase()) {
     router.push('/media/item/lend/purchase-confirmation');
   }
 };
 
 
 
-const handlePurchase = async () => {
+const handleItemPurchase = async () => {
 
   try {
-    const result = await fetch(`${apiUrl}/user/${userId}/lend/media/${route.params?.item}`, {
+    const result = await fetch(`${apiUrl}/user/${userId}/lend/media/${routeItem}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -73,6 +90,68 @@ const handlePurchase = async () => {
     return false;
   }
 };
+
+
+const getCheckoutData = () => {
+
+  getCheckoutItem(routeType, routeItem);
+  getSubscription();
+}
+
+
+const getCheckoutItem = (type, id) => {
+
+  if (routeType == 'item') {
+
+    fetch(`${apiUrl}/media/item/${id}`)
+      .then(result => {
+        if (!result.ok) {
+          return result.json()
+            .then(response => {
+              const errorMessage = response?.error;
+              throw new Error(errorMessage);
+            })
+        }
+        return result.json();
+      })
+      .then(response => itemData.value = response)
+      .catch(error => {
+        toast.error(error.message)
+        console.error(error);
+      })
+
+  }
+}
+
+
+const getSubscription = () => {
+  fetch(`${apiUrl}/user/${userId}`)
+    .then(result => {
+      if (!result.ok) {
+        if (result.status === 404) {
+          subscriptionData.value = null;
+          return;
+        }
+
+        return result.json()
+          .then(response => {
+            const errorMessage = response?.error;
+            throw new Error(errorMessage);
+          })
+      }
+      return result.json()
+    })
+    .then(response => subscriptionData.value = response)
+    .catch(error => {
+      console.error(error);
+      toast.error(error.message);
+    })
+}
+
+
+onMounted(() => {
+  getCheckoutData();
+});
 
 
 </script>
@@ -104,11 +183,16 @@ const handlePurchase = async () => {
 .lend-body {
   display: flex;
   flex-direction: column;
-  align-items: center;
+  margin-top: 2rem;
+  width: 50%;
+}
+
+.body-item {
+  display: flex;
 }
 
 .lend-title {
-  font-size: 2rem !important;
+  font-size: 3rem !important;
   font-weight: 500;
 }
 
@@ -149,5 +233,9 @@ const handlePurchase = async () => {
 
 .go-back-button:hover {
   background-color: var(--color-primary);
+}
+
+.five-rem-distance {
+  margin-bottom: .6rem;
 }
 </style>

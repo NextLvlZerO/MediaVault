@@ -10,6 +10,7 @@
         <SubscriptionItem title="Free Tier" :details="freeTierDetails" :price="0" type="free" />
         <SubscriptionItem title="Premium Tier" :details="premiumTierDetails" :price="5" type="premium" />
         <SubscriptionItem title="Deluxe Tier" :details="deluxeTierDetails" :price="12" type="deluxe" />
+        <SubscriptionItem v-for="(item, index) in data" :title="item?.name" />
       </div>
     </div>
   </div>
@@ -20,7 +21,7 @@
 const apiUrl = import.meta.env.VITE_API_URL;
 import { useRoute, useRouter } from 'vue-router';
 import { useToast } from 'vue-toast-notification';
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -71,6 +72,10 @@ const getSubscriptionData = () => {
       toast.error(error.message);
     })
 };
+
+onMounted(() => {
+  //getSubscriptionData();
+})
 
 </script>
 

@@ -42,8 +42,13 @@ const getMediaItemData = (append) => {
     props.pageSize : 5}`;
 
   switch (props?.dataType) {
-    case 'rating':
+    case 'media-rating':
       fetchUrl = `${apiUrl}/media/movie/best-rated?page=${pageCount.value}&page-size=${props?.pageSize ?
+        props.pageSize : 5}`;
+      break;
+
+    case 'series-all':
+      fetchUrl = `${apiUrl}/media/series/all?page=${pageCount.value}&page-size=${props?.pageSize ?
         props.pageSize : 5}`;
       break;
 
@@ -52,7 +57,7 @@ const getMediaItemData = (append) => {
       break;
 
     case 'history':
-      fetchUrl = `${apiUrl}/user/${userId}/history`;
+      fetchUrl = `${apiUrl}/history/user/${userId}`;
       break;
   }
 

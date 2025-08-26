@@ -11,10 +11,10 @@
 
     <div class="main-section-body" id="body">
       <div class="main-container">
-        <MediaContainer fontSize="5" prename="Highest" name="Rated" dataType="rating" :clickable="true" />
+        <MediaContainer fontSize="5" prename="Highest" name="Rated" dataType="movie-rating" :clickable="true" />
         <MediaContainer fontSize="5" prename="W" name="atchlist" dataType="watchlist" :clickable="true" />
-        <MediaContainer fontSize="5" id="movies" prename="M" name="ovies" dataType="movies" :clickable="true" />
-        <MediaContainer id="series" prename="S" name="eries" dataType="series" :clickable="true" />
+        <MediaContainer fontSize="5" id="movies" prename="M" name="ovies" dataType="movies-all" :clickable="true" />
+        <MediaContainer id="series" prename="S" name="eries" dataType="series-all" :clickable="true" />
       </div>
     </div>
   </div>
