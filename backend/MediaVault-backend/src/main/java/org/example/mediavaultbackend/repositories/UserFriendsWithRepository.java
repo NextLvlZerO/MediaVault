@@ -17,6 +17,6 @@ public interface UserFriendsWithRepository extends JpaRepository<UserFriendsWith
     @Query("SELECT uf.account2 FROM UserFriendsWith uf WHERE uf.account1 = :account")
     List<Account> findFriendsOfAccount(Account account);
 
-    @Query("SELECT uf FROM UserFriendsWith uf WHERE uf.account1.accountId = :account1Id AND uf.account2 = :account2Id")
+    @Query("SELECT uf FROM UserFriendsWith uf WHERE uf.account1.accountId = :account1Id AND uf.account2.accountId = :account2Id")
     Optional<UserFriendsWith> findByAccounts(Long account1Id, Long account2Id);
 }
