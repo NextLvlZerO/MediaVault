@@ -38,12 +38,12 @@ const getMediaItemData = (append) => {
 
   // fetch only the requested type
 
-  let fetchUrl = `${apiUrl}/media/movies/all?page=${pageCount.value}&page-size=${props?.pageSize ?
+  let fetchUrl = `${apiUrl}/media/movie/all?page=${pageCount.value}&page-size=${props?.pageSize ?
     props.pageSize : 5}`;
 
   switch (props?.dataType) {
     case 'rating':
-      fetchUrl = `${apiUrl}/media/movies/best-rated?page=${pageCount.value}&page-size=${props?.pageSize ?
+      fetchUrl = `${apiUrl}/media/movie/best-rated?page=${pageCount.value}&page-size=${props?.pageSize ?
         props.pageSize : 5}`;
       break;
 

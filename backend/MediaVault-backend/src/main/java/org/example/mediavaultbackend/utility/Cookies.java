@@ -15,7 +15,6 @@ public class Cookies {
             Cookie nameCookie = new Cookie("username", accountRequestDto.getUsername());
             nameCookie.setPath("/");
             nameCookie.setMaxAge(7 * 24 * 60 * 60);
-            nameCookie.setAttribute("SameSite", "None");
             response.addCookie(nameCookie);
 
             String accountId = responseData.getBody();
