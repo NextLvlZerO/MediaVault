@@ -35,6 +35,9 @@
           </div>
         </div>
         <HSeperator class="five-rem-distance" />
+        <MediaContainer :fontSize="3" :pageSize="4" prename="Currently" name="lending" dataType="lending"
+          :clickable="false" :expand="true" />
+        <HSeperator style="margin-top: 5rem;" class="five-rem-distance upper-distance" />
         <MediaContainer :fontSize="3" :pageSize="4" prename="H" name="istory" dataType="history" :clickable="false" />
         <HSeperator style="margin-top: 5rem;" class="five-rem-distance upper-distance" />
         <MediaContainer :fontSize="3" :pageSize="4" prename="W" name="atchlist" dataType="watchlist"
@@ -45,6 +48,7 @@
 </template>
 
 <script setup>
+const apiUrl = import.meta.env.VITE_API_URL;
 import { useRoute, useRouter } from 'vue-router';
 import { onMounted, ref } from 'vue';
 import { getCookie } from './../../components/utility/cookies.js';
@@ -52,11 +56,39 @@ import { getCookie } from './../../components/utility/cookies.js';
 const route = useRoute();
 const router = useRouter();
 
-const username = ref('');
+const username = ref(getCookie('username'));
+const userId = ref(getCookie('userId'));
+const subscriptionData = ref(null);
 
 onMounted(() => {
-  username.value = getCookie('username');
+  getSubscriptionData();
 });
+
+
+
+const getSubscriptionData = () => {
+  fetch(`${apiUrl}/user/${userId.value}`)
+    .then(result => {
+      if (!result.ok) {
+        if (result.status === 404) {
+          subscriptionData.value = null;
+          return;
+        }
+
+        return result.json()
+          .then(response => {
+            const errorMessage = response?.error;
+            throw new Error(errorMessage);
+          })
+      }
+      return result.json()
+    })
+    .then(response => subscriptionData.value = response)
+    .catch(error => {
+      console.error(error);
+      toast.error(error.message);
+    })
+};
 
 
 </script>

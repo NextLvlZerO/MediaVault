@@ -10,7 +10,7 @@
         <p class="mediaC-container-title-vault"> {{ props?.name }}</p>
       </div>
     </div>
-    <MediaList :data="data" :clickable="props?.clickable" />
+    <MediaList :data="data" :expand="props?.expand" :clickable="props?.clickable" />
     <button class="g-button-s" style="margin-top: 2rem" @click="onLoadMoreButtonClick"> load more </button>
   </div>
 
@@ -20,12 +20,12 @@
 <script setup>
 
 const apiUrl = import.meta.env.VITE_API_URL;
-import { ref, onMounted, watch } from 'vue';
+import { ref, defineProps, onMounted, watch } from 'vue';
 import { useToast } from 'vue-toast-notification';
 import { getCookie } from '../utility/cookies.js';
 
 const props = defineProps(['prename', 'name', 'dataType', 'clickable', 'fontSize', 'pageSize',
-  'filterData']);
+  'filterData', 'expand'])
 const toast = useToast();
 
 const data = ref([null, null, null, null, null]);
@@ -44,10 +44,7 @@ watch(() => props.filterData, (newVal) => {
 
 const getMediaItemData = (append) => {
 
-  console.log(props.filterData);
-
   if (props?.filterData) {
-
     getMediaFilterData(props.filterData, append);
     return;
   }
@@ -76,6 +73,9 @@ const getMediaItemData = (append) => {
     case 'history':
       fetchUrl = `${apiUrl}/history/user/${userId}`;
       break;
+
+    case 'lending':
+      fetchUrl = `${apiUrl}/user/${userId}/currently-lending`;
   }
 
 

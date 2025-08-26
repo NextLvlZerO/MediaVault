@@ -1,7 +1,7 @@
 <template>
   <div class="media-list-container">
     <Item v-for="(item, index) in data" :key="index" :title="item?.title" :rating="item?.rating" :poster="item?.poster"
-      :clickable="props?.clickable" :id="item?.id" />
+      :clickable="props?.clickable" :id="item?.id" :expireDate="item?.endDate" :expand="props?.expand" />
   </div>
 </template>
 
@@ -9,7 +9,9 @@
 
 <script setup>
 
-const props = defineProps(['data', 'clickable']);
+import { defineProps } from 'vue';
+
+const props = defineProps(['data', 'clickable', 'expand']);
 
 </script>
 

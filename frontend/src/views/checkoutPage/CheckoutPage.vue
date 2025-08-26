@@ -20,7 +20,7 @@
           <p class="g-text-a" style="margin-right: .5rem;"> Discount: </p>
           <p class="g-text"> {{ subscriptionData ? '' : 'None' }}</p>
         </div>
-        <div v-if="routeType == 'item'" class="body-item">
+        <div v-if="routeType == 'item' || routeType == 'expand'" class="body-item">
           <p class="g-text-a" style="margin-right: .5rem;"> Lending span: </p>
           <input class="days-input" v-model="lendingDays" @input="onInput" />
           <p class="g-text"> days </p>
@@ -129,6 +129,38 @@ const handleItemPurchase = async () => {
       return false;
     }
   };
+
+  if (routeType == 'expand') {
+    try {
+      const result = await fetch(`${apiUrl}/user/${userId}/expand/media/${routeItem}`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          days: lendingDays.value
+        }),
+        credentials: 'include'
+      });
+
+      if (!result.ok) {
+        return result.json()
+          .then(response => {
+            const errorMessage = response?.error;
+            throw new Error(errorMessage);
+          })
+      }
+      else {
+        toast.success('successfully expanded media');
+        return true;
+      }
+    }
+    catch (error) {
+      console.error(error);
+      toast.error(error.message);
+      return false;
+    }
+  }
   return false;
 }
 
@@ -143,7 +175,7 @@ const getCheckoutData = () => {
 
 const getCheckoutItem = (type, id) => {
 
-  if (routeType == 'item') {
+  if (routeType == 'item' || routeType == 'expand') {
 
     fetch(`${apiUrl}/media/item/${id}`)
       .then(result => {

@@ -18,6 +18,10 @@
         <div v-else class="spinner-border text-secondary" role="status">
           <span class="visually-hidden">Loading...</span>
         </div>
+        <div v-if="expireDate" class="lend-item-body">
+          <button v-if="expand" class="g-button-s" @click="onExpandPressed"> expand </button>
+          <p class="expire-text"> expires in {{ getTimespan() }} days </p>
+        </div>
       </div>
     </div>
   </div>
@@ -27,8 +31,9 @@
 
 <script setup>
 import { useRouter } from 'vue-router'
+import { defineProps, defineEmits } from 'vue';
 
-const props = defineProps(['title', 'rating', 'poster', 'clickable', 'id']);
+const props = defineProps(['title', 'rating', 'poster', 'clickable', 'id', 'expireDate', 'expand']);
 const router = useRouter();
 
 const baseUrl = 'https://image.tmdb.org/t/p/w500';
@@ -37,6 +42,20 @@ const onItemPressed = () => {
   if (!props.clickable) { return; }
   router.push(`/media/item/${props.id}`)
 };
+
+
+const onExpandPressed = () => {
+  router.push(`/checkout/expand/${props?.id}`)
+};
+
+
+const getTimespan = () => {
+  const currentDate = new Date()
+  const expireDate = new Date(props?.expireDate);
+
+  const difference = expireDate - currentDate;
+  return Math.ceil(difference / (1000 * 60 * 60 * 24));
+}
 
 </script>
 
@@ -72,6 +91,7 @@ const onItemPressed = () => {
 }
 
 .item-container-border-body {
+  position: relative;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -115,5 +135,30 @@ const onItemPressed = () => {
   font-family: var(--font-family-main);
   font-size: 1.1rem;
   margin-bottom: 1rem;
+}
+
+.lend-item-body {
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  bottom: 0;
+  width: 100%;
+  height: 30%;
+}
+
+.lend-item-bottom {
+  background-color: #000;
+}
+
+.expire-text {
+  font-family: var(--font-family-main);
+  font-size: 1rem;
+  color: #000;
+  font-weight: 600;
+  background-color: var(--color-primary);
+  text-align: center;
+  width: 100%;
 }
 </style>
