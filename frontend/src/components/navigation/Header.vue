@@ -15,7 +15,7 @@
         <RouterLink to="/" class="navbar-text">Media</RouterLink>
         <RouterLink to="/" class="navbar-text">Movies</RouterLink>
         <RouterLink to="/" class="navbar-text">Series</RouterLink>
-        <MediaSearchInput />
+        <MediaSearchInput @filterChangedEmit="onFilterChange" />
       </div>
 
       <div class="header-component-navbar-right">
@@ -50,8 +50,16 @@
 import { RouterLink, RouterView, useRouter } from 'vue-router';
 import { motion } from 'motion-v';
 import { deleteAllCookies } from './../utility/cookies.js';
+import { defineEmits } from 'vue';
 
 const Router = useRouter();
+const emits = defineEmits(['filterChangedEmit']);
+
+
+
+const onFilterChange = (newValue) => {
+  emits('filterChangedEmit', newValue);
+}
 
 
 const onLogoutClicked = () => {

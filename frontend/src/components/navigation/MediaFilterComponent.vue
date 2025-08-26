@@ -17,13 +17,15 @@
 <script setup>
 import { defineProps, defineEmits, ref } from 'vue';
 
-const props = defineProps(['data']);
+const props = defineProps(['data', 'numeric']);
 const emits = defineEmits(['onTagClickedEmit', 'onInputChangedEmit']);
 
 const inputValue = ref(null);
 
 const onInput = (event) => {
-  inputValue.value = event.target.value.replace(/\D/g, "");
+  if (props.numeric) {
+    inputValue.value = event.target.value.replace(/\D/g, "");
+  }
   emits('onInputChangedEmit', { componentId: props?.data?.componentId, filter: event.target.value });
 };
 

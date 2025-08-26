@@ -11,6 +11,7 @@
 
     <div class="main-section-body" id="body">
       <div class="main-container">
+        <MediaContainer fontSize="5" prename="F" name="ilter" dataType="movie" :clickable="true" :filterData=filter />
         <MediaContainer fontSize="5" prename="Highest" name="Rated" dataType="movie-rating" :clickable="true" />
         <MediaContainer fontSize="5" prename="W" name="atchlist" dataType="watchlist" :clickable="true" />
         <MediaContainer fontSize="5" id="movies" prename="M" name="ovies" dataType="movies-all" :clickable="true" />
@@ -23,6 +24,10 @@
 
 
 <script setup>
+import { ref, defineProps } from 'vue';
+
+
+const props = defineProps(['filter']);
 
 </script>
 

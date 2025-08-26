@@ -20,11 +20,12 @@
 <script setup>
 
 const apiUrl = import.meta.env.VITE_API_URL;
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { useToast } from 'vue-toast-notification';
 import { getCookie } from '../utility/cookies.js';
 
-const props = defineProps(['prename', 'name', 'dataType', 'clickable', 'fontSize', 'pageSize']);
+const props = defineProps(['prename', 'name', 'dataType', 'clickable', 'fontSize', 'pageSize',
+  'filterData']);
 const toast = useToast();
 
 const data = ref([null, null, null, null, null]);
@@ -33,7 +34,23 @@ const userId = getCookie('userId');
 
 
 
+
+watch(() => props.filterData, (newVal) => {
+  getMediaItemData();
+}
+);
+
+
+
 const getMediaItemData = (append) => {
+
+  console.log(props.filterData);
+
+  if (props?.filterData) {
+
+    getMediaFilterData(props.filterData, append);
+    return;
+  }
 
 
   // fetch only the requested type
@@ -91,6 +108,46 @@ const getMediaItemData = (append) => {
       console.error('Failed to fetch data: ', error)
     })
 };
+
+
+
+
+const getMediaFilterData = (currentFilterData, append) => {
+  fetch(`${apiUrl}/media/movie/filter?page=${pageCount.value}&page-size=${props?.pageSize ?
+    props.pageSize : 5}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(currentFilterData)
+  })
+    .then(result => {
+      if (!result.ok) {
+        return result.json()
+          .then(response => {
+            const errorMessage = response?.error;
+            throw new Error(errorMessage);
+          })
+      }
+      return result.json();
+    })
+    .then(json => {
+
+      if (append) {
+        data.value = [...data.value, ...json];
+
+        if (!json || json.length == 0) { throw new Error('No more data available'); }
+      }
+      else {
+        data.value = json
+      }
+    })
+    .catch(error => {
+      toast.error(error);
+      console.error('Error while searching media');
+    })
+}
+
 
 
 const onLoadMoreButtonClick = () => {

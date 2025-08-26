@@ -1,7 +1,9 @@
 <template>
   <div class="app-component">
-    <Header v-if="checkHeaderVisibility()" />
-    <RouterView />
+    <Header v-if="checkHeaderVisibility()" @filterChangedEmit="updateFilter" />
+    <RouterView v-slot="{ Component }">
+      <component :is="Component" :filter="filter" />
+    </RouterView>
     <Footer v-if="checkFooterVisibility()" />
   </div>
 </template>
@@ -11,11 +13,19 @@
 import { RouterLink, RouterView, useRoute, useRouter } from 'vue-router'
 import Header from './components/navigation/Header.vue'
 import Footer from './components/navigation/Footer.vue'
-import { watch, onMounted } from 'vue'
+import { ref, watch, onMounted } from 'vue'
 import { getCookie } from './components/utility/cookies.js';
 
 const Route = useRoute();
 const Router = useRouter();
+
+const filter = ref(null);
+
+
+
+const updateFilter = (newVal) => {
+  filter.value = newVal;
+};
 
 const checkHeaderVisibility = () => {
   return !(Route.path.startsWith('/media/item/lend')) && !(Route.path.startsWith('/login'));
