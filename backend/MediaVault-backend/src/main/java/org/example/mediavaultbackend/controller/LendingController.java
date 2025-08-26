@@ -1,6 +1,7 @@
 package org.example.mediavaultbackend.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.example.mediavaultbackend.dtos.HistoryResponseDto;
 import org.example.mediavaultbackend.dtos.LendingRequestDto;
 import org.example.mediavaultbackend.dtos.MediaResponseDto;
 import org.example.mediavaultbackend.models.Media;
@@ -29,7 +30,7 @@ public class LendingController {
     }
 
     @GetMapping("/{id}/currently-lending")
-    public ResponseEntity<List<MediaResponseDto>> getCurrentlyLending(@PathVariable("id") Long accountId) {
+    public ResponseEntity<List<HistoryResponseDto>> getCurrentlyLending(@PathVariable("id") Long accountId) {
         return ResponseEntity.ok().body(lendingService.getCurrentlyLending(accountId));
     }
 

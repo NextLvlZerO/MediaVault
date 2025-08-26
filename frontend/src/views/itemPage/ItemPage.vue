@@ -16,7 +16,8 @@
 
             <div class="right-details-availability-container">
               <p class="right-details-availability-text g-text-a"> Availability: </p>
-              <p class="right-details-availability g-text"> {{ data?.available ? `available` : `out
+              <p class="right-details-availability g-text"> {{ data?.available ? `${data?.amount}
+                ${data?.amount == 1 ? 'copie' : 'copies'} available` : `out
                 of stock` }} </p>
             </div>
 

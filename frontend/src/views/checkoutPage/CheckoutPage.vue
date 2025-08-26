@@ -7,19 +7,33 @@
         </h1>
       </div>
       <div class="lend-body">
-        <HSeperator class="five-rem-distance" />
         <div class="body-item">
           <p class="g-text-a" style="margin-right: .5rem;"> Item: </p>
           <p class="g-text"> {{ itemData?.title }}</p>
         </div>
         <HSeperator class="five-rem-distance" />
         <div class="body-item">
+          <p class="g-text-a" style="margin-right: .5rem;"> Price per day: </p>
+          <p class="g-text"> {{ itemData?.price ? `${itemData.price.toFixed(2)}€` : '0€' }}</p>
+        </div>
+        <div class="body-item">
           <p class="g-text-a" style="margin-right: .5rem;"> Discount: </p>
           <p class="g-text"> {{ subscriptionData ? '' : 'None' }}</p>
-
         </div>
-        <button class="go-back-button" :onclick="onBackClick">Back</button>
-        <button class="lend-button" :onclick="onPurchaseClick">Confirm purchase</button>
+        <div v-if="routeType == 'item'" class="body-item">
+          <p class="g-text-a" style="margin-right: .5rem;"> Lending span: </p>
+          <input class="days-input" v-model="lendingDays" @input="onInput" />
+          <p class="g-text"> days </p>
+        </div>
+        <HSeperator class="five-rem-distance" />
+        <div class="body-item">
+          <p class="g-text-a" style="margin-right: .5rem;"> Total: </p>
+          <p class="g-text"> {{ itemData?.price ? `${totalPrice.toFixed(2)}€` : '0€' }}</p>
+        </div>
+        <div class="lend-buttons">
+          <button class="go-back-button" :onclick="onBackClick">Back</button>
+          <button class="lend-button" :onclick="onPurchaseClick">Confirm purchase</button>
+        </div>
       </div>
     </div>
   </div>
@@ -31,7 +45,7 @@ const apiUrl = import.meta.env.VITE_API_URL;
 import { useRoute, useRouter } from 'vue-router';
 import { getCookie } from '../../components/utility/cookies.js'
 import { useToast } from 'vue-toast-notification';
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 
 const route = useRoute();
 const router = useRouter();
@@ -41,8 +55,24 @@ const toast = useToast();
 const routeType = route.params?.type;
 const routeItem = route.params?.item;
 
+
 const itemData = ref(null);
 const subscriptionData = ref(null);
+const lendingDays = ref(7);
+const totalPrice = ref(0);
+
+
+
+
+watch(itemData, (newValue, oldValue) => {
+  getTotalPrice();
+});
+
+
+const onInput = (event) => {
+  lendingDays.value = event.target.value.replace(/\D/g, "");
+  getTotalPrice();
+}
 
 
 const onBackClick = () => {
@@ -57,39 +87,51 @@ const onPurchaseClick = async () => {
 };
 
 
+const getTotalPrice = () => {
+  if (!itemData.value?.price) { return; }
+
+  totalPrice.value = itemData.value.price * lendingDays.value;
+}
+
+
 
 const handleItemPurchase = async () => {
 
-  try {
-    const result = await fetch(`${apiUrl}/user/${userId}/lend/media/${routeItem}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        days: 100
-      }),
-      credentials: 'include'
-    });
+  if (routeType == 'item') {
 
-    if (!result.ok) {
-      return result.json()
-        .then(response => {
-          const errorMessage = response?.error;
-          throw new Error(errorMessage);
-        })
+    try {
+      const result = await fetch(`${apiUrl}/user/${userId}/lend/media/${routeItem}`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          days: lendingDays.value
+        }),
+        credentials: 'include'
+      });
+
+      if (!result.ok) {
+        return result.json()
+          .then(response => {
+            const errorMessage = response?.error;
+            throw new Error(errorMessage);
+          })
+      }
+      else {
+        toast.success('successfully lent media');
+        return true;
+      }
     }
-    else {
-      toast.success('successfully lent media');
-      return true;
+    catch (error) {
+      console.error(error);
+      toast.error(error.message);
+      return false;
     }
-  }
-  catch (error) {
-    console.error(error);
-    toast.error(error.message);
-    return false;
-  }
-};
+  };
+  return false;
+}
+
 
 
 const getCheckoutData = () => {
@@ -177,7 +219,8 @@ onMounted(() => {
 }
 
 .lend-header {
-  margin-top: 5rem;
+  margin-top: 8rem;
+  margin-bottom: 3rem;
 }
 
 .lend-body {
@@ -228,7 +271,7 @@ onMounted(() => {
   align-self: flex-start;
   cursor: pointer;
   transition: 0.2s ease-in-out all;
-  margin-right: 2rem;
+  margin-right: .5rem;
 }
 
 .go-back-button:hover {
@@ -237,5 +280,22 @@ onMounted(() => {
 
 .five-rem-distance {
   margin-bottom: .6rem;
+}
+
+.lend-buttons {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 1rem;
+}
+
+.days-input {
+  background-color: transparent;
+  color: #fff;
+  border: 1px solid #ffffff44;
+  border-radius: 8px;
+  width: 80px;
+  margin-right: .8rem;
+  transform: translateY(-5px);
+  padding-left: .5rem;
 }
 </style>

@@ -22,7 +22,7 @@ public class HistoryController {
     private final HistoryService historyService;
 
     @GetMapping("/user/{id}")
-    public ResponseEntity<List<MediaResponseDto>> getUserHistory(@PathVariable("id") Long accountId) {
+    public ResponseEntity<List<HistoryResponseDto>> getUserHistory(@PathVariable("id") Long accountId) {
         return ResponseEntity.ok().body(historyService.getUserHistory(accountId));
     }
 

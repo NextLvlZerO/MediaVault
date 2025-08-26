@@ -1,6 +1,7 @@
 package org.example.mediavaultbackend.services;
 
 import lombok.RequiredArgsConstructor;
+import org.example.mediavaultbackend.dtos.HistoryResponseDto;
 import org.example.mediavaultbackend.dtos.MediaResponseDto;
 import org.example.mediavaultbackend.models.Account;
 import org.example.mediavaultbackend.models.CurrentlyLending;
@@ -74,18 +75,20 @@ public class LendingService {
 
     }
 
-    public List<MediaResponseDto> getCurrentlyLending(Long accountId) {
+    public List<HistoryResponseDto> getCurrentlyLending(Long accountId) {
 
         Account account = accountRepository.findById(accountId).orElseThrow(() -> new NoSuchElementException("Account not found"));
 
-        return currentlyLendingRepository.findByAccount_AccountId(accountId).stream().map(CurrentlyLending::getMedia).map(m -> MediaResponseDto.builder()
-                .id(m.getMediaId())
-                .type(m.getType())
-                .title(m.getTitle())
-                .details(m.getDescription())
-                .poster(m.getPoster())
-                .rating(m.getAverageRating())
-                .amount(m.getAmount())
+        return currentlyLendingRepository.findByAccount_AccountId(accountId).stream().map(media -> HistoryResponseDto.builder()
+                .id(media.getMedia().getMediaId())
+                .type(media.getMedia().getType())
+                .title(media.getMedia().getTitle())
+                .details(media.getMedia().getDescription())
+                .poster(media.getMedia().getPoster())
+                .rating(media.getMedia().getAverageRating())
+                .amount(media.getMedia().getAmount())
+                .startDate(media.getStartDate())
+                .endDate(media.getEndDate())
                 .build()).collect(Collectors.toList());
     }
 }
