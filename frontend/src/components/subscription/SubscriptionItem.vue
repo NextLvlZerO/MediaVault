@@ -8,7 +8,7 @@
     <div class="body">
       <div class="body-items">
         <div class="body-item" v-for="(item, index) in props.details">
-          <p class="body-item-text g-text-a" :key="index"> {{ item.eigenschaft }}</p>
+          <p class="body-item-text g-text-a" :key="index"> {{ item.property }}</p>
           <i :class="item?.available ? 'bi bi-check' : 'bi bi-x'" style="color: #fff; font-size: 20px;" />
         </div>
       </div>
@@ -27,12 +27,12 @@ import { defineProps } from 'vue';
 import { useRouter } from 'vue-router';
 import { useToast } from 'vue-toast-notification';
 
-const props = defineProps(['title', 'details', 'price', 'type']);
+const props = defineProps(['id', 'title', 'details', 'price', 'type']);
 const router = useRouter();
 const toast = useToast();
 
 const onContinuePressed = () => {
-  router.push(`/checkout/subscription/${props?.type}`);
+  router.push(`/checkout/subscription/${props?.id}`);
 };
 
 

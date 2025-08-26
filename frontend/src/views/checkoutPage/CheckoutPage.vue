@@ -31,8 +31,8 @@
           <p class="g-text"> {{ itemData?.price ? `${totalPrice.toFixed(2)}€` : '0€' }}</p>
         </div>
         <div class="lend-buttons">
-          <button class="go-back-button" :onclick="onBackClick">Back</button>
-          <button class="lend-button" :onclick="onPurchaseClick">Confirm purchase</button>
+          <button class="go-back-button" @click="onBackClick">Back</button>
+          <button class="lend-button" @click="onPurchaseClick">Confirm purchase</button>
         </div>
       </div>
     </div>
@@ -46,6 +46,8 @@ import { useRoute, useRouter } from 'vue-router';
 import { getCookie } from '../../components/utility/cookies.js'
 import { useToast } from 'vue-toast-notification';
 import { ref, onMounted, watch } from 'vue';
+import { Client } from "@stomp/stompjs";
+import SockJS from "sockjs-client/dist/sockjs";
 
 const route = useRoute();
 const router = useRouter();
@@ -112,13 +114,13 @@ const handleItemPurchase = async () => {
       });
 
       if (!result.ok) {
-        return result.json()
-          .then(response => {
-            const errorMessage = response?.error;
-            throw new Error(errorMessage);
-          })
+        const response = await result.json();
+        const errorMessage = response?.error;
+        throw new Error(errorMessage);
       }
       else {
+        handlePayment(result.text());
+
         toast.success('successfully lent media');
         return true;
       }
@@ -166,6 +168,29 @@ const handleItemPurchase = async () => {
 
 
 
+const handlePayment = (sessionId) => {
+  const client = new Client({
+    webSocketFactory: () => new SockJS("http://localhost:8080/ws/payment"),
+    reconnectDelay: 5000,
+  });
+
+  client.onConnect = () => {
+    console.log("STOMP connected");
+    client.subscribe("/topic/payment-status/" + sessionId, (message) => {
+      console.log("Payment update:", message.body);
+    });
+  };
+
+  client.onStompError = (frame) => {
+    console.error("Broker error: ", frame.headers["message"]);
+    console.error("Details: ", frame.body);
+  };
+
+  client.activate();
+};
+
+
+
 const getCheckoutData = () => {
 
   getCheckoutItem(routeType, routeItem);
@@ -199,7 +224,7 @@ const getCheckoutItem = (type, id) => {
 
 
 const getSubscription = () => {
-  fetch(`${apiUrl}/user/${userId}`)
+  fetch(`${apiUrl}/subscription/user/${userId}`)
     .then(result => {
       if (!result.ok) {
         if (result.status === 404) {

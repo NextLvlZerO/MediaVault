@@ -18,9 +18,16 @@ export default defineConfig({
     }),
     vueDevTools(),
   ],
+
+  optimizeDeps: {
+    include: ['@stomp/stompjs', 'sockjs-client']
+  },
   resolve: {
     alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url))
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
+      events: "rollup-plugin-node-polyfills/polyfills/events",
+      util: "rollup-plugin-node-polyfills/polyfills/util",
+      buffer: "rollup-plugin-node-polyfills/polyfills/buffer-es6",
     },
   },
 })

@@ -24,7 +24,7 @@
           <div class="user-info-item user-information-subscription-status">
             <div style="display: flex;">
               <p class="g-text-b-a"> {{ `Status: \b` }} </p>
-              <p class="g-text-b"> Gold</p>
+              <p class="g-text-b"> {{ subscriptionData?.type?.name }}</p>
             </div>
             <div class="subscription-buttons">
               <button class="item-page-container-manage-button g-button-p" :onclick="() => {
@@ -67,13 +67,9 @@ onMounted(() => {
 
 
 const getSubscriptionData = () => {
-  fetch(`${apiUrl}/user/${userId.value}`)
+  fetch(`${apiUrl}/subscription/user/${userId.value}`)
     .then(result => {
       if (!result.ok) {
-        if (result.status === 404) {
-          subscriptionData.value = null;
-          return;
-        }
 
         return result.json()
           .then(response => {

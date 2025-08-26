@@ -1,6 +1,5 @@
-version: "3.9"
-
 services:
+
   backend:
     container_name: mediavault-backend
     build: ./backend/MediaVault-backend
@@ -9,19 +8,35 @@ services:
       - "9092:9092"
     depends_on:
       - paymentservice
+    expose:
+      - "8080"
+    networks:
+      - app-network
+
+  frontend:
+    container_name: MediaVault-frontend
+    build: ./frontend
+    ports:
+      - "5173:5173"
+    expose:
+      - "5173"
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
+    networks:
+      - app-network
+
 
   paymentservice:
     container_name: mediavault-paymentservice
     build: payment-service
     ports:
       - "9090:9090"
+    expose:
+      - "9090"
+    networks:
+      - app-network
 
-  frontend:
-    container_name: mediavault-frontend
-    image: nginx:alpine
-    ports:
-      - "3000:80"
-    volumes:
-      - ./frontend:/usr/share/nginx/html:ro
-    depends_on:
-      - backend
+networks:
+  app-network:
+    driver: bridge

@@ -7,10 +7,8 @@
         </h1>
       </div>
       <div class="subscription-body">
-        <SubscriptionItem title="Free Tier" :details="freeTierDetails" :price="0" type="free" />
-        <SubscriptionItem title="Premium Tier" :details="premiumTierDetails" :price="5" type="premium" />
-        <SubscriptionItem title="Deluxe Tier" :details="deluxeTierDetails" :price="12" type="deluxe" />
-        <SubscriptionItem v-for="(item, index) in data" :title="item?.name" />
+        <SubscriptionItem v-for="(item, index) in data" :id="item?.subscriptionTypeId" :title="item?.name"
+          :price="item?.price" :details="item?.details" />
       </div>
     </div>
   </div>
@@ -64,17 +62,23 @@ const getSubscriptionData = () => {
             throw new Error(errorMessage);
           })
       }
-      return result.json()
+      return result.json();
     })
-    .then(response => data.value = response)
+    .then(response => data.value = response.map(item => ({
+      ...item,
+      details: [
+        { property: `Lend quantity: ${item?.quantity}`, available: true },
+        { property: `Price reduction: ${item?.priceReduction}`, available: true },
+      ]
+    })))
     .catch(error => {
       console.error(error);
       toast.error(error.message);
-    })
+    });
 };
 
 onMounted(() => {
-  //getSubscriptionData();
+  getSubscriptionData();
 })
 
 </script>
