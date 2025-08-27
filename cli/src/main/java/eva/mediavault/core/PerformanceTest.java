@@ -21,16 +21,21 @@ public class PerformanceTest {
     private final int writeAmount;
     private final boolean parallel;
     private final boolean updateSubscription;
+    private final boolean filterMedia;
+
+    private final int mediaAmount = 300;
 
 
 
-    public PerformanceTest(int userAmount, int lendAmount, int writeAmount, boolean parallel, boolean updateSubscription) {
+    public PerformanceTest(int userAmount, int lendAmount, int writeAmount, boolean parallel, boolean updateSubscription, boolean filterMedia) {
         this.userAmount = userAmount;
         this.lendAmount = lendAmount;
         this.writeAmount = writeAmount;
         this.parallel = parallel;
         this.updateSubscription = updateSubscription;
+        this.filterMedia = filterMedia;
     }
+
 
 
     public void startTest() throws JsonProcessingException {
@@ -43,19 +48,26 @@ public class PerformanceTest {
         }
 
         // get media for testing
-        String mediaResult = TimeMeasure.measureTime("Get all media", () -> MediaCommands.getAllMedia(users.getFirst(), baseUrl, 300));
+        String mediaResult = TimeMeasure.measureTime("Get all media", mediaAmount, () -> MediaCommands.getAllMedia(users.getFirst(), baseUrl, mediaAmount));
         List<Integer> mediaIds = getMediaIds(mediaResult);
 
 
-        try {TimeMeasure.measureTimeVoid("Register user", () -> UserCommands.registerUsers(users, baseUrl, parallel));}
+        try {TimeMeasure.measureTimeVoid("Register user", userAmount, () -> UserCommands.registerUsers(users, baseUrl, parallel));}
         catch (Exception e) {
             System.out.println(e.getMessage());
         }
 
         //TimeMeasure.measureTimeVoid("Get user subscriptions", () -> SubscriptionCommands.getUserSubscription(users, baseUrl));
 
+        if (filterMedia) {
+            try {TimeMeasure.measureTimeVoid("Filter media", userAmount, () -> MediaCommands.filterMedia(users, baseUrl, parallel));}
+            catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+        }
+
         if (updateSubscription) {
-            try {TimeMeasure.measureTimeVoid("Update subscription", () -> SubscriptionCommands.updateUserSubscription(users, baseUrl, parallel));}
+            try {TimeMeasure.measureTimeVoid("Update subscription", userAmount, () -> SubscriptionCommands.updateUserSubscription(users, baseUrl, parallel));}
             catch (Exception e) {
                 System.out.println(e.getMessage());
             }
@@ -63,7 +75,7 @@ public class PerformanceTest {
 
 
         if (lendAmount > 0) {
-            try {TimeMeasure.measureTimeVoid("Lend media", () -> MediaCommands.lendMedia(users, mediaIds, baseUrl, lendAmount, parallel));}
+            try {TimeMeasure.measureTimeVoid("Lend media", lendAmount * userAmount, () -> MediaCommands.lendMedia(users, mediaIds, baseUrl, lendAmount, parallel));}
             catch (Exception e) {
                 System.out.println(e.getMessage());
             }
@@ -71,7 +83,7 @@ public class PerformanceTest {
 
 
         if (writeAmount > 0) {
-            try{TimeMeasure.measureTimeVoid("Write review", () -> MediaCommands.writeReview(users, mediaIds, baseUrl, lendAmount, parallel));}
+            try{TimeMeasure.measureTimeVoid("Write review", writeAmount * userAmount, () -> MediaCommands.writeReview(users, mediaIds, baseUrl, lendAmount, parallel));}
             catch (Exception e) {
                 System.out.println(e.getMessage());
             }

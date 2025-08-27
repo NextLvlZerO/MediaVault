@@ -158,5 +158,61 @@ public class MediaCommands {
             throw new RuntimeException(e);
         }
     }
+
+
+
+
+    public static void filterMedia(List<UserClient> users, String baseUrl, boolean parallel) {
+        ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+
+        System.out.println("[FILTER MEDIA]");
+
+        if (parallel) {
+            for (int i = 0; i < users.size(); i++) {
+                int finalI = i;
+                executor.submit(() -> {
+                    filterMediaBody(users, baseUrl, finalI);
+                });
+            }
+            try {
+                executor.shutdown();
+                executor.awaitTermination(2, TimeUnit.MINUTES);
+            }
+            catch (InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        else {
+            for (int i = 0; i < users.size(); i++) {
+                filterMediaBody(users, baseUrl, i);
+            }
+        }
+    }
+
+
+
+    private static void filterMediaBody(List<UserClient> users, String baseUrl, int i) {
+        try {
+            UserClient currentUser = users.get(i);
+
+            Map<String, Object> filterMap = new HashMap<>();
+            filterMap.put("genre", new String[0]);
+            filterMap.put("rating", ((int) (Math.random() * 5) ) + 1);
+            filterMap.put("price", (Math.random()));
+
+            String filterBody = mapper.writeValueAsString(filterMap);
+
+            HttpRequest reviewRequest = HttpRequestUtil.createRequest(HttpMethod.POST, baseUrl + "/media/movie/filter?page=0&page-size=5", filterBody);
+            HttpResponse<String> response = currentUser.getClient().send(reviewRequest, HttpResponse.BodyHandlers.ofString());
+
+            if (response.statusCode() < 200 || response.statusCode() > 299 ) {
+                System.out.println(response.body());
+            }
+        }
+        catch (IOException | InterruptedException e) {
+            throw new RuntimeException(e);
+        }
+    }
 }
 

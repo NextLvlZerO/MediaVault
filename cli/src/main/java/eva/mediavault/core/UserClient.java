@@ -13,6 +13,7 @@ public class UserClient {
     private final CookieManager cookieManager;
     private final CookieStore cookieStore;
 
+
     public UserClient(int id) {
         this.userId = id;
         this.cookieManager = new CookieManager(null, CookiePolicy.ACCEPT_ALL);
@@ -20,9 +21,11 @@ public class UserClient {
         this.client = HttpClient.newBuilder().cookieHandler(cookieManager).build();
     }
 
+
     public HttpClient getClient() {
         return client;
     }
+
 
     public String getCookie(String name) {
         List<HttpCookie> cookies = this.cookieStore.getCookies();

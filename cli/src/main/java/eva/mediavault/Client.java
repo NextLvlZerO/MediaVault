@@ -10,11 +10,13 @@ public class Client {
     Scanner scanner;
     CmdExecutor cmdExecutor;
 
+
     public Client() {
         scanner = new Scanner(System.in);
         cmdExecutor = new CmdExecutor();
         fillCommands();
     }
+
 
     public void run() {
         while(true) {
@@ -24,6 +26,7 @@ public class Client {
             cmdExecutor.execute(command);
         }
     }
+
 
     public String listCommands() {
         StringBuilder sb = new StringBuilder();
@@ -38,11 +41,13 @@ public class Client {
         commands.add("[PERFORMANCE TEST CLI]");
         commands.add("______________________\n");
         commands.add("Commands:");
-        commands.add("| USER <amount> LEND <amount> UPDATE_SUBSCRIPTION PARALLEL");
+        commands.add("| USER <amount> LEND <amount> REVIEW <amount> FILTER_MEDIA UPDATE_SUBSCRIPTION PARALLEL");
         commands.add("__________________________________________________________");
         commands.add("| USER <amount> to select user amount [required] ");
         commands.add("| LEND <amount> to measure Time [optional] ");
+        commands.add("| REVIEW <amount> to write amount x reviews [optional] ");
         commands.add("| UPDATE_SUBSCRIPTION to update subscription [optional] ");
+        commands.add("| FILTER_MEDIA to filter media [optional] ");
         commands.add("| PARALLEL to use Threads for performance test subscription [optional] ");
         commands.add("| [EXAMPLE] USER 500 LEND 10 PARALLEL");
     }

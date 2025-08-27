@@ -60,7 +60,6 @@ public class SubscriptionCommands {
             }
 
             HttpRequest subscriptionRequest = HttpRequestUtil.createRequest(HttpMethod.GET, baseUrl + "/subscription/user/" + currentId, null);
-
             HttpResponse<String> response = currentUser.getClient().send(subscriptionRequest, HttpResponse.BodyHandlers.ofString());
         }
         catch (IOException | InterruptedException e) {

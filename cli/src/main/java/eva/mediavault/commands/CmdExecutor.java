@@ -10,18 +10,18 @@ public class CmdExecutor {
 
 
     public void execute(String command) {
-
         try {
             String[] commands = command.strip().split(" ");
 
             boolean updateSubscription = Arrays.stream(commands).anyMatch(item -> item.equals("UPDATE_SUBSCRIPTION"));
             boolean parallel = Arrays.stream(commands).anyMatch(item -> item.equals("PARALLEL"));
+            boolean filterMedia = Arrays.stream(commands).anyMatch(item -> item.equals("FILTER_MEDIA"));
 
             int userAmount = getUserAmount(commands);
             int lendAmount = getOptionalAmount(commands, "LEND");
             int writeAmount = getOptionalAmount(commands, "REVIEW");
 
-            PerformanceTest performanceTest = new PerformanceTest(userAmount, lendAmount,writeAmount, parallel, updateSubscription);
+            PerformanceTest performanceTest = new PerformanceTest(userAmount, lendAmount,writeAmount, parallel, updateSubscription, filterMedia);
             try {
                 performanceTest.startTest();
             }
@@ -34,8 +34,8 @@ public class CmdExecutor {
         }
     }
 
+
     public int getUserAmount(String[] commands) {
-        // check for user amount
         int userIndex = Arrays.asList(commands).indexOf("USER");
         if (userIndex == -1 || userIndex == commands.length - 1) {
             System.out.println("Invalid user command");
@@ -52,7 +52,6 @@ public class CmdExecutor {
 
 
     public int getOptionalAmount(String[] commands, String name) {
-        // check for lend amount
         int lendIndex = Arrays.asList(commands).indexOf(name);
         if (lendIndex == -1) {return -1;}
         if (lendIndex == commands.length - 1) {

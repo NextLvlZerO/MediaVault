@@ -10,7 +10,6 @@ public class HttpRequestUtil {
 
 
     public static HttpRequest createRequest(HttpMethod method, String url, String body) {
-
         if (!Arrays.asList(HttpMethod.values()).contains(method)) {
             throw new IllegalArgumentException("Invalid HTTP method: " + method);
         }
