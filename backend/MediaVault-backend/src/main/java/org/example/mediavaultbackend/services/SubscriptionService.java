@@ -111,17 +111,14 @@ public class SubscriptionService {
 
         Subscription subscription = subscriptionRepository.findByAccount(account).orElseThrow(() -> new NoSuchElementException("Subscription not found"));
 
-        SubscriptionResponseDto subscriptionResponseDto = SubscriptionResponseDto.builder()
+        return SubscriptionResponseDto.builder()
                 .subscriptionId(subscription.getSubscriptionId())
                 .accountId(subscription.getAccount().getAccountId())
                 .type(subscription.getType())
                 .active(subscription.getActive())
                 .expireDate(subscription.getExpireDate())
                 .build();
-
-        return subscriptionResponseDto;
     }
-
 
 
 }
