@@ -48,9 +48,8 @@ public class WatchlistService {
                 .orElseThrow(() -> new NoSuchElementException("no watchlist found"))
                 .getMedia();
 
-        int toal = watchlist.size();
-        int start = (page) * pageSize;
-        int end = start + pageSize - 1;
+        int start = page * pageSize;
+        int end = Math.min(start + pageSize, watchlist.size());
 
         watchlist = watchlist.subList(start, end);
 
