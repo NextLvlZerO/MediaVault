@@ -51,6 +51,10 @@ public class WatchlistService {
         int start = page * pageSize;
         int end = Math.min(start + pageSize, watchlist.size());
 
+        if (start >= end) {
+            return Collections.emptyList();
+        }
+
         watchlist = watchlist.subList(start, end);
 
         return watchlist.stream()

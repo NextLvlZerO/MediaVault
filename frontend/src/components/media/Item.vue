@@ -2,24 +2,13 @@
   <div class="item-container" :onClick="onItemPressed">
     <div class="item-container-border">
       <div class="item-container-border-body">
-        <!-- <div class="item-container-header">
-          <h1 class="item-container-title">
-            {{ props.title }}
-          </h1>
-        </div>
-        <div class="item-container-body">
-          <div class="item-container-details">
-            <span class="item-container-rating"> {{ props.rating }}</span>
-          </div>
-        </div>
--->
         <img v-if="props.poster" style="border-radius: 4px; width: 198px; height: 298px"
           :src="`${baseUrl}${props?.poster}`" alt="Poster">
         <div v-else class="spinner-border text-secondary" role="status">
           <span class="visually-hidden">Loading...</span>
         </div>
         <div v-if="expireDate" class="lend-item-body">
-          <button v-if="expand" class="g-button-s" @click="onExpandPressed"> expand </button>
+          <button v-if="expand" class="item-expand-button g-button-s" @click="onExpandPressed"> expand </button>
           <p class="expire-text"> expires in {{ getTimespan() }} days </p>
         </div>
       </div>
@@ -160,5 +149,9 @@ const getTimespan = () => {
   background-color: var(--color-primary);
   text-align: center;
   width: 100%;
+}
+
+.item-expand-button {
+  filter: drop-shadow(0px 0px 20px #000);
 }
 </style>
