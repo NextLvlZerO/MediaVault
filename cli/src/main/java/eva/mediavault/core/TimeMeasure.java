@@ -11,8 +11,6 @@ public class TimeMeasure {
         T result = supplier.get();
         long endTime = System.nanoTime();
 
-        String elapsedTime = String.format("%.5f", ((endTime - startTime) / 1_000_000_000.0));
-
         handleResult(command, startTime, endTime);
         return result;
     }
@@ -32,7 +30,7 @@ public class TimeMeasure {
         String elapsedTime = String.format("%.5f", ((endTime - startTime) / 1_000_000_000.0));
 
         System.out.println(line);
-        System.out.println(command + " took: \n | " + elapsedTime + " seconds ");
+        System.out.println(command + " took: \n  [" + elapsedTime + " seconds ]");
         System.out.println(line);
     }
 }
