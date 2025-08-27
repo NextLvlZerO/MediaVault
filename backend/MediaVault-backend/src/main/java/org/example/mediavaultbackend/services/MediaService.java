@@ -122,7 +122,7 @@ public class MediaService {
                 .poster(poster)
                 .amount(amount)
                 .price(price)
-                .averageRating(4.0)
+                .averageRating(5.0)
                 .build();
 
         mediaRepository.save(media);

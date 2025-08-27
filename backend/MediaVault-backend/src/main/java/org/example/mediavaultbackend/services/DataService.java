@@ -20,7 +20,9 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Service
 @RequiredArgsConstructor
@@ -40,7 +42,7 @@ public class DataService {
         importSubscriptionTypes();
         log.info("Imported SubscriptionTypes");
         importGenres();
-        log.info("Importied genres");
+        log.info("Imported genres");
         importMovies();
         log.info("Imported movies");
         importSeries();
@@ -113,8 +115,7 @@ public class DataService {
 
 
         } catch (Exception e) {
-            e.printStackTrace();
-            throw new RuntimeException(e.getMessage());
+            log.error(e.getMessage());
         }
 
 
@@ -122,73 +123,122 @@ public class DataService {
 
 
     public void importMovies() {
+        importMediums(BASE_URL + "/movie/popular?api_key=" + API_KEY + "&language=en-US&page=", "movie");
+    }
+
+    private void importSeries() {
+        importMediums(BASE_URL + "/tv/popular?api_key=" + API_KEY + "&language=en-US&page=", "series");
+    }
+
+
+    private void importMediums(String uri, String type) {
 
         try (HttpClient client = HttpClient.newHttpClient();) {
 
 
+            List<CompletableFuture<Void>> futures = IntStream.range(1, 10)
+                    .mapToObj(page -> {
+                        HttpRequest request = HttpRequest.newBuilder()
+                                .uri(URI.create(uri + page))
+                                .GET()
+                                .build();
+                        return client.sendAsync(request, HttpResponse.BodyHandlers.ofString())
+                                .thenAccept(response -> {
 
-            HttpRequest movieRequest = HttpRequest.newBuilder()
-                    .uri(URI.create(BASE_URL + "/movie/popular?api_key=" + API_KEY + "&language=de-DE&page=1"))
-                    .GET()
-                    .build();
-
-            HttpResponse<String> movieResponse = client.send(movieRequest, HttpResponse.BodyHandlers.ofString());
-
-            if (movieResponse.statusCode() == 200) {
-                ObjectMapper mapper = new ObjectMapper();
-                JsonNode root = mapper.readTree(movieResponse.body());
-
-                for (JsonNode movie : root.get("results")) {
-
-                    Boolean isAdult = Boolean.parseBoolean(movie.get("adult").asText());
-
-                    int[] genreIds = mapper.treeToValue(movie.get("genre_ids"), int[].class);
-                    List<Genre> genres = Arrays.stream(genreIds)
-                            .mapToObj(id -> genreRepository.findByTmdbId((long) id))
-                            .flatMap(Optional::stream)
-                            .toList();
-
-                    String title = movie.get("title").asText();
-                    String description = movie.get("overview").asText();
-
-                    LocalDate releaseDate = Optional.ofNullable(movie.get("release_date").asText())
-                            .filter(s -> !s.isBlank())
-                            .map(LocalDate::parse)
-                            .orElse(null);
+                                    if (response.statusCode() != 200) {
+                                        log.error("API-Error (Page {}): {}", page, response.statusCode());
+                                        return;
+                                    }
 
 
+                                    try {
 
-                    String poster = Optional.ofNullable(movie.get("poster_path").asText())
-                            .filter(s -> !s.isBlank())
-                            .orElse(null);
+                                        ObjectMapper mapper = new ObjectMapper();
+                                        JsonNode root = mapper.readTree(response.body());
+                                        JsonNode results = root.get("results");
 
+                                        if (!results.isArray()) {
+                                            log.error("No results found on page {}: {}", page, response.body());
+                                            return;
+                                        }
 
-                    Random r = new Random();
-
-
-                    try {
-                        mediaService.saveMedia("movie", title, description, isAdult, releaseDate, genres, poster, r.nextInt(50),Math.round(r.nextDouble() *100.0) /100.0 );
-                    } catch (Exception e) {
-                        log.error(e.getMessage());
-                    }
-
+                                        for (JsonNode media : results) {
+                                            try {
 
 
+                                                String title = Optional.ofNullable(media.get("title"))
+                                                        .or(() -> Optional.ofNullable(media.get("name")))
+                                                        .map(JsonNode::asText)
+                                                        .orElseThrow(() -> new IllegalArgumentException("Title not found"));
 
-                }
-            } else {
-                System.out.println("Fehler: " + movieResponse.statusCode());
-                System.out.println(movieResponse.body());
-            }
+
+                                                Boolean isAdult = Optional.ofNullable(media.get("adult"))
+                                                        .map(JsonNode::asText)
+                                                        .map(Boolean::parseBoolean)
+                                                        .orElse(null);
+
+                                                int[] genreIds = mapper.treeToValue(media.get("genre_ids"), int[].class);
+                                                List<Genre> genres = Arrays.stream(genreIds)
+                                                        .mapToObj(id -> genreRepository.findByTmdbId((long) id))
+                                                        .flatMap(Optional::stream)
+                                                        .toList();
+
+                                                String description = Optional.ofNullable(media.get("overview"))
+                                                        .map(JsonNode::asText)
+                                                        .orElse("");
+
+                                                LocalDate releaseDate = Optional.ofNullable(media.get("release_date"))
+                                                        .or(() -> Optional.ofNullable(media.get("first_air_date")))
+                                                        .map(JsonNode::asText)
+                                                        .filter(s -> !s.isBlank())
+                                                        .map(LocalDate::parse)
+                                                        .orElseGet(() -> {
+                                                            log.warn("No release date found for Media: {}", media);
+                                                            return null;
+                                                        });
+
+
+
+                                                String poster = Optional.ofNullable(media.get("poster_path").asText())
+                                                        .filter(s -> !s.isBlank())
+                                                        .orElse(null);
+
+
+                                                Random r = new Random();
+
+                                                try {
+                                                    mediaService.saveMedia(type, title, description, isAdult, releaseDate, genres, poster, r.nextInt(50),Math.round(r.nextDouble() *100.0) /100.0 );
+                                                } catch (Exception e) {
+                                                    log.error("Problem during creation of Medium: {} : {}", media, e.getMessage());
+                                                }
+
+
+
+                                            } catch (Exception e) {
+                                                log.error("Problem during parsing of Medium: {} : {}", media, e.getMessage());
+                                            }
+
+
+                                        }
+
+                                    } catch (Exception e) {
+                                        log.error(e.getMessage());
+                                    }
+
+
+                                });
+                    }).toList();
+
+            CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).join();
+
 
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e.getMessage());
         }
 
     }
 
-    private void importSeries() {
-    }
+
 
 
 }

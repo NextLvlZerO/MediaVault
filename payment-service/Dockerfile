@@ -11,4 +11,5 @@ FROM openjdk:21-jdk-slim
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
 EXPOSE 9090
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENV JAVA_OPTS="-Duser.timezone=Europe/Berlin"
+ENTRYPOINT ["sh", "-c", "java $JAVA_OPTS -jar app.jar"]

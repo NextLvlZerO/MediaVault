@@ -29,7 +29,7 @@ public interface MediaRepository extends JpaRepository<Media, Long> {
             FROM media m
             WHERE m.type = :type
             AND m.price <= :price
-            AND m.average_rating > :rating
+            AND m.average_rating >= :rating
             AND (
                 SELECT COUNT(DISTINCT mg.genre_id)
                 FROM media_genre mg

@@ -78,15 +78,18 @@ public class ReviewService {
                     .build();
 
             reviewRepository.save(review);
-            log.info("Review created: {}", review);
 
-            return ReviewResponseDto.builder()
+            ReviewResponseDto reviewResponseDto = ReviewResponseDto.builder()
                     .username(username)
                     .title(reviewCreateRequestDto.getTitle())
                     .details(reviewCreateRequestDto.getDetails())
                     .rating(reviewCreateRequestDto.getRating())
                     .verified(verified)
                     .build();
+
+            log.info("Review created: {}", reviewResponseDto);
+
+            return reviewResponseDto;
         }
 
 

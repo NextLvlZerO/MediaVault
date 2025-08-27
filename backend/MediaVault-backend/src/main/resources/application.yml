@@ -40,5 +40,5 @@ logging:
   file:
     path: ./logs
   pattern:
-    console: "%d{yyyy-MM-dd HH:mm:ss} %-5level [%thread] %logger{36} - %msg%n"
-    file:    "%d{yyyy-MM-dd HH:mm:ss} %-5level [%thread] %logger{36} - %msg%n"
+    console: "%d{yyyy-MM-dd HH:mm:ss, Europe/Berlin} %-5level [%thread] %logger{36} - %msg%n"
+    file:    "%d{yyyy-MM-dd HH:mm:ss, Europe/Berlin} %-5level [%thread] %logger{36} - %msg%n"
