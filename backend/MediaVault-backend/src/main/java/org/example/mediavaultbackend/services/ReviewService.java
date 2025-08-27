@@ -65,7 +65,7 @@ public class ReviewService {
             Media media = mediaRepository.findById(id)
                     .orElseThrow(() -> new IllegalArgumentException("Media not found"));
 
-            Boolean verified = historyRepository.findByMediaAccount(account.getAccountId(), media.getMediaId()).isPresent();
+            Boolean verified = !historyRepository.findByMediaAccount(account.getAccountId(), media.getMediaId()).isEmpty();
 
             Review review = Review.builder()
                     .title(reviewCreateRequestDto.getTitle())

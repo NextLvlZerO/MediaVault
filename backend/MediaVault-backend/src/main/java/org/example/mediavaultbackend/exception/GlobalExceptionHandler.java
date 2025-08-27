@@ -44,4 +44,12 @@ public class GlobalExceptionHandler {
                 .build());
     }
 
+    @ExceptionHandler(RuntimeException.class)
+    public ResponseEntity<ErrorResponseDto> handleRuntime(RuntimeException ex) {
+        log.error(ex.getMessage());
+        return ResponseEntity.badRequest().body(ErrorResponseDto.builder()
+                .error(ex.getMessage())
+                .build());
+    }
+
 }

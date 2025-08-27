@@ -1,6 +1,7 @@
 package org.example.mediavaultbackend.models;
 
 import jakarta.persistence.*;
+import jakarta.persistence.criteria.CriteriaBuilder;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -30,5 +31,8 @@ public class SubscriptionType {
 
     @Column(name = "price", nullable = false)
     private Double price;
+
+    @Column(name = "extensions", nullable = false)
+    private Integer extensions;
 
 }

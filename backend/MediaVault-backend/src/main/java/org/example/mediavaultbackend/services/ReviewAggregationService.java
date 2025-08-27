@@ -43,7 +43,7 @@ public class ReviewAggregationService {
                                     .average()
                                     .orElse(0);
 
-                            if ((Math.round(average * 1000) / 1000) == (Math.round(media.getAverageRating() * 1000) / 1000)) {
+                            if ((Math.round(average * 1000) / 1000) != (Math.round(media.getAverageRating() * 1000) / 1000)) {
                                 media.setAverageRating(average);
                                 mediaRepository.save(media);
                                 log.info("Rating for Media: {} updated: {}", media.getMediaId(), average);

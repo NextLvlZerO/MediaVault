@@ -16,7 +16,7 @@ import java.util.Optional;
 public interface HistoryRepository extends JpaRepository<History, Long> {
 
     @Query("SELECT h FROM History h WHERE h.account.accountId = :accountId AND h.media.mediaId = :mediaId")
-    public Optional<History> findByMediaAccount(Long accountId, Long mediaId);
+    public List<History> findByMediaAccount(Long accountId, Long mediaId);
 
     public Page<History> findByAccount(Account account, Pageable pageable);
 

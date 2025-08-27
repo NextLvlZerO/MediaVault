@@ -14,8 +14,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
@@ -62,14 +66,14 @@ public class LendingService {
                         .account(account)
                         .media(media)
                         .startDate(LocalDateTime.now())
-                        .endDate(LocalDateTime.now().plusDays(days - 1))
+                        .endDate(LocalDateTime.now().withHour(23).withMinute(59).withSecond(59).plusDays(days - 1))
                         .build());
 
                 historyRepository.save(History.builder()
                         .account(account)
                         .media(media)
                         .startDate(LocalDateTime.now())
-                        .endDate(LocalDateTime.now().plusDays(days - 1))
+                        .endDate(LocalDateTime.now().withHour(23).withMinute(59).withSecond(59).plusDays(days - 1))
                         .build());
 
                 media.setAmount(media.getAmount() - 1);
@@ -100,9 +104,31 @@ public class LendingService {
         Account account = accountRepository.findById(accountId).orElseThrow(() -> new NoSuchElementException("Account not found"));
         Media media = mediaRepository.findById(mediaId).orElseThrow(() -> new NoSuchElementException("Media not found"));
         Subscription subscription = subscriptionRepository.findByAccount(account).orElseThrow(() -> new NoSuchElementException("Subscription not found"));
-        History history = historyRepository.findByMediaAccount(accountId, mediaId).orElseThrow(() -> new NoSuchElementException("History not found"));
 
         CurrentlyLending currentlyLending = currentlyLendingRepository.findByMediaAccount(accountId, mediaId).orElseThrow(() -> new NoSuchElementException("CurrentlyLending not found"));
+        List<History> historyList = historyRepository.findByMediaAccount(accountId, mediaId);
+
+        Map<LocalDateTime,History> byStartDate = historyList.stream().collect(Collectors.toMap(h -> h.getStartDate().truncatedTo(ChronoUnit.SECONDS), h -> h));
+
+        History history = byStartDate.get(currentlyLending.getStartDate().truncatedTo(ChronoUnit.SECONDS));
+        int expandings = 0;
+
+        while (history != null) {
+            History next = byStartDate.get(history.getEndDate().truncatedTo(ChronoUnit.SECONDS));
+
+            if (next != null) {
+                expandings++;
+                history = next;
+            } else {
+                break;
+            }
+        }
+
+        if (expandings >= subscription.getType().getExtensions()) {
+            throw new RuntimeException("User is not permitted to expand media");
+        }
+
+        log.info("expandings: {}", expandings);
 
         String sessionId = paymentSocketClient.payForMedium(media.getPrice(), days, subscription.getType().getPriceReduction(), request);
 
@@ -112,19 +138,16 @@ public class LendingService {
 
             if ("SUCCESS".equals(paymentSessionData.getStatus())) {
 
-                currentlyLending.setEndDate(currentlyLending.getEndDate().plusDays(days));
-
-
 
                 historyRepository.save(History.builder()
                         .account(account)
                         .media(media)
-                        .startDate(history.getEndDate())
-                        .endDate(history.getEndDate().plusDays(days))
+                        .startDate(currentlyLending.getEndDate())
+                        .endDate(currentlyLending.getEndDate().plusDays(days))
                         .build());
 
+                currentlyLending.setEndDate(currentlyLending.getEndDate().plusDays(days));
                 currentlyLendingRepository.save(currentlyLending);
-                historyRepository.save(history);
 
                 MediaResponseDto mediaResponseDto = MediaResponseDto.builder()
                         .id(media.getMediaId())

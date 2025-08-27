@@ -55,18 +55,21 @@ public class DataService {
                 .priceReduction(1.0)
                 .quantity(1)
                 .price(0.0)
+                .extensions(0)
                 .build());
         subscriptionTypeRepository.save(SubscriptionType.builder()
                 .name("Premium")
                 .priceReduction(0.85)
                 .quantity(5)
                 .price(8.0)
+                .extensions(1)
                 .build());
         subscriptionTypeRepository.save(SubscriptionType.builder()
                 .name("Deluxe")
                 .priceReduction(0.75)
                 .quantity(10)
                 .price(15.0)
+                .extensions(3)
                 .build());
     }
 
