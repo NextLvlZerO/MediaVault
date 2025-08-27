@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.mediavaultbackend.dtos.SubscriptionResponseDto;
 import org.example.mediavaultbackend.models.SubscriptionType;
 import org.example.mediavaultbackend.services.SubscriptionService;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,14 +24,19 @@ public class SubscriptionController {
     }
 
     @PutMapping("/update/{type}/user/{account-id}")
-    public String updateSubscriptionType(@PathVariable("type") String type, @PathVariable("account-id") Long accountId, HttpServletRequest request) {
-        return subscriptionService.updateSubscriptionType(type, accountId, request);
+    public ResponseEntity<SubscriptionResponseDto> updateSubscriptionType(@PathVariable("type") String type, @PathVariable("account-id") Long accountId) {
+        return ResponseEntity.ok().body(subscriptionService.updateSubscriptionType(type, accountId));
+    }
+
+    @PutMapping("/cancel/user/{account-id}")
+    public ResponseEntity<SubscriptionResponseDto> cancelSubscription(@PathVariable("account-id") Long accountId) {
+        return ResponseEntity.ok().body(subscriptionService.cancelSubscription(accountId));
     }
 
 
     @GetMapping("/user/{account-id}")
-    public SubscriptionResponseDto getSubscription(@PathVariable("account-id") Long accountId) {
-        return subscriptionService.getSubscription(accountId);
+    public ResponseEntity<SubscriptionResponseDto> getSubscription(@PathVariable("account-id") Long accountId) {
+        return ResponseEntity.ok().body(subscriptionService.getSubscription(accountId));
     }
 
 

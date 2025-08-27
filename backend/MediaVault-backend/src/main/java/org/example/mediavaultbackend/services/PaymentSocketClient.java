@@ -33,14 +33,7 @@ public class PaymentSocketClient {
         this.accountRepository = accountRepository;
     }
 
-    public String sendPaymentRequest(Double price, HttpServletRequest request) {
-
-        String username = Arrays.stream(request.getCookies())
-                .filter(c -> "username".equals(c.getName()))
-                .map(Cookie::getValue)
-                .findFirst()
-                .orElseThrow(() -> new IllegalArgumentException("Missing username in cookie"));
-
+    public String sendPaymentRequest(Double price, String username, String type) {
 
         String sessionId = UUID.randomUUID().toString();
         Account account = accountRepository.findByUsername(username).orElseThrow(() -> new NoSuchElementException("Account not found"));
@@ -54,7 +47,7 @@ public class PaymentSocketClient {
                  PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
                  BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
 
-                out.println("PAYMENT_REQUEST: "+ sessionId + ";" + price);
+                out.println("PAYMENT_REQUEST: "+ type + ";" + sessionId + ";" + price);
                 log.info("Payment started for user: {}" , username);
                 String response = in.readLine();
                 String status = response.split(":")[0];
@@ -82,7 +75,14 @@ public class PaymentSocketClient {
 
 
     public String payForMedium(Double price, Integer days, Double priceReduction,  HttpServletRequest request) {
-        return sendPaymentRequest(price * days * priceReduction, request);
+
+        String username = Arrays.stream(request.getCookies())
+                .filter(c -> "username".equals(c.getName()))
+                .map(Cookie::getValue)
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Missing username in cookie"));
+
+        return sendPaymentRequest(price * days * priceReduction, username, "MEDIUM");
     }
 
     public PaymentSessionData waitForStatus(String sessionId) {

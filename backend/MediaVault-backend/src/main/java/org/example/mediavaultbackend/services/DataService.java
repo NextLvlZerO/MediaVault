@@ -207,7 +207,7 @@ public class DataService {
                                                 Random r = new Random();
 
                                                 try {
-                                                    mediaService.saveMedia(type, title, description, isAdult, releaseDate, genres, poster, r.nextInt(50),Math.round(r.nextDouble() *100.0) /100.0 );
+                                                    mediaService.saveMedia(type, title, description, isAdult, releaseDate, genres, poster, r.nextInt(50),Math.round(r.nextDouble() * 100.0) /100.0 + 0.10 );
                                                 } catch (Exception e) {
                                                     log.error("Problem during creation of Medium: {} : {}", media, e.getMessage());
                                                 }

@@ -27,10 +27,12 @@ public class ReviewAggregationService {
 
 
     @Scheduled(cron = "0 0 0 * * *") //
-    public void aggregateReviewsDaily() {
+    public void aggregateReviews() {
         List<Media> allMedia = mediaRepository.findAll();
 
-        try (ExecutorService executor = Executors.newFixedThreadPool(4)) {
+        log.info("Scheduled Task: Aggregate Reviews");
+
+        try (ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors() - 1)) {
 
             List<CompletableFuture<Void>> futures = allMedia.stream()
                     .map(media -> CompletableFuture.runAsync(() -> {
@@ -41,9 +43,12 @@ public class ReviewAggregationService {
                                     .average()
                                     .orElse(0);
 
-                            media.setAverageRating(average);
+                            if ((Math.round(average * 1000) / 1000) == (Math.round(media.getAverageRating() * 1000) / 1000)) {
+                                media.setAverageRating(average);
+                                mediaRepository.save(media);
+                                log.info("Rating for Media: {} updated: {}", media.getMediaId(), average);
+                            }
 
-                            mediaRepository.save(media);
                         }
                     }, executor)
                     .exceptionally(ex -> {

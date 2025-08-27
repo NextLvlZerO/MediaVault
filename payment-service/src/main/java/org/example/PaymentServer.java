@@ -47,13 +47,27 @@ public class PaymentServer {
             if (request != null && request.startsWith("PAYMENT_REQUEST:")) {
                 String payload = request.split(":")[1].trim();
                 String[] parts = payload.split(";");
-                String paymentId = parts[0];
-                double amount = Double.parseDouble(parts[1]);
+                String paymentType = parts[0];
+                String paymentId = parts[1];
+                double amount = Double.parseDouble(parts[2]);
 
-                boolean success = new Random().nextBoolean();
-                String status = success ? "SUCCESS" : "FAILED";
+                String status;
+                if ("SUBSCRIPTION".equals(paymentType)) {
+                    status = "SUCCESS";
+                }
+                else if ("MEDIUM".equals(paymentType)) {
+                    int percentage = new Random().nextInt(100);
+                    if (percentage < 89) {
+                        status = "SUCCESS";
+                    } else {
+                        status = "FAILED";
+                    }
+                } else {
+                    status = "FAILED";
+                }
 
-                String response = status + ": (PaymentId=" + paymentId + ", Amount=" + amount + ", Time=" + LocalDateTime.now() + ")";
+
+                String response = status + ": (PaymentId=" + paymentId + ", Type=" + paymentType + ", Amount=" + amount + ", Time=" + LocalDateTime.now() + ")";
                 out.println(response);
 
                 log.info("Responded with: {}", response);

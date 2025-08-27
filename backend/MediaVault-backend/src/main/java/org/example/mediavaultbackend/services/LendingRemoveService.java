@@ -21,11 +21,13 @@ public class LendingRemoveService {
 
     @Scheduled(cron = "0 0 0 * * *")
     public void removeLendings() {
+        log.info("Removing expired Lendings");
 
         List<CurrentlyLending> lendings = currentlyLendingRepository.findAll();
 
-        lendings = lendings.stream().filter(l -> l.getEndDate().isBefore(LocalDateTime.now())).collect(Collectors.toList());
+        lendings = lendings.parallelStream().filter(l -> l.getEndDate().isBefore(LocalDateTime.now())).collect(Collectors.toList());
         currentlyLendingRepository.deleteAll(lendings);
+        log.info("Lendings removed: {}", lendings);
 
     }
 

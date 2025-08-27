@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.concurrent.CompletableFuture;
@@ -58,20 +59,17 @@ public class SubscriptionService {
     }
 
 
-    public String updateSubscriptionType(String type, Long accountId, HttpServletRequest request) {
+    public SubscriptionResponseDto updateSubscriptionType(String type, Long accountId) {
 
         Subscription subscription = subscriptionRepository.findByAccount_AccountId(accountId).orElseThrow(() -> new NoSuchElementException("Subscription not found"));
         SubscriptionType subscriptionType = subscriptionTypeRepository.findByName(type).orElseThrow(() -> new NoSuchElementException("Subscription type not found"));
-        String sessionId = paymentSocketClient.sendPaymentRequest(subscriptionType.getPrice(), request);
-
-        CompletableFuture.runAsync(() -> {
-
-            PaymentSessionData paymentSessionData = paymentSocketClient.waitForStatus(sessionId);
-
-            if ("SUCCESS".equals(paymentSessionData.getStatus())) {
 
                 subscription.setType(subscriptionType);
+                subscription.setExpireDate(LocalDate.now().plusMonths(1));
+                subscription.setActive(true);
+
                 subscriptionRepository.save(subscription);
+
                 SubscriptionResponseDto subscriptionResponseDto = SubscriptionResponseDto.builder()
                         .subscriptionId(subscription.getSubscriptionId())
                         .accountId(subscription.getAccount().getAccountId())
@@ -82,18 +80,30 @@ public class SubscriptionService {
 
                 log.info("Subscription updated: {}", subscriptionResponseDto);
 
-            } else {
-                log.error("Payment failed Subscription: {} not updated", subscription.getSubscriptionId());
-            }
 
-
-
-        });
-
-
-
-        return sessionId;
+        return subscriptionResponseDto;
     }
+
+    public SubscriptionResponseDto cancelSubscription(Long accountId) {
+        Subscription subscription = subscriptionRepository.findByAccount_AccountId(accountId).orElseThrow(() -> new NoSuchElementException("Subscription not found"));
+
+        subscription.setActive(false);
+        subscriptionRepository.save(subscription);
+
+        SubscriptionResponseDto subscriptionResponseDto = SubscriptionResponseDto.builder()
+                .subscriptionId(subscription.getSubscriptionId())
+                .accountId(subscription.getAccount().getAccountId())
+                .type(subscription.getType())
+                .active(subscription.getActive())
+                .expireDate(subscription.getExpireDate())
+                .build();
+
+        log.info("Subscription canceled: {}", subscriptionResponseDto);
+
+
+        return subscriptionResponseDto;
+    }
+
 
 
     public SubscriptionResponseDto getSubscription(Long accountId) {
@@ -111,6 +121,7 @@ public class SubscriptionService {
 
         return subscriptionResponseDto;
     }
+
 
 
 }
