@@ -72,15 +72,18 @@ const getMediaItemData = (append) => {
       break;
 
     case 'watchlist':
-      fetchUrl = `${apiUrl}/user/${userId}/watchlist`;
+      fetchUrl = `${apiUrl}/user/${userId}/watchlist?page=${pageCount.value}&page-size=${props?.pageSize ?
+        props.pageSize : 5}`;
       break;
 
     case 'history':
-      fetchUrl = `${apiUrl}/history/user/${userId}`;
+      fetchUrl = `${apiUrl}/history/user/${userId}?page=${pageCount.value}&page-size=${props?.pageSize ?
+        props.pageSize : 5}`;
       break;
 
     case 'lending':
-      fetchUrl = `${apiUrl}/user/${userId}/currently-lending`;
+      fetchUrl = `${apiUrl}/user/${userId}/currently-lending?page=${pageCount.value}&page-size=${props?.pageSize ?
+        props.pageSize : 5}`;
   }
 
 

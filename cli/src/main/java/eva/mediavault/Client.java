@@ -37,7 +37,8 @@ public class Client {
     public void fillCommands() {
         commands.add("Performance test cli");
         commands.add("----------------------");
-        commands.add("|TIME| USER <amount>");
+        commands.add("");
+        commands.add("USER <amount> |LEND <amount>| |UPDATE_SUBSCRIPTION| |PARALLEL|");
         commands.add("TIME to measure Time | optional ");
         commands.add("USER to select user amount | required ");
     }
