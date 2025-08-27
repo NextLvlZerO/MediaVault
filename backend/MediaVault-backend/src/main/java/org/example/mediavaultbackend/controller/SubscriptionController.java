@@ -24,8 +24,8 @@ public class SubscriptionController {
     }
 
     @PutMapping("/update/{type}/user/{account-id}")
-    public ResponseEntity<SubscriptionResponseDto> updateSubscriptionType(@PathVariable("type") String type, @PathVariable("account-id") Long accountId) {
-        return ResponseEntity.ok().body(subscriptionService.updateSubscriptionType(type, accountId));
+    public ResponseEntity<String> updateSubscriptionType(@PathVariable("type") String type, @PathVariable("account-id") Long accountId, HttpServletRequest request) {
+        return ResponseEntity.ok().body(subscriptionService.updateSubscriptionType(type, accountId, request));
     }
 
     @PutMapping("/cancel/user/{account-id}")

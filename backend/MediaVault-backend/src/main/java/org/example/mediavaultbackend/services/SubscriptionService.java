@@ -1,5 +1,6 @@
 package org.example.mediavaultbackend.services;
 
+import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import org.example.mediavaultbackend.dtos.PaymentSessionData;
@@ -16,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.concurrent.CompletableFuture;
@@ -59,10 +61,23 @@ public class SubscriptionService {
     }
 
 
-    public SubscriptionResponseDto updateSubscriptionType(String type, Long accountId) {
+    public String updateSubscriptionType(String type, Long accountId, HttpServletRequest request) {
+
+        String username = Arrays.stream(request.getCookies())
+                .filter(c -> "username".equals(c.getName()))
+                .map(Cookie::getValue)
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Missing username in cookie"));
 
         Subscription subscription = subscriptionRepository.findByAccount_AccountId(accountId).orElseThrow(() -> new NoSuchElementException("Subscription not found"));
         SubscriptionType subscriptionType = subscriptionTypeRepository.findByName(type).orElseThrow(() -> new NoSuchElementException("Subscription type not found"));
+
+        String sessionId = paymentSocketClient.sendPaymentRequest(subscriptionType.getPrice(), username, "SUBSCRIPTION");
+
+        CompletableFuture.runAsync(() -> {
+
+            PaymentSessionData paymentSessionData = paymentSocketClient.waitForStatus(sessionId);
+            if ("SUCCESS".equals(paymentSessionData.getStatus())) {
 
                 subscription.setType(subscriptionType);
                 subscription.setExpireDate(LocalDate.now().plusMonths(1));
@@ -80,8 +95,13 @@ public class SubscriptionService {
 
                 log.info("Subscription updated: {}", subscriptionResponseDto);
 
+            } else {
+                log.error("Payment for Subscription: {} update failed", subscription.getSubscriptionId());
+            }
 
-        return subscriptionResponseDto;
+        });
+
+        return sessionId;
     }
 
     public SubscriptionResponseDto cancelSubscription(Long accountId) {
