@@ -4,7 +4,7 @@ import java.util.function.Supplier;
 
 public class TimeMeasure {
 
-    static String line = "---------------";
+    static String line = "--------------------";
 
     public static <T> T measureTime(String command, Supplier<T> supplier) {
         long startTime = System.nanoTime();
@@ -32,7 +32,7 @@ public class TimeMeasure {
         String elapsedTime = String.format("%.5f", ((endTime - startTime) / 1_000_000_000.0));
 
         System.out.println(line);
-        System.out.println(command + " took: \n   " + elapsedTime + " seconds ");
+        System.out.println(command + " took: \n | " + elapsedTime + " seconds ");
         System.out.println(line);
     }
 }
