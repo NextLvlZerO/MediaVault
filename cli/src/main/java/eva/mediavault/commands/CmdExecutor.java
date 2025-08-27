@@ -41,7 +41,6 @@ public class CmdExecutor {
             System.out.println("Invalid user command");
             return -1;
         }
-        System.out.println(userIndex + commands[userIndex]);
         try {
             return Integer.parseInt(commands[userIndex + 1]);
         }

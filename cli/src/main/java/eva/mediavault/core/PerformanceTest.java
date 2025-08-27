@@ -50,7 +50,7 @@ public class PerformanceTest {
 
 
         if (lendAmount > 0) {
-            String mediaResult = TimeMeasure.measureTime("Get all media", () -> MediaCommands.getAllMedia(users.getFirst(), baseUrl, 100));
+            String mediaResult = TimeMeasure.measureTime("Get all media", () -> MediaCommands.getAllMedia(users.getFirst(), baseUrl, 300));
 
             List<Integer> mediaIds = getMediaIds(mediaResult);
 
