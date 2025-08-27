@@ -20,9 +20,9 @@ public class SubscriptionCommands {
 
 
     public static void getUserSubscription(List<UserClient> users, String baseUrl, boolean parallel) {
-        System.out.println("[GET USER SUBSCRIPTION]");
-
         ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+
+        System.out.println("[GET USER SUBSCRIPTION]");
 
         if (parallel) {
             for (int i = 0; i < users.size(); i++) {
@@ -71,9 +71,9 @@ public class SubscriptionCommands {
 
 
     public static void updateUserSubscription(List<UserClient> users, String baseUrl, boolean parallel) {
-        System.out.println("[UPDATE USER SUBSCRIPTION]");
-
         ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+
+        System.out.println("[UPDATE USER SUBSCRIPTION]");
 
         if (parallel) {
             for (int i = 0; i < users.size(); i++) {

@@ -18,15 +18,15 @@ public class CmdExecutor {
             boolean parallel = Arrays.stream(commands).anyMatch(item -> item.equals("PARALLEL"));
 
             int userAmount = getUserAmount(commands);
-            int lendAmount = getLendAmount(commands);
+            int lendAmount = getOptionalAmount(commands, "LEND");
+            int writeAmount = getOptionalAmount(commands, "REVIEW");
 
-
-            PerformanceTest performanceTest = new PerformanceTest(userAmount, lendAmount, parallel, updateSubscription);
+            PerformanceTest performanceTest = new PerformanceTest(userAmount, lendAmount,writeAmount, parallel, updateSubscription);
             try {
                 performanceTest.startTest();
             }
             catch (Exception e) {
-                e.printStackTrace();
+                System.out.println(e.getMessage());
             }
         }
         catch(Error e) {
@@ -51,14 +51,12 @@ public class CmdExecutor {
     }
 
 
-    public int getLendAmount(String[] commands) {
+    public int getOptionalAmount(String[] commands, String name) {
         // check for lend amount
-        int lendIndex = Arrays.asList(commands).indexOf("LEND");
-
+        int lendIndex = Arrays.asList(commands).indexOf(name);
         if (lendIndex == -1) {return -1;}
-
         if (lendIndex == commands.length - 1) {
-            System.out.println("Invalid lend command");
+            System.out.println("Invalid " + name + " command");
             return -1;
         }
         try {

@@ -17,11 +17,12 @@ import java.util.concurrent.TimeUnit;
 public class UserCommands {
 
     private static final ObjectMapper mapper = new ObjectMapper();
-    private static final ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
 
 
 
     public static void registerUsers(List<UserClient> users, String baseUrl, boolean parallel) {
+        ExecutorService executor = Executors.newFixedThreadPool(Runtime.getRuntime().availableProcessors());
+
         System.out.println("[REGISTER USERS]");
 
         if(parallel) {

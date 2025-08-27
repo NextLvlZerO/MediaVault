@@ -18,14 +18,16 @@ public class PerformanceTest {
 
     private final int userAmount;
     private final int lendAmount;
+    private final int writeAmount;
     private final boolean parallel;
     private final boolean updateSubscription;
 
 
 
-    public PerformanceTest(int userAmount, int lendAmount, boolean parallel, boolean updateSubscription) {
+    public PerformanceTest(int userAmount, int lendAmount, int writeAmount, boolean parallel, boolean updateSubscription) {
         this.userAmount = userAmount;
         this.lendAmount = lendAmount;
+        this.writeAmount = writeAmount;
         this.parallel = parallel;
         this.updateSubscription = updateSubscription;
     }
@@ -40,21 +42,39 @@ public class PerformanceTest {
             users.add(new UserClient(i));
         }
 
-        TimeMeasure.measureTimeVoid("Register user", () -> UserCommands.registerUsers(users, baseUrl, parallel));
+        // get media for testing
+        String mediaResult = TimeMeasure.measureTime("Get all media", () -> MediaCommands.getAllMedia(users.getFirst(), baseUrl, 300));
+        List<Integer> mediaIds = getMediaIds(mediaResult);
+
+
+        try {TimeMeasure.measureTimeVoid("Register user", () -> UserCommands.registerUsers(users, baseUrl, parallel));}
+        catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
 
         //TimeMeasure.measureTimeVoid("Get user subscriptions", () -> SubscriptionCommands.getUserSubscription(users, baseUrl));
 
         if (updateSubscription) {
-            TimeMeasure.measureTimeVoid("Update subscription",() -> SubscriptionCommands.updateUserSubscription(users, baseUrl, parallel));
+            try {TimeMeasure.measureTimeVoid("Update subscription", () -> SubscriptionCommands.updateUserSubscription(users, baseUrl, parallel));}
+            catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
         }
 
 
         if (lendAmount > 0) {
-            String mediaResult = TimeMeasure.measureTime("Get all media", () -> MediaCommands.getAllMedia(users.getFirst(), baseUrl, 300));
+            try {TimeMeasure.measureTimeVoid("Lend media", () -> MediaCommands.lendMedia(users, mediaIds, baseUrl, lendAmount, parallel));}
+            catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+        }
 
-            List<Integer> mediaIds = getMediaIds(mediaResult);
 
-            TimeMeasure.measureTimeVoid("Lend media", () ->MediaCommands.lendMedia(users, mediaIds, baseUrl, lendAmount, parallel));
+        if (writeAmount > 0) {
+            try{TimeMeasure.measureTimeVoid("Write review", () -> MediaCommands.writeReview(users, mediaIds, baseUrl, lendAmount, parallel));}
+            catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
         }
     }
 
