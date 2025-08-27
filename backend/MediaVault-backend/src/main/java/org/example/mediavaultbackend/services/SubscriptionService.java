@@ -71,6 +71,8 @@ public class SubscriptionService {
             if ("SUCCESS".equals(paymentSessionData.getStatus())) {
 
                 subscription.setType(subscriptionType);
+                subscription.setExpireDate(LocalDate.now().plusDays(30));
+                subscription.setActive(true);
                 subscriptionRepository.save(subscription);
                 SubscriptionResponseDto subscriptionResponseDto = SubscriptionResponseDto.builder()
                         .subscriptionId(subscription.getSubscriptionId())
