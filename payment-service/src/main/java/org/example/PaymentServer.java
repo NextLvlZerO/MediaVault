@@ -57,7 +57,7 @@ public class PaymentServer {
                 }
                 else if ("MEDIUM".equals(paymentType)) {
                     int percentage = new Random().nextInt(100);
-                    if (percentage < 89) {
+                    if (percentage < 101) {
                         status = "SUCCESS";
                     } else {
                         status = "FAILED";

@@ -31,7 +31,7 @@
                 router.push('/user/subscription');
               }">manage</button>
               <button v-if="subscriptionData?.type?.name != 'Free' && subscriptionData?.active"
-                class="item-page-container-cancel-button g-button-s" :onclick="onLendPressed"> cancel</button>
+                class="item-page-container-cancel-button g-button-s" :onclick="onCancelPressed"> cancel</button>
             </div>
           </div>
         </div>
@@ -53,9 +53,11 @@ const apiUrl = import.meta.env.VITE_API_URL;
 import { useRoute, useRouter } from 'vue-router';
 import { onMounted, ref } from 'vue';
 import { getCookie } from './../../components/utility/cookies.js';
+import { useToast } from 'vue-toast-notification';
 
 const route = useRoute();
 const router = useRouter();
+const toast = useToast();
 
 const username = ref(getCookie('username'));
 const userId = ref(getCookie('userId'));
@@ -85,6 +87,34 @@ const getSubscriptionData = () => {
       console.error(error);
       toast.error(error.message);
     })
+};
+
+
+const onCancelPressed = () => {
+  fetch(`${apiUrl}/subscription/cancel/user/${userId.value}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    credentials: 'include'
+  })
+    .then(result => {
+      if (!result.ok) {
+
+        return result.json()
+          .then(response => {
+            const errorMessage = response?.error;
+            throw new Error(errorMessage);
+          })
+      }
+      getSubscriptionData();
+      toast.success('Successfully canceled the subscription');
+    })
+    .catch(error => {
+      console.error(error);
+      toast.error(error.message);
+    })
+
 };
 
 

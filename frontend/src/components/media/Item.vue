@@ -9,7 +9,8 @@
         </div>
         <div v-if="expireDate" class="lend-item-body">
           <button v-if="expand" class="item-expand-button g-button-s" @click="onExpandPressed"> expand </button>
-          <p class="expire-text"> expires in {{ getTimespan() }} days </p>
+          <p class="expire-text">{{ getTimespan() >= 0 ? `expires in ${getTimespan()} days` :
+            `expired for ${getTimespan()} days` }}</p>
         </div>
       </div>
     </div>

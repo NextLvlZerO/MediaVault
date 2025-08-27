@@ -14,6 +14,13 @@
             <Item :title="data?.title" :rating="data?.rating" :poster="data?.poster" :clickable="false"
               :id="data?.id" />
 
+            <div class="right-details-rating-container">
+              <p class="right-details-price-text g-text-a line-fix"> Rating: </p>
+              <p class="right-details-price g-text line-fix" style="color: var(--color-primary);
+              font-weight: 500;"> {{ `${data?.rating}/5`
+                }} </p>
+            </div>
+
             <div class="right-details-availability-container">
               <p class="right-details-availability-text g-text-a"> Availability: </p>
               <p class="right-details-availability g-text"> {{ data?.available ? `${data?.amount}
@@ -295,7 +302,13 @@ const onReviewSubmit = () => {
 .right-details-availability-container {
   display: flex;
   gap: 0.5rem;
-  margin-top: 0.3rem;
+  margin-bottom: 1.5rem;
+}
+
+.right-details-rating-container {
+  margin-top: 1rem;
+  display: flex;
+  gap: 0.5rem;
 }
 
 

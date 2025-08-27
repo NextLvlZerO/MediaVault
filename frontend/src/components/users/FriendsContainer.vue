@@ -12,8 +12,8 @@
       <div v-if="!addState" class="friends-body">
         <p v-if="!friendsData || friendsData.length == 0" class="g-text-a"> No friends found :/ </p>
         <SingleFriend v-else v-for="(friend, index) in friendsData" :key="index" :username="friend?.username"
-          @userClickedEmit="onUserChange" :active="activeUser ===
-            friend?.id" :userId="friend?.id" :request="false" />
+          @userClickedEmit="onUserChange" @reloadEmit="getFriendsData" :active="activeUser ===
+            friend?.id" :userId="friend?.id" :request="false" :friend="true" />
       </div>
       <div v-if="addState" class="add-body">
         <div class="mb-3">

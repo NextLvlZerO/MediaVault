@@ -12,6 +12,7 @@ import org.springframework.data.crossstore.ChangeSetPersister;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -29,7 +30,7 @@ public class HistoryService {
 
         Account account = accountRepository.findById(accountId).orElseThrow(() -> new NoSuchElementException("Account not found"));
 
-        Pageable pageable = PageRequest.of(page, pageSize);
+        Pageable pageable = PageRequest.of(page, pageSize, Sort.by("startDate").descending());
 
         return historyRepository.findByAccount(account, pageable).stream().map(media -> HistoryResponseDto.builder()
                 .id(media.getMedia().getMediaId())

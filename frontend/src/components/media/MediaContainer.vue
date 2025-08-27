@@ -147,7 +147,7 @@ const getMediaFilterData = (currentFilterData, append) => {
         if (!json || json.length == 0) { throw new Error('No more data available'); }
       }
       else {
-        data.value = json
+        data.value = json;
       }
     })
     .catch(error => {

@@ -11,6 +11,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
@@ -176,7 +177,7 @@ public class LendingService {
 
         Account account = accountRepository.findById(accountId).orElseThrow(() -> new NoSuchElementException("Account not found"));
 
-        Pageable pageable = PageRequest.of(page, pageSize);
+        Pageable pageable = PageRequest.of(page, pageSize, Sort.by("startDate").descending());
 
         return currentlyLendingRepository.findByAccount_AccountId(accountId, pageable).stream().map(media -> HistoryResponseDto.builder()
                 .id(media.getMedia().getMediaId())

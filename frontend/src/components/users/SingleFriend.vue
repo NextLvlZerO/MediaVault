@@ -2,7 +2,7 @@
   <div class="single-friend-container" :style="{
     backgroundColor: props?.active ? '#ffffff08' :
       '#ffffff00'
-  }" :onclick="onUserClick">
+  }" @click="onUserClick">
     <div class="left">
       <i class="bi bi-person-fill" style="color: #fff; font-size: 18px" :style="{
         color: props.active ? 'var(--color-primary)' :
@@ -22,15 +22,26 @@
         <i class="bi bi-check button-icon" />
       </button>
     </div>
+    <div class="delete-button" v-if="props?.friend">
+      <button class="g-button-b delete-button-item" @click.stop="deleteButtonPressed">
+        <i class="bi bi-x button-icon" />
+      </button>
+    </div>
   </div>
 </template>
 
 <script setup>
 
-import { ref, watch, defineProps, defineEmits } from 'vue';
+const apiUrl = import.meta.env.VITE_API_URL;
 
-const emits = defineEmits(['userClickedEmit', 'userRequestsClickedEmit']);
-const props = defineProps(['username', 'userId', 'active', 'request']);
+import { ref, watch, defineProps, defineEmits } from 'vue';
+import { getCookie } from '../utility/cookies.js';
+import { useToast } from 'vue-toast-notification';
+
+const emits = defineEmits(['userClickedEmit', 'userRequestsClickedEmit', 'reloadEmit']);
+const props = defineProps(['username', 'userId', 'active', 'request', 'friend']);
+const id = getCookie('userId');
+const toast = useToast();
 
 const active = ref(false);
 
@@ -47,6 +58,35 @@ const onUserClick = () => {
 
 const requestButtonPressed = (value) => {
   emits('userRequestsClickedEmit', value, props?.userId);
+};
+
+
+const deleteButtonPressed = () => {
+  fetch(`${apiUrl}/user/${id}/remove-user/${props?.userId}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json'
+    }
+  })
+    .then(result => {
+      if (!result.ok) {
+        return result.json()
+          .then(response => {
+            const errorMessage = response?.error;
+            throw new Error(errorMessage);
+          })
+          .catch((error) => {
+            console.error(error);
+            toast.error(error.message);
+          })
+      }
+
+      toast.success('Successfully removed user');
+      emits('reloadEmit');
+    })
+    .catch(error => {
+      console.error(error);
+    })
 };
 
 </script>
@@ -92,6 +132,14 @@ const requestButtonPressed = (value) => {
   position: relative;
   height: 35px;
   width: 35px;
+}
+
+.delete-button-item {
+  display: flex;
+  position: relative;
+  height: 35px;
+  width: 35px;
+  z-index: 100;
 }
 
 .button-icon {

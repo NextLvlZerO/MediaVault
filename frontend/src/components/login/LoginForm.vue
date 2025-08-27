@@ -20,11 +20,16 @@
       </div>
       <div class="mb-3" v-if="registerLayout">
         <label class="form-label g-text-d-a">Confirm password</label>
-        <input class="form-control input-field input-password" type="password" v-model="confirmedPassword"
-          :required="registerLayout">
+        <input class="form-control input-field input-password" type="password" ref="confirmedPasswordInputRef"
+          v-model="confirmedPassword" :required="registerLayout">
+        <div class="invalid-feedback">passwords do not match</div>
       </div>
-      <label style="align-self: center" class="form-label-forgot-password g-text-d-a" v-if="!registerLayout">Forgot
-        password?</label>
+      <div v-if="!registerLayout" style="align-self: center;">
+        <label style="align-self: center" class="form-label-forgot-password g-text-d-a">Forgot
+          password?</label>
+        <label style="margin-left: 0.5rem; font-weight:
+          500; cursor: pointer;" class="g-text-d">Unlucky</label>
+      </div>
       <button class="login-button" type="submit">
         {{ registerLayout ? 'Register' : 'Login' }}
       </button>
@@ -53,6 +58,7 @@ import { useRouter } from 'vue-router';
 
 const Router = useRouter();
 const emits = defineEmits(['onFormSubmitEmit']);
+const confirmedPasswordInputRef = ref(null);
 
 const username = ref('');
 const password = ref('');
@@ -79,6 +85,24 @@ const onSubmit = (e) => {
 const checkValidation = (e) => {
   let result = true;
   const form = e.target;
+
+  if (registerLayout.value && (password.value !== confirmedPassword.value)) {
+    console.error('passwords do not match');
+    result = false;
+
+    const confirmInput = confirmedPasswordInputRef.value
+    if (confirmedPasswordInputRef.value) {
+      confirmedPasswordInputRef.value.setCustomValidity("Passwords do not match");
+      confirmedPasswordInputRef.value.reportValidity();
+    }
+  }
+  else {
+
+    const confirmInput = confirmedPasswordInputRef.value
+    if (confirmedPasswordInputRef.value) {
+      confirmedPasswordInputRef.value.setCustomValidity("");
+    }
+  }
 
   if (!form.checkValidity()) {
     console.error('invalid inputs');

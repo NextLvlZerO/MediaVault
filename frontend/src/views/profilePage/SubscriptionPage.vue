@@ -69,6 +69,7 @@ const getSubscriptionData = () => {
       details: [
         { property: `Lend quantity: ${item?.quantity}`, available: true },
         { property: `Price reduction: ${((1 - item?.priceReduction) * 100).toFixed(0)}%`, available: true },
+        { property: `Media lend quantity: ${item?.quantity}`, available: true },
       ]
     })))
     .catch(error => {
