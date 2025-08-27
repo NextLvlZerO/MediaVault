@@ -2,7 +2,7 @@
   <div class="subscription-item-container">
     <div class="header">
       <h2 class="header-title">
-        {{ props.title }}
+        {{ `${props.title} Tier` }}
       </h2>
     </div>
     <div class="body">
@@ -14,7 +14,9 @@
       </div>
       <div class="body-footer">
         <p class="item-price"> {{ props?.price ? props.price.toFixed(2) : 0 }} € </p>
-        <button class="g-button-p item-continue-button" :onclick="onContinuePressed"> Continue </button>
+        <button :class="props?.title == 'Free' ? 'disable-button' : ''" class="g-button-p item-continue-button"
+          :onclick="onContinuePressed">
+          Continue </button>
       </div>
     </div>
   </div>
@@ -125,5 +127,11 @@ const getSubscriptionItemData = () => {
 .item-continue-button {
   align-self: center;
   width: max-content !important;
+}
+
+.disable-button {
+  background-color: #ffffff44 !important;
+  pointer-events: none !important;
+  cursor: none;
 }
 </style>

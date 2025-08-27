@@ -1,7 +1,5 @@
 <template>
-  <motion.div class="information-component" :initial="{ opacity: 0, filter: 'blur(5px)' }"
-    :animate="{ opacity: 1, filter: 'blur(0px)' }" :transition="{ duration: 2 }">
-
+  <div class="information-component">
     <div class="information-container-left">
       <div class="information-container-title">
         <h1 class="information-container-title-media text">MEDIA</h1>
@@ -14,7 +12,7 @@
       </span>
       <button class="get-started-button" @click="scrollToBody">Get started</button>
     </div>
-  </motion.div>
+  </div>
 </template>
 
 

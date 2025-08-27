@@ -109,7 +109,7 @@ const handleRegisterSubmit = (username, password, confirmedPassword) => {
     })
     .then(response => router.push('/'))
     .catch(error => {
-      toast.error(error.message);
+      toast.error(error);
       console.error(error);
     })
 };

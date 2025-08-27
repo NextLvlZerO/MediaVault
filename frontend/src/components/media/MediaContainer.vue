@@ -50,7 +50,7 @@ const getMediaItemData = (append) => {
   }
 
 
-  // fetch only the requested type
+  // fetch only the requested type, if filter is disabled
 
   let fetchUrl = `${apiUrl}/media/movie/all?page=${pageCount.value}&page-size=${props?.pageSize ?
     props.pageSize : 5}`;
@@ -58,6 +58,11 @@ const getMediaItemData = (append) => {
   switch (props?.dataType) {
     case 'media-rating':
       fetchUrl = `${apiUrl}/media/movie/best-rated?page=${pageCount.value}&page-size=${props?.pageSize ?
+        props.pageSize : 5}`;
+      break;
+
+    case 'series-rating':
+      fetchUrl = `${apiUrl}/media/series/best-rated?page=${pageCount.value}&page-size=${props?.pageSize ?
         props.pageSize : 5}`;
       break;
 
@@ -110,7 +115,7 @@ const getMediaItemData = (append) => {
 };
 
 
-
+// getting media filter data
 
 const getMediaFilterData = (currentFilterData, append) => {
   fetch(`${apiUrl}/media/movie/filter?page=${pageCount.value}&page-size=${props?.pageSize ?

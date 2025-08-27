@@ -13,8 +13,6 @@
       </div>
       <div class="header-component-navbar-links">
         <RouterLink to="/" class="navbar-text">Media</RouterLink>
-        <RouterLink to="/" class="navbar-text">Movies</RouterLink>
-        <RouterLink to="/" class="navbar-text">Series</RouterLink>
         <MediaSearchInput @filterChangedEmit="onFilterChange" />
       </div>
 
@@ -97,6 +95,7 @@ const onLogoutClicked = () => {
   font-size: 1.5rem;
   margin-left: 1rem;
   opacity: 0;
+  cursor: default;
 }
 
 .header-component-navbar-centered {

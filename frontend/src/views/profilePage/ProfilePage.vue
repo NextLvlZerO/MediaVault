@@ -30,7 +30,8 @@
               <button class="item-page-container-manage-button g-button-p" :onclick="() => {
                 router.push('/user/subscription');
               }">manage</button>
-              <button class="item-page-container-cancel-button g-button-s" :onclick="onLendPressed"> cancel</button>
+              <button v-if="subscriptionData?.type?.name != 'Free' && subscriptionData?.active"
+                class="item-page-container-cancel-button g-button-s" :onclick="onLendPressed"> cancel</button>
             </div>
           </div>
         </div>

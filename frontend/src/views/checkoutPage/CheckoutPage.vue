@@ -9,16 +9,19 @@
       <div class="lend-body">
         <div class="body-item">
           <p class="g-text-a" style="margin-right: .5rem;"> Item: </p>
-          <p class="g-text"> {{ itemData?.title }}</p>
+          <p class="g-text"> {{ routeType == 'subscription' ? `${itemData?.name} Tier` : itemData?.title }}</p>
         </div>
-        <HSeperator class="five-rem-distance" />
-        <div class="body-item">
+        <HSeperator v-if="routeType == 'item' || routeType == 'expand'" class="five-rem-distance" />
+        <div v-if="routeType == 'item' || routeType == 'expand'" class="body-item">
           <p class="g-text-a" style="margin-right: .5rem;"> Price per day: </p>
           <p class="g-text"> {{ itemData?.price ? `${itemData.price.toFixed(2)}€` : '0€' }}</p>
         </div>
-        <div class="body-item">
+        <div v-if="routeType == 'item' || routeType == 'expand'" class="body-item">
           <p class="g-text-a" style="margin-right: .5rem;"> Discount: </p>
-          <p class="g-text"> {{ subscriptionData ? '' : 'None' }}</p>
+          <p class="g-text"> {{ subscriptionData ? `${((1 -
+            subscriptionData?.type?.priceReduction) * 100).toFixed(0)}%` : 'None' }}</p>
+          <p class="g-text-a" style="margin-left: .5rem;"> {{ `(${(totalPriceWithoutDiscount -
+            totalPrice).toFixed(2)}€ saved)` }} </p>
         </div>
         <div v-if="routeType == 'item' || routeType == 'expand'" class="body-item">
           <p class="g-text-a" style="margin-right: .5rem;"> Lending span: </p>
@@ -62,11 +65,16 @@ const itemData = ref(null);
 const subscriptionData = ref(null);
 const lendingDays = ref(7);
 const totalPrice = ref(0);
+const totalPriceWithoutDiscount = ref(0);
 
 
 
 
 watch(itemData, (newValue, oldValue) => {
+  getTotalPrice();
+});
+
+watch(subscriptionData, (newValue, oldValue) => {
   getTotalPrice();
 });
 
@@ -91,80 +99,118 @@ const onPurchaseClick = async () => {
 
 const getTotalPrice = () => {
   if (!itemData.value?.price) { return; }
+  const discount = subscriptionData.value?.type?.priceReduction ?
+    subscriptionData.value.type.priceReduction : 1;
 
-  totalPrice.value = itemData.value.price * lendingDays.value;
+  if (routeType == 'subscription') {
+    totalPrice.value = itemData.value.price;
+    totalPriceWithoutDiscount.value = itemData.value.price;
+  }
+  else {
+    totalPrice.value = itemData.value.price * lendingDays.value * discount;
+    totalPriceWithoutDiscount.value = itemData.value.price * lendingDays.value;
+  }
 }
 
 
 
 const handleItemPurchase = async () => {
-
-  if (routeType == 'item') {
-
-    try {
-      const result = await fetch(`${apiUrl}/user/${userId}/lend/media/${routeItem}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          days: lendingDays.value
-        }),
-        credentials: 'include'
-      });
-
-      if (!result.ok) {
-        const response = await result.json();
-        const errorMessage = response?.error;
-        throw new Error(errorMessage);
-      }
-      else {
-        handlePayment(result.text());
-
-        toast.success('successfully lent media');
-        return true;
-      }
+  try {
+    let result = null;
+    if (routeType == 'item') {
+      result = await handleMediaPurchase();
+      console.log(result);
     }
-    catch (error) {
-      console.error(error);
-      toast.error(error.message);
-      return false;
-    }
-  };
 
-  if (routeType == 'expand') {
-    try {
-      const result = await fetch(`${apiUrl}/user/${userId}/expand/media/${routeItem}`, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          days: lendingDays.value
-        }),
-        credentials: 'include'
-      });
+    else if (routeType == 'expand') {
+      result = await handleMediaExpansion();
+    }
 
-      if (!result.ok) {
-        return result.json()
-          .then(response => {
-            const errorMessage = response?.error;
-            throw new Error(errorMessage);
-          })
-      }
-      else {
-        toast.success('successfully expanded media');
-        return true;
-      }
+    else if (routeType == 'subscription') {
+      result = await handleSubscriptionPurchase();
     }
-    catch (error) {
-      console.error(error);
-      toast.error(error.message);
-      return false;
+
+    if (result && result?.text()) {
+      handlePayment(result.text());
+
+      let message = ''
+      if (routeType == 'item') message = 'Successfully lent media';
+      else if (routeType == 'expand') message = 'Successfully expanded item';
+      else if (routeType == 'subscription') message = 'Successfully subscribed';
+
+      toast.success(message);
+      return true;
     }
+    return false;
+
   }
-  return false;
+  catch (error) {
+    console.error(error);
+    toast.error(error.message);
+    return false;
+  }
 }
+
+
+
+const handleMediaPurchase = async () => {
+  const result = await fetch(`${apiUrl}/user/${userId}/lend/media/${routeItem}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      days: lendingDays.value
+    }),
+    credentials: 'include'
+  });
+
+  if (!result.ok) {
+    const response = await result.json();
+    const errorMessage = response?.error;
+    throw new Error(errorMessage);
+  }
+  return result;
+};
+
+
+const handleMediaExpansion = async () => {
+  const result = await fetch(`${apiUrl}/user/${userId}/expand/media/${routeItem}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify({
+      days: lendingDays.value
+    }),
+    credentials: 'include'
+  });
+
+  if (!result.ok) {
+    const response = await result.json();
+    const errorMessage = response?.error;
+    throw new Error(errorMessage);
+  }
+  return result;
+};
+
+
+const handleSubscriptionPurchase = async () => {
+  const result = await fetch(`${apiUrl}/subscription/update/${itemData.value?.name}/user/${userId}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json'
+    },
+    credentials: 'include'
+  });
+
+  if (!result.ok) {
+    const response = await result.json();
+    const errorMessage = response?.error;
+    throw new Error(errorMessage);
+  }
+  return result;
+};
 
 
 
@@ -218,7 +264,26 @@ const getCheckoutItem = (type, id) => {
         toast.error(error.message)
         console.error(error);
       })
+  }
 
+  else if (routeType == 'subscription') {
+    fetch(`${apiUrl}/subscription/types`)
+      .then(result => {
+        if (!result.ok) {
+          return result.json()
+            .then(response => {
+              const errorMessage = response?.error;
+              throw new Error(errorMessage);
+            })
+        }
+        return result.json();
+      })
+      .then(response => itemData.value = response.filter(item => item.subscriptionTypeId ==
+        routeItem)[0])
+      .catch(error => {
+        toast.error(error.message)
+        console.error(error);
+      })
   }
 }
 
